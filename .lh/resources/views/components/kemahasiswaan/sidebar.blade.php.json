@@ -1,0 +1,18 @@
+{
+    "sourceFile": "resources/views/components/kemahasiswaan/sidebar.blade.php",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1766475643413,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1766475643413,
+            "name": "Commit-0",
+            "content": "<div id=\"sidebar-overlay\" class=\"sidebar-overlay hidden\"></div>\r\n<aside id=\"sidebar\" class=\"sidebar kemahasiswaan-sidebar\" aria-hidden=\"true\">\r\n    <div class=\"sidebar-header\">\r\n        <h3>Menu Kemahasiswaan</h3>\r\n        <button id=\"sidebar-close\" class=\"sidebar-close\" aria-label=\"Close sidebar\">✕</button>\r\n    </div>\r\n    <nav class=\"sidebar-nav\">\r\n        <ul>\r\n            <li><a href=\"/portal/kemahasiswaan\" class=\"nav-link\" data-close>Dashboard</a></li>\r\n            <li><a href=\"#\" class=\"nav-link\" data-close>Manajemen Organisasi</a></li>\r\n            <li><a href=\"#\" class=\"nav-link\" data-close>Pendaftaran Organisasi</a></li>\r\n            <li><a href=\"#\" class=\"nav-link\" data-close>Event Organisasi</a></li>\r\n            <li class=\"sidebar-divider\"></li>\r\n            <li><a href=\"/portal/login\" class=\"nav-link\" data-close>Keluar</a></li>\r\n        </ul>\r\n    </nav>\r\n</aside>\r\n"
+        }
+    ]
+}

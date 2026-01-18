@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/components/Sidebar.jsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1766404845178,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1766404845178,
+            "name": "Commit-0",
+            "content": "import React from 'react';\r\nimport { NavLink } from 'react-router-dom';\r\nexport default function Sidebar({ items = [] }) {\r\n  return (\r\n    <nav className=\"sidebar\">\r\n      <ul>\r\n        {items.map(i => (\r\n          <li key={i.to}>\r\n            <NavLink to={i.to} className={({isActive}) => isActive ? 'active' : ''}>\r\n              {i.label}\r\n            </NavLink>\r\n          </li>\r\n        ))}\r\n      </ul>\r\n    </nav>\r\n  );\r\n}"
+        }
+    ]
+}

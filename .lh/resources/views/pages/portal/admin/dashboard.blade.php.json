@@ -1,0 +1,18 @@
+{
+    "sourceFile": "resources/views/pages/portal/admin/dashboard.blade.php",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1766474714525,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1766474714525,
+            "name": "Commit-0",
+            "content": "@extends('layouts.app')\r\n\r\n@section('title', 'Dashboard Admin - UFO Portal')\r\n\r\n@section('header')\r\n    @include('components.header-portal')\r\n@endsection\r\n\r\n@section('burger')\r\n    @include('components.burger-admin')\r\n@endsection\r\n\r\n@section('content')\r\n<div class=\"portal-dashboard admin-dashboard\">\r\n    <div class=\"page-header\">\r\n        <h1>Dashboard Admin Sistem</h1>\r\n        <p class=\"page-subtitle\">Kelola seluruh sistem UFO</p>\r\n    </div>\r\n\r\n    <div class=\"stats-grid\">\r\n        <div class=\"stat-card\">\r\n            <div class=\"stat-icon\">🏢</div>\r\n            <div class=\"stat-content\">\r\n                <div class=\"stat-value\">24</div>\r\n                <div class=\"stat-label\">Total Organisasi</div>\r\n            </div>\r\n        </div>\r\n        <div class=\"stat-card\">\r\n            <div class=\"stat-icon\">👥</div>\r\n            <div class=\"stat-content\">\r\n                <div class=\"stat-value\">1250</div>\r\n                <div class=\"stat-label\">Total Pengguna</div>\r\n            </div>\r\n        </div>\r\n        <div class=\"stat-card\">\r\n            <div class=\"stat-icon\">📅</div>\r\n            <div class=\"stat-content\">\r\n                <div class=\"stat-value\">45</div>\r\n                <div class=\"stat-label\">Event Aktif</div>\r\n            </div>\r\n        </div>\r\n        <div class=\"stat-card\">\r\n            <div class=\"stat-icon\">⚠️</div>\r\n            <div class=\"stat-content\">\r\n                <div class=\"stat-value\">8</div>\r\n                <div class=\"stat-label\">Laporan Pending</div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n\r\n    <section class=\"section\">\r\n        <h2>Pengajuan Menunggu Persetujuan</h2>\r\n        <div class=\"approval-list\">\r\n            <div class=\"approval-item\">\r\n                <h4>Organisasi Baru: Robotics Club</h4>\r\n                <p class=\"approval-desc\">Pengajuan pembentukan organisasi baru</p>\r\n                <div class=\"approval-actions\">\r\n                    <button class=\"btn btn-success\">Setujui</button>\r\n                    <button class=\"btn btn-danger\">Tolak</button>\r\n                </div>\r\n            </div>\r\n            <div class=\"approval-item\">\r\n                <h4>Event: Tech Talks 2025</h4>\r\n                <p class=\"approval-desc\">Pengajuan event dari HIMA Teknik</p>\r\n                <div class=\"approval-actions\">\r\n                    <button class=\"btn btn-success\">Setujui</button>\r\n                    <button class=\"btn btn-danger\">Tolak</button>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </section>\r\n</div>\r\n@endsection\r\n\r\n@section('scripts')\r\n<script src=\"/js/portal.js\"></script>\r\n@endsection\r\n"
+        }
+    ]
+}

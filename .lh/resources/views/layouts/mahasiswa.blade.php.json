@@ -1,0 +1,26 @@
+{
+    "sourceFile": "resources/views/layouts/mahasiswa.blade.php",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1766408775483,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1766409918615,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,26 +1,22 @@\n-<!doctype html>\r\n+<!DOCTYPE html>\r\n <html lang=\"id\">\r\n <head>\r\n-    <meta charset=\"utf-8\">\r\n-    <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\r\n+    <meta charset=\"UTF-8\">\r\n+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n     <title>@yield('title', 'UFO - Mahasiswa')</title>\r\n+    <script src=\"https://cdn.tailwindcss.com\"></script>\r\n     <link rel=\"stylesheet\" href=\"{{ asset('css/app.css') }}\">\r\n     @stack('styles')\r\n </head>\r\n-<body>\r\n+<body class=\"bg-gray-50\">\r\n     @include('components.header')\r\n     @include('components.burger-menu')\r\n-\r\n-    <div class=\"layout\">\r\n-        <div class=\"layout-body container\">\r\n-            <div class=\"layout-content\">\r\n-                @yield('content')\r\n-            </div>\r\n-        </div>\r\n+    \r\n+    <div class=\"pt-20\">\r\n+        @yield('content')\r\n     </div>\r\n \r\n-    <script src=\"{{ asset('js/app.js') }}\"></script>\r\n-    <script src=\"{{ asset('js/mahasiswa-ui.js') }}\"></script>\r\n+    <script src=\"{{ asset('js/mahasiswa.js') }}\"></script>\r\n     @stack('scripts')\r\n </body>\r\n </html>\r\n"
+                },
+                {
+                    "date": 1766475617007,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -2,21 +2,18 @@\n <html lang=\"id\">\r\n <head>\r\n     <meta charset=\"UTF-8\">\r\n     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\r\n-    <title>@yield('title', 'UFO - Mahasiswa')</title>\r\n-    <script src=\"https://cdn.tailwindcss.com\"></script>\r\n-    <link rel=\"stylesheet\" href=\"{{ asset('css/app.css') }}\">\r\n-    @stack('styles')\r\n+    <title>@yield('title', 'UFO - UNKLAB Forum Organization')</title>\r\n+    <link rel=\"stylesheet\" href=\"/css/app.css\">\r\n </head>\r\n-<body class=\"bg-gray-50\">\r\n-    @include('components.header')\r\n-    @include('components.burger-menu')\r\n+<body class=\"mahasiswa-layout\">\r\n+    @include('components.mahasiswa.header')\r\n     \r\n-    <div class=\"pt-20\">\r\n+    <main class=\"main-content\">\r\n         @yield('content')\r\n-    </div>\r\n+    </main>\r\n \r\n-    <script src=\"{{ asset('js/mahasiswa.js') }}\"></script>\r\n-    @stack('scripts')\r\n+    <script src=\"/js/global.js\"></script>\r\n+    <script src=\"/js/sidebar-toggle.js\"></script>\r\n </body>\r\n </html>\r\n"
+                }
+            ],
+            "date": 1766408775483,
+            "name": "Commit-0",
+            "content": "<!doctype html>\r\n<html lang=\"id\">\r\n<head>\r\n    <meta charset=\"utf-8\">\r\n    <meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">\r\n    <title>@yield('title', 'UFO - Mahasiswa')</title>\r\n    <link rel=\"stylesheet\" href=\"{{ asset('css/app.css') }}\">\r\n    @stack('styles')\r\n</head>\r\n<body>\r\n    @include('components.header')\r\n    @include('components.burger-menu')\r\n\r\n    <div class=\"layout\">\r\n        <div class=\"layout-body container\">\r\n            <div class=\"layout-content\">\r\n                @yield('content')\r\n            </div>\r\n        </div>\r\n    </div>\r\n\r\n    <script src=\"{{ asset('js/app.js') }}\"></script>\r\n    <script src=\"{{ asset('js/mahasiswa-ui.js') }}\"></script>\r\n    @stack('scripts')\r\n</body>\r\n</html>\r\n"
+        }
+    ]
+}

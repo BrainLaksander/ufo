@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/auth/ProtectedRoute.jsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1766404857820,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1766404857820,
+            "name": "Commit-0",
+            "content": "import React from 'react';\r\nimport { Navigate } from 'react-router-dom';\r\nimport { useAuth } from './useAuth';\r\n\r\nexport default function ProtectedRoute({ allowedRoles = [], children }) {\r\n  const { user, loading } = useAuth();\r\n\r\n  if (loading) return <div>Loading...</div>;\r\n\r\n  if (!user) {\r\n    // not authenticated\r\n    return <Navigate to=\"/login\" replace />;\r\n  }\r\n\r\n  if (allowedRoles.length && !allowedRoles.includes(user.role)) {\r\n    // role not allowed\r\n    return <Navigate to=\"/unauthorized\" replace />;\r\n  }\r\n\r\n  return children;\r\n}"
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/contexts/NotificationProvider.jsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1766404855059,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1766404855059,
+            "name": "Commit-0",
+            "content": "import React, { createContext, useState } from 'react';\r\nexport const NotificationContext = createContext();\r\n\r\nexport function NotificationProvider({ children }) {\r\n  const [toasts, setToasts] = useState([]);\r\n\r\n  const push = (message, type = 'info') => {\r\n    const id = Date.now();\r\n    setToasts((t) => [...t, { id, message, type }]);\r\n    setTimeout(() => {\r\n      setToasts((t) => t.filter((x) => x.id !== id));\r\n    }, 5000);\r\n  };\r\n\r\n  return (\r\n    <NotificationContext.Provider value={{ toasts, push }}>\r\n      {children}\r\n      <div id=\"notification-root\">\r\n        {toasts.map((t) => (\r\n          <div key={t.id} className={`toast toast-${t.type}`}>\r\n            {t.message}\r\n          </div>\r\n        ))}\r\n      </div>\r\n    </NotificationContext.Provider>\r\n  );\r\n}"
+        }
+    ]
+}

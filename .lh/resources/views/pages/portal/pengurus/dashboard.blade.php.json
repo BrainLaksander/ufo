@@ -1,0 +1,18 @@
+{
+    "sourceFile": "resources/views/pages/portal/pengurus/dashboard.blade.php",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1766474714523,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1766474714523,
+            "name": "Commit-0",
+            "content": "@extends('layouts.app')\r\n\r\n@section('title', 'Dashboard Pengurus - UFO Portal')\r\n\r\n@section('header')\r\n    @include('components.header-portal')\r\n@endsection\r\n\r\n@section('burger')\r\n    @include('components.burger-pengurus')\r\n@endsection\r\n\r\n@section('content')\r\n<div class=\"portal-dashboard pengurus-dashboard\">\r\n    <div class=\"page-header\">\r\n        <h1>Dashboard Pengurus Organisasi</h1>\r\n        <p class=\"page-subtitle\">Kelola organisasi Anda dengan mudah</p>\r\n    </div>\r\n\r\n    <div class=\"stats-grid\">\r\n        <div class=\"stat-card\">\r\n            <div class=\"stat-icon\">👥</div>\r\n            <div class=\"stat-content\">\r\n                <div class=\"stat-value\">128</div>\r\n                <div class=\"stat-label\">Total Anggota</div>\r\n            </div>\r\n        </div>\r\n        <div class=\"stat-card\">\r\n            <div class=\"stat-icon\">📅</div>\r\n            <div class=\"stat-content\">\r\n                <div class=\"stat-value\">12</div>\r\n                <div class=\"stat-label\">Total Event</div>\r\n            </div>\r\n        </div>\r\n        <div class=\"stat-card\">\r\n            <div class=\"stat-icon\">📝</div>\r\n            <div class=\"stat-content\">\r\n                <div class=\"stat-value\">3</div>\r\n                <div class=\"stat-label\">Pengajuan Aktif</div>\r\n            </div>\r\n        </div>\r\n        <div class=\"stat-card\">\r\n            <div class=\"stat-icon\">💬</div>\r\n            <div class=\"stat-content\">\r\n                <div class=\"stat-value\">5</div>\r\n                <div class=\"stat-label\">Chat Baru</div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n\r\n    <section class=\"section\">\r\n        <h2>Kegiatan Terbaru</h2>\r\n        <div class=\"activity-list\">\r\n            <div class=\"activity-item\">\r\n                <div class=\"activity-icon\">✓</div>\r\n                <div class=\"activity-content\">\r\n                    <h4>Event Workshop Coding berhasil diselenggarakan</h4>\r\n                    <span class=\"activity-date\">23 Desember 2024</span>\r\n                </div>\r\n            </div>\r\n            <div class=\"activity-item\">\r\n                <div class=\"activity-icon\">📝</div>\r\n                <div class=\"activity-content\">\r\n                    <h4>Pengajuan event \"Seminar Karir\" sedang direview</h4>\r\n                    <span class=\"activity-date\">22 Desember 2024</span>\r\n                </div>\r\n            </div>\r\n            <div class=\"activity-item\">\r\n                <div class=\"activity-icon\">👤</div>\r\n                <div class=\"activity-content\">\r\n                    <h4>5 anggota baru bergabung dengan organisasi</h4>\r\n                    <span class=\"activity-date\">20 Desember 2024</span>\r\n                </div>\r\n            </div>\r\n        </div>\r\n    </section>\r\n</div>\r\n@endsection\r\n\r\n@section('scripts')\r\n<script src=\"/js/portal.js\"></script>\r\n@endsection\r\n"
+        }
+    ]
+}

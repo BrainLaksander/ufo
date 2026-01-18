@@ -1,0 +1,18 @@
+{
+    "sourceFile": "resources/views/pages/kemahasiswaan/dashboard.blade.php",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1766475694677,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1766475694677,
+            "name": "Commit-0",
+            "content": "@extends('layouts.kemahasiswaan')\r\n\r\n@section('title', 'Dashboard Kemahasiswaan - UFO')\r\n\r\n@section('content')\r\n<div class=\"dashboard-container\">\r\n    <div class=\"page-header\">\r\n        <h1>Dashboard Departemen Kemahasiswaan</h1>\r\n        <p>Pantau dan kelola kegiatan kemahasiswaan</p>\r\n    </div>\r\n\r\n    <div class=\"stats-grid\">\r\n        <div class=\"stat-card\">\r\n            <div class=\"stat-icon\">🏢</div>\r\n            <div class=\"stat-content\">\r\n                <div class=\"stat-value\">24</div>\r\n                <div class=\"stat-label\">Organisasi Terdaftar</div>\r\n            </div>\r\n        </div>\r\n        <div class=\"stat-card\">\r\n            <div class=\"stat-icon\">📝</div>\r\n            <div class=\"stat-content\">\r\n                <div class=\"stat-value\">7</div>\r\n                <div class=\"stat-label\">Permohonan Baru</div>\r\n            </div>\r\n        </div>\r\n        <div class=\"stat-card\">\r\n            <div class=\"stat-icon\">📅</div>\r\n            <div class=\"stat-content\">\r\n                <div class=\"stat-value\">32</div>\r\n                <div class=\"stat-label\">Event Bulan Ini</div>\r\n            </div>\r\n        </div>\r\n    </div>\r\n\r\n    <section class=\"dashboard-section\">\r\n        <h2>Monitoring Organisasi</h2>\r\n        <div class=\"monitoring-list\">\r\n            <div class=\"monitoring-item\">\r\n                <h4>HIMA Teknik Informatika</h4>\r\n                <p><span class=\"badge badge-active\">Aktif</span> | Anggota: 245 | Event: 12/20</p>\r\n            </div>\r\n            <div class=\"monitoring-item\">\r\n                <h4>BEM UNKLAB</h4>\r\n                <p><span class=\"badge badge-active\">Aktif</span> | Anggota: 50 | Event: 25/25</p>\r\n            </div>\r\n        </div>\r\n    </section>\r\n</div>\r\n@endsection\r\n"
+        }
+    ]
+}
