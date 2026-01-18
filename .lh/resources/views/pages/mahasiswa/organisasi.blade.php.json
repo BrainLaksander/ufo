@@ -1,0 +1,22 @@
+{
+    "sourceFile": "resources/views/pages/mahasiswa/organisasi.blade.php",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1766474689045,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1766475728555,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,16 +1,8 @@\n-@extends('layouts.app')\r\n+@extends('layouts.mahasiswa')\r\n \r\n-@section('title', 'Organisasi - UFO')\r\n+@section('title', 'Daftar Organisasi - UFO')\r\n \r\n-@section('header')\r\n-    @include('components.header-mahasiswa')\r\n-@endsection\r\n-\r\n-@section('burger')\r\n-    @include('components.burger-mahasiswa')\r\n-@endsection\r\n-\r\n @section('content')\r\n <div class=\"mahasiswa-organisasi\">\r\n     <div class=\"page-header\">\r\n         <h1>Daftar Organisasi</h1>\r\n"
+                }
+            ],
+            "date": 1766474689045,
+            "name": "Commit-0",
+            "content": "@extends('layouts.app')\r\n\r\n@section('title', 'Organisasi - UFO')\r\n\r\n@section('header')\r\n    @include('components.header-mahasiswa')\r\n@endsection\r\n\r\n@section('burger')\r\n    @include('components.burger-mahasiswa')\r\n@endsection\r\n\r\n@section('content')\r\n<div class=\"mahasiswa-organisasi\">\r\n    <div class=\"page-header\">\r\n        <h1>Daftar Organisasi</h1>\r\n        <p class=\"page-subtitle\">Pilih organisasi yang ingin Anda ikuti</p>\r\n    </div>\r\n\r\n    <div class=\"filter-section\">\r\n        <select id=\"filter-kategori\" class=\"filter-input\">\r\n            <option value=\"\">Semua Kategori</option>\r\n            <option value=\"himpunan\">Himpunan</option>\r\n            <option value=\"bem\">BEM</option>\r\n            <option value=\"ukm\">UKM</option>\r\n        </select>\r\n    </div>\r\n\r\n    <div class=\"org-list\">\r\n        <div class=\"org-item\">\r\n            <div class=\"org-item-image\" style=\"background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);\"></div>\r\n            <div class=\"org-item-content\">\r\n                <h3>HIMA Teknik Informatika</h3>\r\n                <p class=\"org-category\">Himpunan</p>\r\n                <p class=\"org-desc\">Organisasi untuk mahasiswa Teknik Informatika yang peduli dengan pengembangan teknologi.</p>\r\n                <div class=\"org-stats\">\r\n                    <span>👥 245 Anggota</span>\r\n                    <span>📅 20 Event/Tahun</span>\r\n                </div>\r\n                <button class=\"btn btn-primary\">Lihat Profil</button>\r\n            </div>\r\n        </div>\r\n\r\n        <div class=\"org-item\">\r\n            <div class=\"org-item-image\" style=\"background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);\"></div>\r\n            <div class=\"org-item-content\">\r\n                <h3>HIMA Bisnis</h3>\r\n                <p class=\"org-category\">Himpunan</p>\r\n                <p class=\"org-desc\">Organisasi untuk mahasiswa program studi Bisnis.</p>\r\n                <div class=\"org-stats\">\r\n                    <span>👥 180 Anggota</span>\r\n                    <span>📅 15 Event/Tahun</span>\r\n                </div>\r\n                <button class=\"btn btn-primary\">Lihat Profil</button>\r\n            </div>\r\n        </div>\r\n\r\n        <div class=\"org-item\">\r\n            <div class=\"org-item-image\" style=\"background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);\"></div>\r\n            <div class=\"org-item-content\">\r\n                <h3>BEM UNKLAB 2024</h3>\r\n                <p class=\"org-category\">BEM</p>\r\n                <p class=\"org-desc\">Badan Eksekutif Mahasiswa UNKLAB untuk tahun 2024.</p>\r\n                <div class=\"org-stats\">\r\n                    <span>👥 50 Anggota</span>\r\n                    <span>📅 25 Event/Tahun</span>\r\n                </div>\r\n                <button class=\"btn btn-primary\">Lihat Profil</button>\r\n            </div>\r\n        </div>\r\n    </div>\r\n</div>\r\n@endsection\r\n\r\n@section('scripts')\r\n<script src=\"/js/mahasiswa.js\"></script>\r\n@endsection\r\n"
+        }
+    ]
+}

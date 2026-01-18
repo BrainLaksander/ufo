@@ -1,0 +1,18 @@
+{
+    "sourceFile": "public/js/portal.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1766474974597,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1766474974597,
+            "name": "Commit-0",
+            "content": "// portal.js - Vanilla JS for portal internal pages\r\n(function () {\r\n    // Detect which burger menu to use based on current page\r\n    var role = localStorage.getItem(\"portal_role\") || \"pengurus\";\r\n    var burgerBtnId = \"burger-btn-portal\";\r\n    var burgerId = \"burger-\" + role;\r\n    var overlayId = \"overlay-\" + role;\r\n\r\n    var burgerBtn = document.getElementById(burgerBtnId);\r\n    var burgerMenu = document.getElementById(burgerId);\r\n    var overlay = document.getElementById(overlayId);\r\n    var burgerClose = burgerMenu\r\n        ? burgerMenu.querySelector(\".burger-close\")\r\n        : null;\r\n\r\n    function openBurger() {\r\n        if (burgerMenu) {\r\n            burgerMenu.setAttribute(\"aria-hidden\", \"false\");\r\n        }\r\n        if (overlay) {\r\n            overlay.classList.remove(\"hidden\");\r\n        }\r\n    }\r\n\r\n    function closeBurger() {\r\n        if (burgerMenu) {\r\n            burgerMenu.setAttribute(\"aria-hidden\", \"true\");\r\n        }\r\n        if (overlay) {\r\n            overlay.classList.add(\"hidden\");\r\n        }\r\n    }\r\n\r\n    if (burgerBtn) {\r\n        burgerBtn.addEventListener(\"click\", openBurger);\r\n    }\r\n\r\n    if (burgerClose) {\r\n        burgerClose.addEventListener(\"click\", closeBurger);\r\n    }\r\n\r\n    if (overlay) {\r\n        overlay.addEventListener(\"click\", closeBurger);\r\n    }\r\n\r\n    // Close menu when clicking links with data-close\r\n    document.addEventListener(\"click\", function (e) {\r\n        var link = e.target.closest(\"[data-close]\");\r\n        if (link) {\r\n            closeBurger();\r\n        }\r\n    });\r\n\r\n    // Logout handler\r\n    var logoutBtn =\r\n        document.getElementById(\"pengurus-logout\") ||\r\n        document.querySelector('a[href=\"/portal/login\"]#logout-btn');\r\n    if (logoutBtn) {\r\n        logoutBtn.addEventListener(\"click\", function (e) {\r\n            e.preventDefault();\r\n            localStorage.removeItem(\"portal_role\");\r\n            window.location.href = \"/portal/login\";\r\n        });\r\n    }\r\n})();\r\n"
+        }
+    ]
+}

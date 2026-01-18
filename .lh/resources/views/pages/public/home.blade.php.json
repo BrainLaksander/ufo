@@ -1,0 +1,18 @@
+{
+    "sourceFile": "resources/views/pages/public/home.blade.php",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1766408051764,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1766408051764,
+            "name": "Commit-0",
+            "content": "@extends('layouts.app')\r\n\r\n@section('title', 'Beranda Mahasiswa')\r\n\r\n@section('content')\r\n    <h2>Selamat datang mahasiswa Universitas Klabat</h2>\r\n    <p>Selamat datang di sistem informasi organisasi mahasiswa (UFO).</p>\r\n\r\n    <ul>\r\n        <li><a href=\"{{ route('organisasi.index') }}\">Daftar Organisasi</a></li>\r\n        <li><a href=\"{{ route('kegiatan.index') }}\">Kegiatan Organisasi</a></li>\r\n        <li><a href=\"{{ route('login') }}\">Login Pengurus</a></li>\r\n    </ul>\r\n@endsection\r\n"
+        }
+    ]
+}

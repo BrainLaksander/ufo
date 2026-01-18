@@ -1,0 +1,18 @@
+{
+    "sourceFile": "resources/views/components/header-portal.blade.php",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1766474641182,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1766474641182,
+            "name": "Commit-0",
+            "content": "<header class=\"header header-portal\">\r\n    <div class=\"header-container\">\r\n        <div class=\"header-left\">\r\n            <button id=\"burger-btn-portal\" class=\"burger-toggle\" aria-label=\"Open menu\">☰</button>\r\n            <div class=\"header-brand\">\r\n                <span class=\"brand-icon\">🛸</span>\r\n                <div>\r\n                    <div class=\"brand-title\">UFO Portal</div>\r\n                    <div class=\"brand-subtitle\">Internal</div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n        <div class=\"header-right\">\r\n            <button class=\"notification-btn\" aria-label=\"Notifications\">🔔<span class=\"notification-dot\"></span></button>\r\n        </div>\r\n    </div>\r\n</header>\r\n"
+        }
+    ]
+}

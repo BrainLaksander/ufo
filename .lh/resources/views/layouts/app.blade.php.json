@@ -1,0 +1,26 @@
+{
+    "sourceFile": "resources/views/layouts/app.blade.php",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 2,
+            "patches": [
+                {
+                    "date": 1766382973925,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1766462961085,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,4 +1,23 @@\n+<!doctype html>\n+<html lang=\"id\">\n+  <head>\n+    <meta charset=\"utf-8\">\n+    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n+    <title>UFO - Pengurus</title>\n+    <link rel=\"stylesheet\" href=\"/css/pengurus.css\">\n+  </head>\n+  <body>\n+    @include('components.header')\n+    @include('components.burger-menu')\n+\n+    <main class=\"content\">\n+      @yield('content')\n+    </main>\n+\n+    <script src=\"/js/pengurus.js\"></script>\n+  </body>\n+</html>\n <!DOCTYPE html>\n <html lang=\"id\">\n <head>\n     <meta charset=\"UTF-8\">\n"
+                },
+                {
+                    "date": 1766474641300,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,22 +1,22 @@\n <!doctype html>\n <html lang=\"id\">\n-  <head>\n+<head>\n     <meta charset=\"utf-8\">\n     <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n-    <title>UFO - Pengurus</title>\n-    <link rel=\"stylesheet\" href=\"/css/pengurus.css\">\n-  </head>\n-  <body>\n-    @include('components.header')\n-    @include('components.burger-menu')\n-\n-    <main class=\"content\">\n-      @yield('content')\n+    <title>@yield('title', 'UFO - UNKLAB Forum Organization')</title>\n+    <link rel=\"stylesheet\" href=\"/css/app.css\">\n+</head>\n+<body class=\"@yield('body-class')\">\n+    @yield('header')\n+    @yield('burger')\n+    \n+    <main class=\"main-content\">\n+        @yield('content')\n     </main>\n \n-    <script src=\"/js/pengurus.js\"></script>\n-  </body>\n+    @yield('scripts')\n+</body>\n </html>\n <!DOCTYPE html>\n <html lang=\"id\">\n <head>\n"
+                }
+            ],
+            "date": 1766382973925,
+            "name": "Commit-0",
+            "content": "<!DOCTYPE html>\n<html lang=\"id\">\n<head>\n    <meta charset=\"UTF-8\">\n    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n    <title>@yield('title', 'UFO')</title>\n    {{-- place to add global CSS links (public/css/app.css) --}}\n    <link rel=\"stylesheet\" href=\"{{ asset('css/app.css') }}\">\n    @stack('styles')\n</head>\n<body>\n    @include('partials.header')\n\n    <main class=\"container\">\n        @yield('content')\n    </main>\n\n    @include('partials.footer')\n\n    <script src=\"{{ asset('js/app.js') }}\"></script>\n    @stack('scripts')\n</body>\n</html>\n"
+        }
+    ]
+}

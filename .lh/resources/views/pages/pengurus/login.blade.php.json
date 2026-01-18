@@ -1,0 +1,18 @@
+{
+    "sourceFile": "resources/views/pages/pengurus/login.blade.php",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1766462961021,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1766462961021,
+            "name": "Commit-0",
+            "content": "@extends('layouts.app')\r\n\r\n@section('content')\r\n  <div class=\"pengurus-login-wrap\">\r\n    <div class=\"pengurus-login-card\">\r\n      <div class=\"login-brand\">🛸 UFO</div>\r\n      <h2 class=\"login-title\">Login Pengurus</h2>\r\n\r\n      <form id=\"pengurus-login-form\">\r\n        <label class=\"form-label\">Email</label>\r\n        <input id=\"login-email\" class=\"form-input\" type=\"email\" placeholder=\"pengurus@contoh.test\" required />\r\n\r\n        <label class=\"form-label\">Password</label>\r\n        <input id=\"login-password\" class=\"form-input\" type=\"password\" placeholder=\"••••••••\" required />\r\n\r\n        <button type=\"submit\" class=\"btn-primary\">Login</button>\r\n      </form>\r\n    </div>\r\n  </div>\r\n\r\n  <script>\r\n    document.getElementById('pengurus-login-form').addEventListener('submit', function(e){\r\n      e.preventDefault();\r\n      // dummy redirect\r\n      window.location.href = '/pengurus/dashboard';\r\n    });\r\n  </script>\r\n@endsection\r\n"
+        }
+    ]
+}

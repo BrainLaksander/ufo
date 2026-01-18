@@ -1,0 +1,18 @@
+{
+    "sourceFile": "app/Http/Controllers/AuthController.php",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1766408051767,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1766408051767,
+            "name": "Commit-0",
+            "content": "<?php\r\n\r\nnamespace App\\Http\\Controllers;\r\n\r\nuse Illuminate\\Http\\Request;\r\n\r\nclass AuthController extends Controller\r\n{\r\n    public function showLogin()\r\n    {\r\n        return view('auth.login');\r\n    }\r\n\r\n    /**\r\n     * Login using static/dummy credentials.\r\n     * This avoids database access and uses session storage only.\r\n     */\r\n    public function login(Request $request)\r\n    {\r\n        $data = $request->validate([\r\n            'email' => ['required','email'],\r\n            'password' => ['required'],\r\n        ]);\r\n\r\n        // static users (email => [name, role, password])\r\n        $users = [\r\n            'admin@example.com' => ['name' => 'Admin Sistem', 'role' => 'admin', 'password' => 'password'],\r\n            'kemahasiswaan@example.com' => ['name' => 'Kemahasiswaan', 'role' => 'kemahasiswaan', 'password' => 'password'],\r\n            'pengurus@example.com' => ['name' => 'Pengurus Organisasi', 'role' => 'pengurus', 'password' => 'password'],\r\n            'mahasiswa@example.com' => ['name' => 'Mahasiswa', 'role' => 'mahasiswa', 'password' => 'password'],\r\n        ];\r\n\r\n        $email = $data['email'];\r\n        $password = $data['password'];\r\n\r\n        if (!isset($users[$email]) || $users[$email]['password'] !== $password) {\r\n            return back()->withErrors(['email' => 'Credentials not match'])->onlyInput('email');\r\n        }\r\n\r\n        $user = $users[$email];\r\n        // store minimal user info in session\r\n        $request->session()->put('user', [\r\n            'name' => $user['name'],\r\n            'email' => $email,\r\n            'role' => $user['role'],\r\n        ]);\r\n\r\n        // regenerate session id\r\n        $request->session()->migrate(true);\r\n\r\n        // redirect by role\r\n        if ($user['role'] === 'admin') return redirect()->route('dashboard.admin');\r\n        if ($user['role'] === 'kemahasiswaan') return redirect()->route('dashboard.kemahasiswaan');\r\n        if ($user['role'] === 'pengurus') return redirect()->route('dashboard.pengurus');\r\n\r\n        return redirect()->route('home');\r\n    }\r\n\r\n    public function logout(Request $request)\r\n    {\r\n        $request->session()->forget('user');\r\n        $request->session()->invalidate();\r\n        $request->session()->regenerateToken();\r\n        return redirect()->route('home');\r\n    }\r\n}\r\n"
+        }
+    ]
+}

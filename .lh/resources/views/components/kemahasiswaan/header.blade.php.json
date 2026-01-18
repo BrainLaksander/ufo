@@ -1,0 +1,18 @@
+{
+    "sourceFile": "resources/views/components/kemahasiswaan/header.blade.php",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1766475643413,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1766475643413,
+            "name": "Commit-0",
+            "content": "<header class=\"header kemahasiswaan-header\">\r\n    <div class=\"header-container\">\r\n        <div class=\"header-left\">\r\n            <button id=\"sidebar-toggle\" class=\"sidebar-toggle\" aria-label=\"Open sidebar\">☰</button>\r\n            <div class=\"header-brand\">\r\n                <span class=\"brand-icon\">🛸</span>\r\n                <div class=\"brand-text\">\r\n                    <div class=\"brand-title\">Portal Kemahasiswaan</div>\r\n                    <div class=\"brand-subtitle\">UNKLAB Forum Organization</div>\r\n                </div>\r\n            </div>\r\n        </div>\r\n        <div class=\"header-right\">\r\n            <button class=\"notification-btn\" aria-label=\"Notifications\">🔔<span class=\"notification-dot\"></span></button>\r\n            <a href=\"/portal/login\" class=\"btn-logout\">Keluar</a>\r\n        </div>\r\n    </div>\r\n</header>\r\n"
+        }
+    ]
+}

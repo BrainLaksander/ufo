@@ -1,0 +1,18 @@
+{
+    "sourceFile": "public/js/organisasi-detail.js",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1766411299632,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1766411299632,
+            "name": "Commit-0",
+            "content": "document.addEventListener(\"DOMContentLoaded\", function () {\r\n    // Simple image lightbox for event images\r\n    document.querySelectorAll(\".org-event-image\").forEach((img) => {\r\n        img.addEventListener(\"click\", function () {\r\n            const src = this.getAttribute(\"src\");\r\n            const overlay = document.createElement(\"div\");\r\n            overlay.style =\r\n                \"position:fixed;inset:0;background:rgba(0,0,0,0.8);display:flex;align-items:center;justify-content:center;z-index:9999;\";\r\n            const im = document.createElement(\"img\");\r\n            im.src = src;\r\n            im.style = \"max-width:90%;max-height:90%;border-radius:8px;\";\r\n            overlay.appendChild(im);\r\n            overlay.addEventListener(\"click\", () =>\r\n                document.body.removeChild(overlay)\r\n            );\r\n            document.body.appendChild(overlay);\r\n        });\r\n    });\r\n\r\n    // Toggle long descriptions\r\n    document.querySelectorAll(\".org-show-more\").forEach((btn) => {\r\n        btn.addEventListener(\"click\", function () {\r\n            const target = document.querySelector(this.dataset.target);\r\n            if (!target) return;\r\n            target.classList.toggle(\"hidden\");\r\n            this.textContent = target.classList.contains(\"hidden\")\r\n                ? \"Tampilkan lebih\"\r\n                : \"Sembunyikan\";\r\n        });\r\n    });\r\n});\r\n"
+        }
+    ]
+}

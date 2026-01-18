@@ -1,0 +1,18 @@
+{
+    "sourceFile": "src/layouts/KemahasiswaanLayout.jsx",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1766404867741,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1766404867741,
+            "name": "Commit-0",
+            "content": "import React from 'react';\r\nimport { Outlet } from 'react-router-dom';\r\nimport Header from '../components/layout/Header';\r\nimport Sidebar from '../components/layout/Sidebar';\r\nimport { useAuth } from '../auth/useAuth';\r\nimport './KemahasiswaanLayout.css'; // optional\r\n\r\nexport default function KemahasiswaanLayout() {\r\n  const { user } = useAuth();\r\n\r\n  return (\r\n    <div className=\"layout kemahasiswaan-layout\">\r\n      <Header role=\"kemahasiswaan\" />\r\n      <div className=\"layout-body\">\r\n        <aside className=\"layout-sidebar\">\r\n          <Sidebar\r\n            role=\"kemahasiswaan\"\r\n            items={[\r\n              { to: '/kemahasiswaan', label: 'Dashboard' },\r\n              { to: '/kemahasiswaan/manajemen-organisasi', label: 'Manajemen Organisasi' },\r\n              { to: '/kemahasiswaan/pendaftaran', label: 'Pendaftaran' },\r\n              // add more items\r\n            ]}\r\n          />\r\n        </aside>\r\n        <main className=\"layout-content\">\r\n          {/* Outlet renders nested routes (Dashboard, pages) */}\r\n          <Outlet />\r\n        </main>\r\n      </div>\r\n    </div>\r\n  );\r\n}"
+        }
+    ]
+}

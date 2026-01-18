@@ -1,0 +1,22 @@
+{
+    "sourceFile": "resources/views/mahasiswa/kegiatan.blade.php",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 1,
+            "patches": [
+                {
+                    "date": 1766382975489,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                },
+                {
+                    "date": 1766408974347,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,5 +1,5 @@\n-@extends('layouts.app')\r\n+@extends('layouts.mahasiswa')\r\n \r\n @section('title', 'Kegiatan Organisasi')\r\n \r\n @section('content')\r\n"
+                }
+            ],
+            "date": 1766382975489,
+            "name": "Commit-0",
+            "content": "@extends('layouts.app')\r\n\r\n@section('title', 'Kegiatan Organisasi')\r\n\r\n@section('content')\r\n\t<h2>Kegiatan Organisasi</h2>\r\n\t<p>Daftar kegiatan organisasi akan ditampilkan di halaman ini.</p>\r\n@endsection\r\n"
+        }
+    ]
+}

@@ -1,0 +1,18 @@
+{
+    "sourceFile": "app/Http/Controllers/Kemahasiswaan/KemahasiswaanController.php",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1766408104139,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1766408104139,
+            "name": "Commit-0",
+            "content": "<?php\r\n\r\nnamespace App\\Http\\Controllers\\Kemahasiswaan;\r\n\r\nuse App\\Http\\Controllers\\Controller;\r\n\r\nclass KemahasiswaanController extends Controller\r\n{\r\n    public function index()\r\n    {\r\n        return view('pages.dashboard.kemahasiswaan');\r\n    }\r\n}\r\n"
+        }
+    ]
+}

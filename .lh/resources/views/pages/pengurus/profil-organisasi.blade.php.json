@@ -1,0 +1,18 @@
+{
+    "sourceFile": "resources/views/pages/pengurus/profil-organisasi.blade.php",
+    "activeCommit": 0,
+    "commits": [
+        {
+            "activePatchIndex": 0,
+            "patches": [
+                {
+                    "date": 1766463033384,
+                    "content": "Index: \n===================================================================\n--- \n+++ \n"
+                }
+            ],
+            "date": 1766463033384,
+            "name": "Commit-0",
+            "content": "@extends('layouts.app')\r\n\r\n@section('content')\r\n  <div class=\"profil-wrap\">\r\n    <div class=\"profil-grid\">\r\n      <div class=\"left\">\r\n        <div class=\"card\">\r\n          <div class=\"card-row\">\r\n            <div class=\"logo-placeholder\">Logo</div>\r\n            <div class=\"banner-placeholder\">Banner</div>\r\n          </div>\r\n\r\n          <div class=\"form-row\">\r\n            <label>Kategori</label>\r\n            <select id=\"org-kategori\" class=\"form-input\">\r\n              <option>Himpunan</option>\r\n              <option>UKM</option>\r\n              <option>Komunitas</option>\r\n            </select>\r\n          </div>\r\n\r\n          <div class=\"form-row\">\r\n            <label>Total Anggota Aktif</label>\r\n            <div id=\"org-total\" class=\"stat-large\">85</div>\r\n          </div>\r\n\r\n          <div class=\"form-row\">\r\n            <label>Visi & Misi</label>\r\n            <div class=\"editable-block\" data-editable>\r\n              <div class=\"view-mode\">\r\n                <p id=\"visi-misi\">Visi: Menjadi organisasi contoh. Misi: Melakukan kegiatan edukasi.</p>\r\n                <button class=\"btn-sm\" data-toggle-edit>Edit</button>\r\n              </div>\r\n              <div class=\"edit-mode hidden\">\r\n                <textarea id=\"visi-misi-input\" class=\"form-input\">Visi: Menjadi organisasi contoh. Misi: Melakukan kegiatan edukasi.</textarea>\r\n                <div class=\"mt-2\">\r\n                  <button class=\"btn-sm\" data-save>Edit Simpan</button>\r\n                  <button class=\"btn-sm btn-secondary\" data-cancel>Edit Batal</button>\r\n                </div>\r\n              </div>\r\n            </div>\r\n          </div>\r\n\r\n        </div>\r\n      </div>\r\n\r\n      <div class=\"right\">\r\n        <div class=\"card\">\r\n          <h3>Program Kegiatan</h3>\r\n          <ul id=\"program-list\" class=\"program-list\">\r\n            <li data-id=\"1\">\r\n              <div class=\"prog-row\">\r\n                <div class=\"prog-title\">Workshop Coding</div>\r\n                <div class=\"prog-actions\">\r\n                  <button class=\"btn-sm\" data-toggle-expand>Detail</button>\r\n                  <button class=\"btn-sm btn-danger\" data-remove>Hapus</button>\r\n                </div>\r\n              </div>\r\n              <div class=\"prog-detail hidden\">Detail lengkap workshop coding.</div>\r\n            </li>\r\n          </ul>\r\n          <div class=\"mt-3\">\r\n            <input id=\"new-program\" class=\"form-input\" placeholder=\"Nama program baru\">\r\n            <button id=\"add-program\" class=\"btn-primary mt-2\">Tambah Program</button>\r\n          </div>\r\n        </div>\r\n\r\n        <div class=\"card mt-4\">\r\n          <h3>Struktur Kepengurusan</h3>\r\n          <p class=\"text-muted\">(Static placeholder)</p>\r\n        </div>\r\n\r\n        <div class=\"card mt-4\">\r\n          <h3>Sosial Media</h3>\r\n          <ul class=\"social-list\">\r\n            <li>Instagram: @ufo_example</li>\r\n            <li>Twitter: @ufo_example</li>\r\n          </ul>\r\n        </div>\r\n      </div>\r\n    </div>\r\n  </div>\r\n@endsection\r\n"
+        }
+    ]
+}
