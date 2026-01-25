@@ -1,34 +1,67 @@
-{
-    "sourceFile": "routes/web.php",
-    "activeCommit": 0,
-    "commits": [
-        {
-            "activePatchIndex": 4,
-            "patches": [
-                {
-                    "date": 1766410688588,
-                    "content": "Index: \n===================================================================\n--- \n+++ \n"
-                },
-                {
-                    "date": 1766411299677,
-                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -13,8 +13,9 @@\n |--------------------------------------------------------------------------\n */\n Route::get('/', [PublicController::class, 'home'])->name('home');\n Route::get('/organisasi', [PublicController::class, 'organisasi'])->name('organisasi.index');\n+Route::get('/organisasi/{id}', [PublicController::class, 'organisasiDetail'])->name('organisasi.show');\n Route::get('/kegiatan', [PublicController::class, 'kegiatan'])->name('kegiatan.index');\n \n Route::prefix('mahasiswa')->group(function () {\n   Route::view('/organisasi', 'mahasiswa.organisasi')->name('mahasiswa.organisasi');\n"
-                },
-                {
-                    "date": 1766463050507,
-                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -43,4 +43,14 @@\n     Route::get('/admin', [AdminController::class, 'index'])->middleware('role:admin')->name('dashboard.admin');\n     Route::get('/kemahasiswaan', [KemahasiswaanController::class, 'index'])->middleware('role:kemahasiswaan')->name('dashboard.kemahasiswaan');\n     Route::get('/pengurus', [PengurusController::class, 'index'])->middleware('role:pengurus')->name('dashboard.pengurus');\n });\n+\n+/*\n+|--------------------------------------------------------------------------\n+| PENGURUS STATIC PAGES (FRONTEND ONLY)\n+|--------------------------------------------------------------------------\n+| Static blade views for pengurus domain. No controller, no DB.\n+*/\n+Route::view('/pengurus/login', 'pages.pengurus.login');\n+Route::view('/pengurus/dashboard', 'pages.pengurus.dashboard');\n+Route::view('/pengurus/profil', 'pages.pengurus.profil-organisasi');\n"
-                },
-                {
-                    "date": 1766474974551,
-                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -8,49 +8,57 @@\n use App\\Http\\Controllers\\Pengurus\\PengurusController;\n \n /*\n |--------------------------------------------------------------------------\n-| HALAMAN PUBLIK (MAHASISWA - TANPA LOGIN)\n+| HALAMAN PUBLIK MAHASISWA (TANPA LOGIN)\n |--------------------------------------------------------------------------\n */\n-Route::get('/', [PublicController::class, 'home'])->name('home');\n-Route::get('/organisasi', [PublicController::class, 'organisasi'])->name('organisasi.index');\n-Route::get('/organisasi/{id}', [PublicController::class, 'organisasiDetail'])->name('organisasi.show');\n-Route::get('/kegiatan', [PublicController::class, 'kegiatan'])->name('kegiatan.index');\n \n+// Main mahasiswa landing page\n+Route::view('/', 'pages.mahasiswa.dashboard')->name('home');\n+\n+// Mahasiswa pages\n Route::prefix('mahasiswa')->group(function () {\n-  Route::view('/organisasi', 'mahasiswa.organisasi')->name('mahasiswa.organisasi');\n-  Route::view('/event', 'mahasiswa.event')->name('mahasiswa.event');\n-  Route::view('/lost-found', 'mahasiswa.lost-found')->name('mahasiswa.lost-found');\n-  Route::view('/pengumuman', 'mahasiswa.pengumuman')->name('mahasiswa.pengumuman');\n-  Route::view('/tentang', 'mahasiswa.tentang')->name('mahasiswa.tentang');\n+    Route::view('/', 'pages.mahasiswa.dashboard')->name('mahasiswa.dashboard');\n+    Route::view('/organisasi', 'pages.mahasiswa.organisasi')->name('mahasiswa.organisasi');\n+    Route::view('/event', 'pages.mahasiswa.event')->name('mahasiswa.event');\n });\n \n /*\n |--------------------------------------------------------------------------\n-| LOGIN (HANYA UNTUK INTERNAL)\n+| PORTAL INTERNAL (LOGIN + ROLE SELECTION)\n |--------------------------------------------------------------------------\n */\n-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');\n-Route::post('/login', [AuthController::class, 'login'])->name('login.perform');\n-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');\n \n+// Portal login page\n+Route::view('/portal/login', 'pages.portal.login')->name('portal.login');\n+\n+// Pengurus portal pages (frontend only)\n+Route::prefix('/portal/pengurus')->group(function () {\n+    Route::view('/', 'pages.portal.pengurus.dashboard')->name('portal.pengurus.dashboard');\n+});\n+\n+// Admin portal pages (frontend only)\n+Route::prefix('/portal/admin')->group(function () {\n+    Route::view('/', 'pages.portal.admin.dashboard')->name('portal.admin.dashboard');\n+});\n+\n+// Kemahasiswaan portal pages (frontend only)\n+Route::prefix('/portal/kemahasiswaan')->group(function () {\n+    Route::view('/', 'pages.portal.kemahasiswaan.dashboard')->name('portal.kemahasiswaan.dashboard');\n+});\n+\n /*\n |--------------------------------------------------------------------------\n-| DASHBOARD INTERNAL (SETELAH LOGIN) - PROTECTED BY AUTH & ROLE\n+| LEGACY AUTH & DASHBOARD ROUTES (UNTUK BACKWARD COMPATIBILITY)\n |--------------------------------------------------------------------------\n */\n+\n+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');\n+Route::post('/login', [AuthController::class, 'login'])->name('login.perform');\n+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');\n+\n Route::prefix('dashboard')->middleware(['auth'])->group(function () {\n     Route::get('/admin', [AdminController::class, 'index'])->middleware('role:admin')->name('dashboard.admin');\n     Route::get('/kemahasiswaan', [KemahasiswaanController::class, 'index'])->middleware('role:kemahasiswaan')->name('dashboard.kemahasiswaan');\n     Route::get('/pengurus', [PengurusController::class, 'index'])->middleware('role:pengurus')->name('dashboard.pengurus');\n });\n-\n-/*\n-|--------------------------------------------------------------------------\n-| PENGURUS STATIC PAGES (FRONTEND ONLY)\n-|--------------------------------------------------------------------------\n-| Static blade views for pengurus domain. No controller, no DB.\n-*/\n-Route::view('/pengurus/login', 'pages.pengurus.login');\n-Route::view('/pengurus/dashboard', 'pages.pengurus.dashboard');\n-Route::view('/pengurus/profil', 'pages.pengurus.profil-organisasi');\n"
-                },
-                {
-                    "date": 1766475728557,
-                    "content": "Index: \n===================================================================\n--- \n+++ \n@@ -1,64 +1,60 @@\n <?php\n \n use Illuminate\\Support\\Facades\\Route;\n-use App\\Http\\Controllers\\PublicController;\n-use App\\Http\\Controllers\\AuthController;\n-use App\\Http\\Controllers\\Admin\\AdminController;\n-use App\\Http\\Controllers\\Kemahasiswaan\\KemahasiswaanController;\n-use App\\Http\\Controllers\\Pengurus\\PengurusController;\n \n /*\n |--------------------------------------------------------------------------\n | HALAMAN PUBLIK MAHASISWA (TANPA LOGIN)\n |--------------------------------------------------------------------------\n */\n \n-// Main mahasiswa landing page\n-Route::view('/', 'pages.mahasiswa.dashboard')->name('home');\n+// Mahasiswa homepage\n+Route::view('/', 'pages.mahasiswa.dashboard')->name('mahasiswa.dashboard');\n \n-// Mahasiswa pages\n+// Mahasiswa public pages\n Route::prefix('mahasiswa')->group(function () {\n-    Route::view('/', 'pages.mahasiswa.dashboard')->name('mahasiswa.dashboard');\n+    Route::view('/', 'pages.mahasiswa.dashboard')->name('mahasiswa.home');\n     Route::view('/organisasi', 'pages.mahasiswa.organisasi')->name('mahasiswa.organisasi');\n     Route::view('/event', 'pages.mahasiswa.event')->name('mahasiswa.event');\n });\n \n /*\n |--------------------------------------------------------------------------\n-| PORTAL INTERNAL (LOGIN + ROLE SELECTION)\n+| PORTAL SISTEM INTERNAL (DUMMY LOGIN)\n |--------------------------------------------------------------------------\n */\n \n-// Portal login page\n+// Portal login (role selector)\n Route::view('/portal/login', 'pages.portal.login')->name('portal.login');\n+Route::view('/portal', 'pages.portal.login')->name('portal.index');\n \n-// Pengurus portal pages (frontend only)\n+/*\n+|--------------------------------------------------------------------------\n+| PENGURUS PORTAL\n+|--------------------------------------------------------------------------\n+*/\n+\n Route::prefix('/portal/pengurus')->group(function () {\n-    Route::view('/', 'pages.portal.pengurus.dashboard')->name('portal.pengurus.dashboard');\n+    Route::view('/', 'pages.pengurus.dashboard')->name('portal.pengurus.dashboard');\n+    Route::view('/profil', 'pages.pengurus.profil-organisasi')->name('portal.pengurus.profil');\n });\n \n-// Admin portal pages (frontend only)\n+/*\n+|--------------------------------------------------------------------------\n+| ADMIN PORTAL\n+|--------------------------------------------------------------------------\n+*/\n+\n Route::prefix('/portal/admin')->group(function () {\n-    Route::view('/', 'pages.portal.admin.dashboard')->name('portal.admin.dashboard');\n+    Route::view('/', 'pages.admin.dashboard')->name('portal.admin.dashboard');\n });\n \n-// Kemahasiswaan portal pages (frontend only)\n-Route::prefix('/portal/kemahasiswaan')->group(function () {\n-    Route::view('/', 'pages.portal.kemahasiswaan.dashboard')->name('portal.kemahasiswaan.dashboard');\n-});\n-\n /*\n |--------------------------------------------------------------------------\n-| LEGACY AUTH & DASHBOARD ROUTES (UNTUK BACKWARD COMPATIBILITY)\n+| KEMAHASISWAAN PORTAL\n |--------------------------------------------------------------------------\n */\n \n-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');\n-Route::post('/login', [AuthController::class, 'login'])->name('login.perform');\n-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');\n-\n-Route::prefix('dashboard')->middleware(['auth'])->group(function () {\n-    Route::get('/admin', [AdminController::class, 'index'])->middleware('role:admin')->name('dashboard.admin');\n-    Route::get('/kemahasiswaan', [KemahasiswaanController::class, 'index'])->middleware('role:kemahasiswaan')->name('dashboard.kemahasiswaan');\n-    Route::get('/pengurus', [PengurusController::class, 'index'])->middleware('role:pengurus')->name('dashboard.pengurus');\n+Route::prefix('/portal/kemahasiswaan')->group(function () {\n+    Route::view('/', 'pages.kemahasiswaan.dashboard')->name('portal.kemahasiswaan.dashboard');\n });\n"
-                }
-            ],
-            "date": 1766410688588,
-            "name": "Commit-0",
-            "content": "<?php\n\nuse Illuminate\\Support\\Facades\\Route;\nuse App\\Http\\Controllers\\PublicController;\nuse App\\Http\\Controllers\\AuthController;\nuse App\\Http\\Controllers\\Admin\\AdminController;\nuse App\\Http\\Controllers\\Kemahasiswaan\\KemahasiswaanController;\nuse App\\Http\\Controllers\\Pengurus\\PengurusController;\n\n/*\n|--------------------------------------------------------------------------\n| HALAMAN PUBLIK (MAHASISWA - TANPA LOGIN)\n|--------------------------------------------------------------------------\n*/\nRoute::get('/', [PublicController::class, 'home'])->name('home');\nRoute::get('/organisasi', [PublicController::class, 'organisasi'])->name('organisasi.index');\nRoute::get('/kegiatan', [PublicController::class, 'kegiatan'])->name('kegiatan.index');\n\nRoute::prefix('mahasiswa')->group(function () {\n  Route::view('/organisasi', 'mahasiswa.organisasi')->name('mahasiswa.organisasi');\n  Route::view('/event', 'mahasiswa.event')->name('mahasiswa.event');\n  Route::view('/lost-found', 'mahasiswa.lost-found')->name('mahasiswa.lost-found');\n  Route::view('/pengumuman', 'mahasiswa.pengumuman')->name('mahasiswa.pengumuman');\n  Route::view('/tentang', 'mahasiswa.tentang')->name('mahasiswa.tentang');\n});\n\n/*\n|--------------------------------------------------------------------------\n| LOGIN (HANYA UNTUK INTERNAL)\n|--------------------------------------------------------------------------\n*/\nRoute::get('/login', [AuthController::class, 'showLogin'])->name('login');\nRoute::post('/login', [AuthController::class, 'login'])->name('login.perform');\nRoute::post('/logout', [AuthController::class, 'logout'])->name('logout');\n\n/*\n|--------------------------------------------------------------------------\n| DASHBOARD INTERNAL (SETELAH LOGIN) - PROTECTED BY AUTH & ROLE\n|--------------------------------------------------------------------------\n*/\nRoute::prefix('dashboard')->middleware(['auth'])->group(function () {\n    Route::get('/admin', [AdminController::class, 'index'])->middleware('role:admin')->name('dashboard.admin');\n    Route::get('/kemahasiswaan', [KemahasiswaanController::class, 'index'])->middleware('role:kemahasiswaan')->name('dashboard.kemahasiswaan');\n    Route::get('/pengurus', [PengurusController::class, 'index'])->middleware('role:pengurus')->name('dashboard.pengurus');\n});\n"
-        }
-    ]
-}
+<?php
+
+use Illuminate\Support\Facades\Route;
+
+Route::get('/tes', function () {
+    return 'TES ROUTE TERBACA';
+});
+
+
+/*
+|--------------------------------------------------------------------------
+| HALAMAN PUBLIK MAHASISWA (TANPA LOGIN)
+|--------------------------------------------------------------------------
+*/
+
+Route::view('/', 'pages.mahasiswa.dashboard')->name('mahasiswa.dashboard');
+
+Route::prefix('mahasiswa')->group(function () {
+    Route::view('/', 'pages.mahasiswa.dashboard')->name('mahasiswa.home');
+    Route::view('/organisasi', 'pages.mahasiswa.organisasi')->name('mahasiswa.organisasi');
+    Route::view('/event', 'pages.mahasiswa.event')->name('mahasiswa.event');
+});
+
+/*
+|--------------------------------------------------------------------------
+| LOGIN PORTAL INTERNAL (ADMIN, KEMAHASISWAAN, PENGURUS)
+|--------------------------------------------------------------------------
+*/
+
+// Login bisa diakses dari:
+// /login
+// /portal
+// /portal/login
+Route::view('/login', 'pages.portal.login')->name('login');
+Route::view('/portal', 'pages.portal.login')->name('portal.index');
+Route::view('/portal/login', 'pages.portal.login')->name('portal.login');
+
+/*
+|--------------------------------------------------------------------------
+| PORTAL PENGURUS
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('portal/pengurus')->group(function () {
+    Route::view('/', 'pages.pengurus.dashboard')->name('portal.pengurus.dashboard');
+    Route::view('/profil', 'pages.pengurus.profil-organisasi')->name('portal.pengurus.profil');
+});
+
+/*
+|--------------------------------------------------------------------------
+| PORTAL ADMIN
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('portal/admin')->group(function () {
+    Route::view('/', 'pages.admin.dashboard')->name('portal.admin.dashboard');
+});
+
+/*
+|--------------------------------------------------------------------------
+| PORTAL KEMAHASISWAAN
+|--------------------------------------------------------------------------
+*/
+
+Route::prefix('portal/kemahasiswaan')->group(function () {
+    Route::view('/', 'pages.kemahasiswaan.dashboard')->name('portal.kemahasiswaan.dashboard');
+});
