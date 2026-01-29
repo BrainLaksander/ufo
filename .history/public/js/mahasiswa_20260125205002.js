@@ -246,10 +246,3 @@ function renderOrgCards(searchQuery = "", filter = "all") {
         }
     });
 }
-
-// Initialize everything on page load
-document.addEventListener("DOMContentLoaded", function () {
-    initCarousel();
-    initFilters();
-    renderOrgCards();
-});

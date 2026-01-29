@@ -18,8 +18,8 @@ const LostAndFound = lazy(() => import("./pages/public/LostAndFound"));
 const TentangUFO = lazy(() => import("./pages/public/TentangUFO"));
 const Login = lazy(() => import("./pages/auth/Login"));
 
-const KemahasiswaanDashboard = lazy(
-    () => import("./pages/kemahasiswaan/Dashboard"),
+const KemahasiswaanDashboard = lazy(() =>
+    import("./pages/kemahasiswaan/Dashboard")
 );
 const PengurusDashboard = lazy(() => import("./pages/pengurus/Dashboard"));
 const PengurusLogin = lazy(() => import("./pages/pengurus/Login"));

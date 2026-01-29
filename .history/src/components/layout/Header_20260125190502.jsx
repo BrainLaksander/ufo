@@ -2,13 +2,13 @@ import React from "react";
 
 /**
  * Header Component
- *
+ * 
  * Header umum untuk semua layout (Mahasiswa, Pengurus, Admin, Kemahasiswaan)
  * Menampilkan:
  * - Hamburger button untuk trigger burger menu
  * - Brand/judul aplikasi
  * - Notification atau info lainnya
- *
+ * 
  * Props:
  * - role: string - peran user (mahasiswa, pengurus, admin, kemahasiswaan)
  * - onMenuClick: function - callback untuk trigger pembukaan menu
@@ -17,7 +17,7 @@ export default function Header({ role, onMenuClick }) {
     // Determine header styling berdasarkan role
     const getHeaderClass = () => {
         const baseClass = "fixed top-0 left-0 right-0 z-40 shadow";
-
+        
         switch (role) {
             case "pengurus":
                 return `${baseClass} bg-gradient-to-r from-yellow-400 to-yellow-500`;
@@ -32,10 +32,7 @@ export default function Header({ role, onMenuClick }) {
     };
 
     const getTextClass = () => {
-        return role === "mahasiswa" ||
-            role === "admin" ||
-            role === "kemahasiswaan" ||
-            role === "pengurus"
+        return role === "mahasiswa" || role === "admin" || role === "kemahasiswaan" || role === "pengurus"
             ? "text-white"
             : "text-gray-800";
     };
@@ -49,9 +46,7 @@ export default function Header({ role, onMenuClick }) {
                         onClick={onMenuClick}
                         aria-label="Buka menu"
                         className={`p-2 rounded-md transition-colors ${
-                            role === "mahasiswa" ||
-                            role === "admin" ||
-                            role === "kemahasiswaan"
+                            role === "mahasiswa" || role === "admin" || role === "kemahasiswaan"
                                 ? "hover:bg-white hover:bg-opacity-20 text-white"
                                 : "hover:bg-gray-100 text-gray-800"
                         }`}
@@ -76,31 +71,25 @@ export default function Header({ role, onMenuClick }) {
                     {/* Brand/Judul */}
                     <div className="flex items-center gap-2">
                         <span className="text-xl">🛸</span>
-                        <h1
-                            className={`text-lg font-semibold ${getTextClass()}`}
-                        >
+                        <h1 className={`text-lg font-semibold ${getTextClass()}`}>
                             {role === "pengurus"
                                 ? "Panel Pengurus"
                                 : role === "admin"
-                                  ? "Admin Panel"
-                                  : role === "kemahasiswaan"
-                                    ? "Kemahasiswaan"
-                                    : "UFO Portal"}
+                                ? "Admin Panel"
+                                : role === "kemahasiswaan"
+                                ? "Kemahasiswaan"
+                                : "UFO Portal"}
                         </h1>
                     </div>
                 </div>
 
                 {/* Right side - Info atau notifikasi */}
                 <div className="flex items-center gap-4">
-                    <span
-                        className={`text-sm ${
-                            role === "mahasiswa" ||
-                            role === "admin" ||
-                            role === "kemahasiswaan"
-                                ? "text-white"
-                                : "text-gray-600"
-                        }`}
-                    >
+                    <span className={`text-sm ${
+                        role === "mahasiswa" || role === "admin" || role === "kemahasiswaan"
+                            ? "text-white"
+                            : "text-gray-600"
+                    }`}>
                         Selamat datang
                     </span>
                 </div>
@@ -108,3 +97,4 @@ export default function Header({ role, onMenuClick }) {
         </header>
     );
 }
+

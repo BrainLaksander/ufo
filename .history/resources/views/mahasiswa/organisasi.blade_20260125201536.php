@@ -14,30 +14,20 @@
     </div>
 
     <!-- Carousel Section -->
-    <div class="relative w-full mb-10 overflow-hidden rounded-xl shadow-lg bg-gradient-to-r from-purple-600 to-yellow-400">
-      <div id="carousel" class="relative w-full h-48 sm:h-64 md:h-80">
-        <!-- Carousel Image -->
-        <img id="carousel-img" src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRu3RdSXKIMnhuNhu_7Y8QhZFfeUALzPkGqCg&s" alt="Carousel" class="w-full h-full object-cover">
-        
-        <!-- Dark Overlay for Text Readability -->
-        <div class="absolute inset-0 bg-black/40"></div>
-        
-        <!-- Carousel Content Overlay -->
-        <div class="absolute inset-0 flex flex-col items-center justify-center text-white text-center px-6">
-          <h2 class="text-2xl sm:text-4xl font-bold mb-3">Jelajahi Organisasi Kami</h2>
-          <p class="text-sm sm:text-base opacity-90 max-w-md">Temukan organisasi yang sesuai dengan minat dan bakat Anda</p>
-        </div>
+    <div class="relative w-full mb-10 overflow-hidden rounded-xl shadow-lg">
+      <div id="carousel" class="relative w-full h-48 sm:h-64 md:h-80 bg-gradient-to-r from-purple-600 to-purple-800">
+        <img id="carousel-img" src="https://images.unsplash.com/photo-1655472355485-d949925e67bb?w=1200&h=500&fit=crop" alt="Carousel" class="w-full h-full object-cover">
         
         <!-- Navigation Buttons -->
-        <button id="prev-slide" class="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-gray-900 px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 z-20 focus:outline-none focus:ring-2 focus:ring-yellow-400" aria-label="Previous slide">
-          <span class="text-lg sm:text-xl font-bold">❮</span>
+        <button id="prev-slide" class="absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white px-2 sm:px-3 py-2 rounded-lg transition-all duration-200 z-10 focus:outline-none focus:ring-2 focus:ring-yellow-400" aria-label="Previous slide">
+          <span class="text-lg sm:text-xl">❮</span>
         </button>
-        <button id="next-slide" class="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 bg-white/70 hover:bg-white text-gray-900 px-3 sm:px-4 py-2 rounded-lg transition-all duration-200 z-20 focus:outline-none focus:ring-2 focus:ring-yellow-400" aria-label="Next slide">
-          <span class="text-lg sm:text-xl font-bold">❯</span>
+        <button id="next-slide" class="absolute right-3 sm:right-4 top-1/2 -translate-y-1/2 bg-black/60 hover:bg-black/80 text-white px-2 sm:px-3 py-2 rounded-lg transition-all duration-200 z-10 focus:outline-none focus:ring-2 focus:ring-yellow-400" aria-label="Next slide">
+          <span class="text-lg sm:text-xl">❯</span>
         </button>
         
         <!-- Carousel Dots -->
-        <div id="carousel-dots" class="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-20"></div>
+        <div id="carousel-dots" class="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10"></div>
       </div>
     </div>
 
