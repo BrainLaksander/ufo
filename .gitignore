@@ -22,3 +22,14 @@
 Homestead.json
 Homestead.yaml
 Thumbs.db
+
+# VS Code history (file backups with timestamps)
+.history/
+.historyFiles/
+
+# Backup files
+*.backup
+*_backup.jsx
+*_backup.js
+*.swp
+*.swo
