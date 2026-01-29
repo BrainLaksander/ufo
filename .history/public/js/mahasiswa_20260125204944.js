@@ -1,65 +1,60 @@
 // mahasiswa.js - Vanilla JS for mahasiswa public pages
-(function () {
+(function(){
     // Burger menu toggle
-    var burgerBtn = document.getElementById("burger-btn-mahasiswa");
-    var burgerMenu = document.getElementById("burger-mahasiswa");
-    var overlay = document.getElementById("overlay-mahasiswa");
-    var burgerClose = burgerMenu
-        ? burgerMenu.querySelector(".burger-close")
-        : null;
+    var burgerBtn = document.getElementById('burger-btn-mahasiswa');
+    var burgerMenu = document.getElementById('burger-mahasiswa');
+    var overlay = document.getElementById('overlay-mahasiswa');
+    var burgerClose = burgerMenu ? burgerMenu.querySelector('.burger-close') : null;
 
     function openBurger() {
-        if (burgerMenu) {
-            burgerMenu.setAttribute("aria-hidden", "false");
+        if(burgerMenu) {
+            burgerMenu.setAttribute('aria-hidden', 'false');
         }
-        if (overlay) {
-            overlay.classList.remove("hidden");
+        if(overlay) {
+            overlay.classList.remove('hidden');
         }
     }
 
     function closeBurger() {
-        if (burgerMenu) {
-            burgerMenu.setAttribute("aria-hidden", "true");
+        if(burgerMenu) {
+            burgerMenu.setAttribute('aria-hidden', 'true');
         }
-        if (overlay) {
-            overlay.classList.add("hidden");
+        if(overlay) {
+            overlay.classList.add('hidden');
         }
     }
 
-    if (burgerBtn) {
-        burgerBtn.addEventListener("click", openBurger);
+    if(burgerBtn) {
+        burgerBtn.addEventListener('click', openBurger);
     }
 
-    if (burgerClose) {
-        burgerClose.addEventListener("click", closeBurger);
+    if(burgerClose) {
+        burgerClose.addEventListener('click', closeBurger);
     }
 
-    if (overlay) {
-        overlay.addEventListener("click", closeBurger);
+    if(overlay) {
+        overlay.addEventListener('click', closeBurger);
     }
 
     // Close menu when clicking links with data-close
-    document.addEventListener("click", function (e) {
-        var link = e.target.closest("[data-close]");
-        if (link) {
+    document.addEventListener('click', function(e){
+        var link = e.target.closest('[data-close]');
+        if(link) {
             closeBurger();
         }
     });
 
     // Filter functionality (if needed on organisasi page)
-    var filterInput = document.getElementById("filter-kategori");
-    if (filterInput) {
-        filterInput.addEventListener("change", function (e) {
+    var filterInput = document.getElementById('filter-kategori');
+    if(filterInput) {
+        filterInput.addEventListener('change', function(e){
             var category = e.target.value;
-            var items = document.querySelectorAll(".org-item");
-            items.forEach(function (item) {
-                if (
-                    !category ||
-                    item.getAttribute("data-category") === category
-                ) {
-                    item.style.display = "flex";
+            var items = document.querySelectorAll('.org-item');
+            items.forEach(function(item){
+                if(!category || item.getAttribute('data-category') === category) {
+                    item.style.display = 'flex';
                 } else {
-                    item.style.display = "none";
+                    item.style.display = 'none';
                 }
             });
         });
@@ -166,14 +161,14 @@ function initFilters() {
                     "to-purple-700",
                     "text-white",
                     "font-semibold",
-                    "shadow-md",
+                    "shadow-md"
                 );
                 b.classList.add(
                     "border-2",
                     "border-purple-600",
                     "text-purple-600",
                     "font-medium",
-                    "hover:bg-purple-50",
+                    "hover:bg-purple-50"
                 );
             });
 
@@ -183,14 +178,14 @@ function initFilters() {
                 "to-purple-700",
                 "text-white",
                 "font-semibold",
-                "shadow-md",
+                "shadow-md"
             );
             e.target.classList.remove(
                 "border-2",
                 "border-purple-600",
                 "text-purple-600",
                 "font-medium",
-                "hover:bg-purple-50",
+                "hover:bg-purple-50"
             );
 
             selectedFilter = e.target.getAttribute("data-filter");
@@ -246,10 +241,3 @@ function renderOrgCards(searchQuery = "", filter = "all") {
         }
     });
 }
-
-// Initialize everything on page load
-document.addEventListener("DOMContentLoaded", function () {
-    initCarousel();
-    initFilters();
-    renderOrgCards();
-});

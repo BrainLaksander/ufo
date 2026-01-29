@@ -10,33 +10,16 @@ export default function ProfilOrganisasi() {
         emoji: "🏛️",
         ketua: "Budi Santoso",
         kontak: "hmc@example.test",
-        deskripsi:
-            "Organisasi mahasiswa yang aktif dalam kegiatan kampus dan pengembangan keterampilan anggota.",
+        deskripsi: "Organisasi mahasiswa yang aktif dalam kegiatan kampus dan pengembangan keterampilan anggota.",
         kategori: "Himpunan",
         jumlahAnggota: 245,
         eventPerTahun: 20,
         registrationOpen: true,
         divisions: [
-            {
-                id: 1,
-                nama: "Internal",
-                deskripsi: "Mengelola operasional organisasi",
-            },
-            {
-                id: 2,
-                nama: "Event",
-                deskripsi: "Merencanakan dan melaksanakan acara",
-            },
-            {
-                id: 3,
-                nama: "Akademik",
-                deskripsi: "Program pengembangan skill anggota",
-            },
-            {
-                id: 4,
-                nama: "Humas",
-                deskripsi: "Komunikasi internal dan eksternal",
-            },
+            { id: 1, nama: "Internal", deskripsi: "Mengelola operasional organisasi" },
+            { id: 2, nama: "Event", deskripsi: "Merencanakan dan melaksanakan acara" },
+            { id: 3, nama: "Akademik", deskripsi: "Program pengembangan skill anggota" },
+            { id: 4, nama: "Humas", deskripsi: "Komunikasi internal dan eksternal" },
         ],
         guidebookUrl: "#",
     };
@@ -56,15 +39,14 @@ export default function ProfilOrganisasi() {
 
             {/* Main Container */}
             <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                
                 {/* Header Card */}
                 <div className="bg-white rounded-2xl shadow-lg p-6 sm:p-8 mb-8">
                     {/* Logo Section */}
                     <div className="flex flex-col sm:flex-row sm:items-start sm:gap-8 mb-8">
                         <div className="flex-shrink-0">
                             <div className="w-20 h-20 sm:w-24 sm:h-24 mx-auto sm:mx-0 bg-gradient-to-br from-purple-500 to-purple-700 rounded-2xl flex items-center justify-center shadow-lg">
-                                <span className="text-5xl sm:text-6xl">
-                                    {org.emoji}
-                                </span>
+                                <span className="text-5xl sm:text-6xl">{org.emoji}</span>
                             </div>
                         </div>
 
@@ -73,10 +55,8 @@ export default function ProfilOrganisasi() {
                             <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
                                 {org.nama}
                             </h1>
-                            <p className="text-gray-600 mb-4">
-                                {org.deskripsi}
-                            </p>
-
+                            <p className="text-gray-600 mb-4">{org.deskripsi}</p>
+                            
                             {/* Category Badge */}
                             <div className="flex flex-wrap gap-3 mb-4">
                                 <span className="px-4 py-2 bg-purple-100 text-purple-700 rounded-full text-sm font-semibold">
@@ -88,15 +68,11 @@ export default function ProfilOrganisasi() {
                             <div className="grid grid-cols-2 gap-4 text-sm">
                                 <div>
                                     <p className="text-gray-600">Anggota</p>
-                                    <p className="text-2xl font-bold text-purple-600">
-                                        {org.jumlahAnggota}
-                                    </p>
+                                    <p className="text-2xl font-bold text-purple-600">{org.jumlahAnggota}</p>
                                 </div>
                                 <div>
                                     <p className="text-gray-600">Event/Tahun</p>
-                                    <p className="text-2xl font-bold text-purple-600">
-                                        {org.eventPerTahun}
-                                    </p>
+                                    <p className="text-2xl font-bold text-purple-600">{org.eventPerTahun}</p>
                                 </div>
                             </div>
                         </div>
@@ -105,11 +81,7 @@ export default function ProfilOrganisasi() {
                         <button
                             onClick={() => setIsFavorite(!isFavorite)}
                             className="flex-shrink-0 w-12 h-12 rounded-full bg-gray-100 hover:bg-purple-100 transition-colors duration-200 flex items-center justify-center text-2xl focus:outline-none focus:ring-2 focus:ring-purple-400"
-                            aria-label={
-                                isFavorite
-                                    ? "Remove from favorites"
-                                    : "Add to favorites"
-                            }
+                            aria-label={isFavorite ? "Remove from favorites" : "Add to favorites"}
                         >
                             {isFavorite ? "❤️" : "🤍"}
                         </button>
@@ -130,8 +102,7 @@ export default function ProfilOrganisasi() {
                                     Pendaftaran Dibuka
                                 </h3>
                                 <p className="text-gray-700 mb-4">
-                                    Anda dapat mendaftar sebagai anggota
-                                    organisasi ini sekarang.
+                                    Anda dapat mendaftar sebagai anggota organisasi ini sekarang.
                                 </p>
                                 <button className="w-full sm:w-auto px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold rounded-lg hover:from-green-600 hover:to-emerald-700 transition-all duration-200 shadow-md hover:shadow-lg focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-offset-2">
                                     Daftar Sekarang
@@ -148,9 +119,7 @@ export default function ProfilOrganisasi() {
                         <h3 className="text-sm font-semibold text-gray-600 uppercase tracking-wide mb-2">
                             Ketua Organisasi
                         </h3>
-                        <p className="text-xl font-bold text-gray-900">
-                            {org.ketua}
-                        </p>
+                        <p className="text-xl font-bold text-gray-900">{org.ketua}</p>
                     </div>
 
                     {/* Kontak */}
@@ -201,8 +170,7 @@ export default function ProfilOrganisasi() {
                             📖 Panduan Organisasi
                         </h2>
                         <p className="text-purple-100 mb-6">
-                            Baca panduan lengkap tentang visi, misi, struktur
-                            organisasi, dan berbagai informasi penting lainnya.
+                            Baca panduan lengkap tentang visi, misi, struktur organisasi, dan berbagai informasi penting lainnya.
                         </p>
                         <a
                             href={org.guidebookUrl}

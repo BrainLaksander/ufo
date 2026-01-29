@@ -27,7 +27,7 @@
             </div>
 
             <!-- Login Form -->
-            <form class="portal-login-form" method="POST" action="{{ route('portal.login') }}">
+            <form class="portal-login-form" method="POST" action="{{ route('login') }}">
                 @csrf
 
                 <!-- Email Input -->
