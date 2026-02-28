@@ -24,6 +24,7 @@
             <div class="portal-login-card-header">
                 <h2 class="portal-login-card-title">Selamat Datang</h2>
                 <p class="portal-login-card-subtitle">Silakan masuk ke akun Anda</p>
+                <p class="portal-login-note">Akses internal — hanya untuk Admin Sistem</p>
             </div>
 
             <!-- Login Form -->
@@ -106,4 +107,42 @@
         </div>
     </div>
 </div>
+
+<!-- Internal logic: persist simple auth state in localStorage and redirect to appropriate portal -->
+<script>
+    (function(){
+        var form = document.querySelector('.portal-login-form');
+        if (!form) return;
+        form.addEventListener('submit', function(e){
+            e.preventDefault();
+            var email = (document.querySelector('#email') || {}).value || null;
+            var roleSelect = document.querySelector('#role');
+            var role = roleSelect ? roleSelect.value : null;
+
+            if (!role) {
+                alert('Silakan pilih role');
+                return;
+            }
+
+            // Store simple auth state (used by SPA client)
+            try {
+                var payload = { email: email, role: role, name: email };
+                localStorage.setItem('ufo_auth', JSON.stringify(payload));
+            } catch(err) {
+                console.warn('Failed to persist auth', err);
+            }
+
+            // Redirect to SPA route depending on role
+            if (role === 'pengurus') {
+                window.location.href = '/portal/pengurus';
+            } else if (role === 'admin') {
+                window.location.href = '/portal/admin';
+            } else if (role === 'kemahasiswaan') {
+                window.location.href = '/portal/kemahasiswaan';
+            } else {
+                window.location.href = '/portal';
+            }
+        });
+    })();
+</script>
 @endsection

@@ -35,17 +35,21 @@
                 <span class="burger-link-icon">📅</span>
                 <span class="burger-link-text">Event</span>
             </a></li>
-            <li><a href="#" class="burger-link" data-close>
+            <li><a href="/lost-found" class="burger-link" data-close>
                 <span class="burger-link-icon">🔍</span>
                 <span class="burger-link-text">Lost & Found</span>
             </a></li>
-            <li><a href="#" class="burger-link" data-close>
+            <li><a href="{{ route('pengumuman.index') }}" class="burger-link" data-close>
                 <span class="burger-link-icon">📢</span>
                 <span class="burger-link-text">Pengumuman</span>
             </a></li>
-            <li><a href="#" class="burger-link" data-close>
+            <li><a href="{{ route('mahasiswa.tentang') }}" class="burger-link" data-close>
                 <span class="burger-link-icon">ℹ️</span>
                 <span class="burger-link-text">Tentang UFO</span>
+            </a></li>
+            <li><a href="/portal/login" class="burger-link" data-close>
+                <span class="burger-link-icon">🔐</span>
+                <span class="burger-link-text">Portal Internal</span>
             </a></li>
         </ul>
     </nav>

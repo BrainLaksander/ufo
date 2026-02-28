@@ -13,7 +13,7 @@
       <li><a href="#" data-close>Pengumuman</a></li>
       <li><a href="#" data-close>Pengajuan & Laporan</a></li>
       <li><a href="#" data-close>Pendaftaran Organisasi</a></li>
-      <li><a href="#" data-close>Lost & Found</a></li>
+      <li><a href="/lost-found" data-close>Lost & Found</a></li>
       <li><a href="#" data-close>Chat & Konsultasi</a></li>
       <li><a href="#" id="pengurus-logout" data-close>Keluar</a></li>
     </ul>
@@ -30,7 +30,7 @@
       <ul class="space-y-0">
         <li><a href="{{ route('mahasiswa.organisasi') }}" class="drawer-item block px-4 py-3 text-gray-800 hover:bg-yellow-300 font-medium" data-item="organisasi">Organisasi</a></li>
         <li><a href="{{ route('mahasiswa.event') }}" class="drawer-item block px-4 py-3 text-gray-800 hover:bg-yellow-300" data-item="event">Event</a></li>
-        <li><a href="{{ route('mahasiswa.lost-found') }}" class="drawer-item block px-4 py-3 text-gray-800 hover:bg-yellow-300" data-item="lost-found">Lost & Found</a></li>
+        <li><a href="/lost-found" class="drawer-item block px-4 py-3 text-gray-800 hover:bg-yellow-300" data-item="lost-found" data-close>Lost & Found</a></li>
         <li><a href="{{ route('mahasiswa.pengumuman') }}" class="drawer-item block px-4 py-3 text-gray-800 hover:bg-yellow-300" data-item="pengumuman">Pengumuman</a></li>
         <li><a href="{{ route('mahasiswa.tentang') }}" class="drawer-item block px-4 py-3 text-gray-800 hover:bg-yellow-300" data-item="tentang">Tentang UFO</a></li>
       </ul>

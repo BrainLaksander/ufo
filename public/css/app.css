@@ -808,6 +808,15 @@ body {
     color: var(--text-secondary);
 }
 
+/* Small note for internal-only portal */
+.portal-login-note {
+    margin-top: 8px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 600;
+    text-align: center;
+    opacity: 0.9;
+}
 /* Login form */
 .portal-login-form {
     margin-bottom: 24px;

@@ -11,61 +11,61 @@ Fitur sidebar/burger menu untuk mahasiswa telah berhasil diimplementasikan denga
 ### **File Baru (4 File):**
 
 1. **`src/components/layout/StudentBurgerMenu.jsx`**
-    - Komponen main burger menu
-    - Props: `open`, `onClose`, `activeItem`
-    - 5 menu items + footer dengan versi
-    - Smooth slide-in animation
+   - Komponen main burger menu
+   - Props: `open`, `onClose`, `activeItem`
+   - 5 menu items + footer dengan versi
+   - Smooth slide-in animation
 
 2. **`src/layouts/MahasiswaLayout.jsx`**
-    - Layout untuk halaman publik
-    - State management: `menuOpen`, `activeItem`
-    - Integrasi Header + StudentBurgerMenu
+   - Layout untuk halaman publik
+   - State management: `menuOpen`, `activeItem`
+   - Integrasi Header + StudentBurgerMenu
 
 3. **`src/pages/public/LostAndFound.jsx`**
-    - Placeholder page untuk Lost & Found
-    - Mock data dengan status Lost/Found
-    - Styling konsisten
+   - Placeholder page untuk Lost & Found
+   - Mock data dengan status Lost/Found
+   - Styling konsisten
 
 4. **`src/pages/public/TentangUFO.jsx`**
-    - Placeholder page untuk About UFO
-    - Visi, misi, fitur, info versi
-    - Styling konsisten
+   - Placeholder page untuk About UFO
+   - Visi, misi, fitur, info versi
+   - Styling konsisten
 
 ### **File Updated (3 File):**
 
 1. **`src/components/layout/Header.jsx`**
-    - Role-based styling (mahasiswa = purple gradient)
-    - Hamburger button trigger burger menu
-    - UFO icon + brand name
-    - Proper ARIA labels
+   - Role-based styling (mahasiswa = purple gradient)
+   - Hamburger button trigger burger menu
+   - UFO icon + brand name
+   - Proper ARIA labels
 
 2. **`src/App.jsx`**
-    - Import LostAndFound & TentangUFO pages
-    - Add routes: `/lostandfound`, `/tentang-ufo`
+   - Import LostAndFound & TentangUFO pages
+   - Add routes: `/lostandfound`, `/tentang-ufo`
 
 3. **`public/css/app.css`** (+150 baris)
-    - `.student-menu-overlay` - overlay gelap
-    - `.student-burger-menu` - sidebar container
-    - `.student-burger-header` - header area
-    - `.student-burger-link` + `.student-burger-link--active`
-    - `.student-burger-footer` - footer
-    - Animations & transitions
-    - Responsive scrollbar
-    - `.mahasiswa-layout` & `.mahasiswa-layout-content`
+   - `.student-menu-overlay` - overlay gelap
+   - `.student-burger-menu` - sidebar container
+   - `.student-burger-header` - header area
+   - `.student-burger-link` + `.student-burger-link--active`
+   - `.student-burger-footer` - footer
+   - Animations & transitions
+   - Responsive scrollbar
+   - `.mahasiswa-layout` & `.mahasiswa-layout-content`
 
 ### **File Config/Helper (2 File):**
 
 1. **`src/config/menuConfig.js`**
-    - Menu items configuration
-    - App info (name, version)
-    - Style config (colors, sizing, timing)
-    - Layout config untuk different roles
+   - Menu items configuration
+   - App info (name, version)
+   - Style config (colors, sizing, timing)
+   - Layout config untuk different roles
 
 2. **`src/hooks/useMenuNavigation.js`**
-    - Custom hooks untuk keyboard navigation
-    - `useKeyboardNavigation()` - Esc key support
-    - `useFocusManagement()` - Accessibility
-    - Menu reducer pattern
+   - Custom hooks untuk keyboard navigation
+   - `useKeyboardNavigation()` - Esc key support
+   - `useFocusManagement()` - Accessibility
+   - Menu reducer pattern
 
 ---
 
@@ -96,13 +96,13 @@ Fitur sidebar/burger menu untuk mahasiswa telah berhasil diimplementasikan denga
 
 ## 📋 Menu Items (5 Menu)
 
-| Icon | Label        | Path            | Deskripsi                    |
-| ---- | ------------ | --------------- | ---------------------------- |
-| 👥   | Organisasi   | `/organisasi`   | Daftar organisasi mahasiswa  |
-| 📅   | Event        | `/event`        | Event & aktivitas organisasi |
-| 🔍   | Lost & Found | `/lostandfound` | Cari/laporkan barang hilang  |
-| 📢   | Pengumuman   | `/pengumuman`   | Pengumuman resmi             |
-| ℹ️   | Tentang UFO  | `/tentang-ufo`  | Info UFO & versi 1.0         |
+| Icon | Label        | Path           | Deskripsi                    |
+| ---- | ------------ | -------------- | ---------------------------- |
+| 👥   | Organisasi   | `/organisasi`  | Daftar organisasi mahasiswa  |
+| 📅   | Event        | `/event`       | Event & aktivitas organisasi |
+| 🔍   | Lost & Found | `/lost-found`  | Cari/laporkan barang hilang  |
+| 📢   | Pengumuman   | `/pengumuman`  | Pengumuman resmi             |
+| ℹ️   | Tentang UFO  | `/tentang-ufo` | Info UFO & versi 1.0         |
 
 ---
 
@@ -163,13 +163,13 @@ const [menuOpen, setMenuOpen] = useState(false);
 
 ```css
 .student-burger-menu {
-    /* sidebar */
+  /* sidebar */
 }
 .student-burger-link--active {
-    /* active state */
+  /* active state */
 }
 .student-menu-overlay {
-    /* overlay */
+  /* overlay */
 }
 ```
 
@@ -183,10 +183,10 @@ Edit `StudentBurgerMenu.jsx`, tambah di `<ul className="student-burger-list">`:
 
 ```jsx
 <li className="student-burger-item">
-    <Link to="/new-path" className="student-burger-link">
-        <span className="student-burger-icon-item">🆕</span>
-        <span>New Menu</span>
-    </Link>
+  <Link to="/new-path" className="student-burger-link">
+    <span className="student-burger-icon-item">🆕</span>
+    <span>New Menu</span>
+  </Link>
 </li>
 ```
 
@@ -196,14 +196,14 @@ Edit `public/css/app.css`:
 
 ```css
 .student-burger-menu {
-    background: linear-gradient(135deg, #YourColor1, #YourColor2);
+  background: linear-gradient(135deg, #YourColor1, #YourColor2);
 }
 ```
 
 ### **Tambah Keyboard Support:**
 
 ```jsx
-import { useKeyboardNavigation } from "../hooks/useMenuNavigation";
+import { useKeyboardNavigation } from '../hooks/useMenuNavigation';
 
 useKeyboardNavigation(menuOpen, handleMenuClose);
 ```

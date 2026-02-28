@@ -19,7 +19,7 @@
 ║ │ │ - path: "/organisasi" (Organisasi) │ │ ║
 ║ │ │ - path: "/event" (Event) │ │ ║
 ║ │ │ - path: "/pengumuman" (Pengumuman) │ │ ║
-║ │ │ - path: "/lostandfound" (LostAndFound) ← NEW │ │ ║
+║ │ │ - path: "/lost-found" (LostAndFound) ← NEW │ │ ║
 ║ │ │ - path: "/tentang-ufo" (TentangUFO) ← NEW │ │ ║
 ║ │ └────────────────────────────────────────────────────────────────┘ │ ║
 ║ │ │ ║
@@ -90,7 +90,7 @@
 │ │ ├─ li.student-burger-item │
 │ │ │ └─ Link to="/event" │
 │ │ ├─ li.student-burger-item │
-│ │ │ └─ Link to="/lostandfound" ← NEW │
+│ │ │ └─ Link to="/lost-found" ← NEW │
 │ │ ├─ li.student-burger-item │
 │ │ │ └─ Link to="/pengumuman" │
 │ │ └─ li.student-burger-item │
