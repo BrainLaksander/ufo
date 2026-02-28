@@ -1,59 +1,54 @@
-import React, { createContext, useEffect, useState } from "react";
-import PropTypes from "prop-types";
-import authService from "../services/authService";
-import { getLocalToken, setLocalToken } from "../hooks/useLocalStorage";
+import React, { createContext, useEffect, useState } from 'react';
+import PropTypes from 'prop-types';
 
+// Simple AuthContext (localStorage-based)
+const STORAGE_KEY = 'ufo_auth';
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-    const [user, setUser] = useState(null); // {id, name, role, ...}
-    const [token, setToken] = useState(() => getLocalToken());
-    const [loading, setLoading] = useState(!!token);
+  const [user, setUser] = useState(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) {
+      return null;
+    }
+  });
 
-    useEffect(() => {
-        async function restore() {
-            if (!token) {
-                setLoading(false);
-                return;
-            }
-            try {
-                const data = await authService.me(token); // call backend /me
-                setUser(data.user);
-            } catch (err) {
-                console.error("Failed to restore session", err);
-                setToken(null);
-                setUser(null);
-            } finally {
-                setLoading(false);
-            }
-        }
-        restore();
-    }, [token]);
+  const [loading, setLoading] = useState(false);
 
-    const login = async (credentials) => {
-        const { token: newToken, user: u } = await authService.login(
-            credentials
-        );
-        setToken(newToken);
-        setLocalToken(newToken);
-        setUser(u);
-        return u;
-    };
+  useEffect(() => {
+    // no-op for now, kept for parity
+  }, []);
 
-    const logout = async () => {
-        await authService.logout(token);
-        setToken(null);
-        setUser(null);
-        setLocalToken(null);
-    };
+  // Simple login: store minimal user object in localStorage
+  const login = async ({ email, role, name }) => {
+    const u = { email: email || null, role: role || null, name: name || null };
+    setUser(u);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(u));
+    } catch (e) {
+      // ignore storage errors
+    }
+    return u;
+  };
 
-    return (
-        <AuthContext.Provider
-            value={{ user, token, login, logout, loading, setUser }}
-        >
-            {children}
-        </AuthContext.Provider>
-    );
+  const logout = async () => {
+    setUser(null);
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch (e) {}
+  };
+
+  const isAuthenticated = !!user;
+
+  return (
+    <AuthContext.Provider
+      value={{ user, isAuthenticated, login, logout, loading, setUser }}
+    >
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 AuthProvider.propTypes = { children: PropTypes.node };

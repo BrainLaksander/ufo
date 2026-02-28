@@ -36,7 +36,7 @@ Sidebar dengan **kuning (#ffcc00) + ungu (#663399)** sudah siap pakai di halaman
 ```
 👥 Organisasi      → /organisasi
 📅 Event           → /event
-🔍 Lost & Found    → /lostandfound
+🔍 Lost & Found    → /lost-found
 📢 Pengumuman       → /pengumuman
 ℹ️  Tentang UFO     → /tentang-ufo
 ```
@@ -111,33 +111,33 @@ src/
 ### Gunakan di Component Lain
 
 ```jsx
-import StudentBurgerMenu from "../components/layout/StudentBurgerMenu";
-import { useState } from "react";
+import StudentBurgerMenu from '../components/layout/StudentBurgerMenu';
+import { useState } from 'react';
 
 export default function MyPage() {
-    const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
-    return (
-        <>
-            <StudentBurgerMenu
-                open={menuOpen}
-                onClose={() => setMenuOpen(false)}
-                activeItem="organisasi"
-            />
-            <button onClick={() => setMenuOpen(true)}>Open Menu</button>
-        </>
-    );
+  return (
+    <>
+      <StudentBurgerMenu
+        open={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        activeItem="organisasi"
+      />
+      <button onClick={() => setMenuOpen(true)}>Open Menu</button>
+    </>
+  );
 }
 ```
 
 ### Gunakan Menu Config
 
 ```jsx
-import { STUDENT_MENU_ITEMS, APP_INFO } from "../config/menuConfig";
+import { STUDENT_MENU_ITEMS, APP_INFO } from '../config/menuConfig';
 
 // Iterate menu items
 STUDENT_MENU_ITEMS.forEach((item) => {
-    console.log(item.label, item.icon, item.path);
+  console.log(item.label, item.icon, item.path);
 });
 
 // Access app info
@@ -147,7 +147,7 @@ console.log(APP_INFO.name, APP_INFO.version); // "UNKLAB Forum Organization", "1
 ### Gunakan Hooks (Opsional)
 
 ```jsx
-import { useKeyboardNavigation } from "../hooks/useMenuNavigation";
+import { useKeyboardNavigation } from '../hooks/useMenuNavigation';
 
 useKeyboardNavigation(menuOpen, handleClose); // Esc key support
 ```
@@ -206,7 +206,7 @@ Edit `public/css/app.css`:
 
 ```css
 .student-burger-menu {
-    transition: transform 0.3s ease; /* change 0.28s */
+  transition: transform 0.3s ease; /* change 0.28s */
 }
 ```
 
@@ -215,7 +215,7 @@ Edit `public/css/app.css`:
 Uncomment di `StudentBurgerMenu.jsx`:
 
 ```jsx
-import { useKeyboardNavigation } from "../hooks/useMenuNavigation";
+import { useKeyboardNavigation } from '../hooks/useMenuNavigation';
 useKeyboardNavigation(open, onClose);
 ```
 
@@ -242,8 +242,8 @@ useKeyboardNavigation(open, onClose);
 
 ```javascript
 // Di browser console
-const menu = document.querySelector(".student-burger-menu");
-console.log(menu.classList.contains("student-burger-menu--open")); // true/false
+const menu = document.querySelector('.student-burger-menu');
+console.log(menu.classList.contains('student-burger-menu--open')); // true/false
 ```
 
 ---

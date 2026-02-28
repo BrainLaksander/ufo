@@ -1,13 +1,141 @@
 @extends('layouts.pengurus')
 
-@section('title', 'Dashboard Pengurus - UFO')
+@section('title', 'Dashboard Pengurus')
 
 @section('content')
-<div class="dashboard-container">
-    <div class="page-header">
-        <h1>Dashboard Pengurus Organisasi</h1>
-        <p>Kelola organisasi Anda dengan mudah</p>
+<div class="page-header">
+    <h1>Dashboard Pengurus</h1>
+    <p class="page-subtitle">Ringkasan aktivitas organisasi Anda</p>
+</div>
+
+<!-- STATISTICS -->
+<div class="row g-3 mb-4">
+    @foreach($stats as $stat)
+    <div class="col-md-6 col-lg-3">
+        <div class="stat-card">
+            <div class="stat-card-icon">{{ $stat['icon'] }}</div>
+            <div class="stat-card-value">{{ $stat['value'] }}</div>
+            <div class="stat-card-label">{{ $stat['label'] }}</div>
+        </div>
     </div>
+    @endforeach
+</div>
+
+<div class="row g-3">
+    <!-- QUICK ACTIONS -->
+    <div class="col-lg-6">
+        <div class="bg-white p-4 rounded-3 shadow-sm border" style="border: 2px solid #f0f0f0;">
+            <h4 class="text-primary mb-3" style="font-weight: 700;">⚡ Quick Actions</h4>
+            <div class="d-flex flex-column gap-2">
+                <a href="/portal/pengurus/events/create" class="btn-primary-org">
+                    <span>➕</span> Buat Event
+                </a>
+                <a href="/portal/pengurus/announcements/create" class="btn-primary-org">
+                    <span>➕</span> Buat Pengumuman
+                </a>
+                <a href="/portal/pengurus/lostandfound" class="btn-primary-org">
+                    <span>➕</span> Lapor Lost & Found
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECENT APPLICATIONS -->
+    <div class="col-lg-6">
+        <div class="bg-white p-4 rounded-3 shadow-sm border" style="border: 2px solid #f0f0f0;">
+            <h4 class="text-primary mb-3" style="font-weight: 700;">📋 Pendaftaran Terbaru</h4>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <tbody>
+                        @foreach($recent_applications as $app)
+                        <tr>
+                            <td>
+                                <strong>{{ $app['name'] }}</strong><br>
+                                <small class="text-muted">{{ $app['nim'] }}</small>
+                            </td>
+                            <td class="text-end">
+                                <button class="btn btn-sm btn-success" style="background: var(--success); border: none; color: white; cursor: pointer;">✓</button>
+                                <button class="btn btn-sm btn-danger" style="background: var(--danger); border: none; color: white; cursor: pointer;">✕</button>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-3">
+                <a href="/portal/pengurus/applications" class="btn-secondary-org" style="text-decoration: none; display: inline-block;">Lihat Semua →</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mt-3">
+    <!-- RECENT EVENTS -->
+    <div class="col-lg-6">
+        <div class="bg-white p-4 rounded-3 shadow-sm border" style="border: 2px solid #f0f0f0;">
+            <h4 class="text-primary mb-3" style="font-weight: 700;">📅 Event Terdekat</h4>
+            <div class="d-flex flex-column gap-3">
+                @foreach($recent_events as $event)
+                <div style="border-left: 4px solid var(--primary); padding-left: 15px;">
+                    <div style="font-weight: 600; color: var(--primary);">{{ $event['name'] }}</div>
+                    <div style="font-size: 12px; color: var(--text-secondary);">
+                        📅 {{ date('d M Y', strtotime($event['date'])) }} | 👥 {{ $event['participants'] }} peserta
+                    </div>
+                    <div class="mt-1">
+                        @if($event['status'] == 'Draft')
+                            <span class="badge-org warning">Draft</span>
+                        @elseif($event['status'] == 'Open')
+                            <span class="badge-org success">Open</span>
+                        @else
+                            <span class="badge-org danger">{{ $event['status'] }}</span>
+                        @endif
+                    </div>
+                </div>
+                @endforeach
+            </div>
+            <div class="mt-3">
+                <a href="/portal/pengurus/events" class="btn-secondary-org" style="text-decoration: none; display: inline-block;">Lihat Semua →</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- RECENT LOST & FOUND -->
+    <div class="col-lg-6">
+        <div class="bg-white p-4 rounded-3 shadow-sm border" style="border: 2px solid #f0f0f0;">
+            <h4 class="text-primary mb-3" style="font-weight: 700;">🔍 Lost & Found Terbaru</h4>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead>
+                        <tr style="background: var(--primary); color: white;">
+                            <th style="border: none;">Barang</th>
+                            <th style="border: none;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($recent_lostandfound as $item)
+                        <tr>
+                            <td style="border-bottom: 1px solid #f0f0f0;">
+                                <strong>{{ $item['item'] }}</strong><br>
+                                <small class="text-muted">{{ $item['category'] }}</small>
+                            </td>
+                            <td style="border-bottom: 1px solid #f0f0f0;">
+                                @if($item['status'] == 'Found')
+                                    <span class="badge-org success">Found</span>
+                                @else
+                                    <span class="badge-org warning">Pending</span>
+                                @endif
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+            <div class="mt-3">
+                <a href="/portal/pengurus/lostandfound" class="btn-secondary-org" style="text-decoration: none; display: inline-block;">Lihat Semua →</a>
+            </div>
+        </div>
+    </div>
+</div>
 
     <div class="stats-grid">
         <div class="stat-card">
