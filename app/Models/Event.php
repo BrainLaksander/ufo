@@ -3,55 +3,136 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Event Model
+ * Mewakili event/kegiatan organisasi
+ * 
+ * Categories: rapat, event, akademik, sosial
+ * Status: draft, published, ongoing, completed, cancelled
+ */
 class Event extends Model
 {
+    use SoftDeletes;
 
     protected $fillable = [
         'organization_id',
+        'created_by',
         'title',
         'description',
-        'start_date',
-        'end_date',
+        'poster',
+        'event_date',
+        'location',
+        'category',
         'status',
+        'capacity',
+        'registered',
     ];
 
     protected $casts = [
-        'start_date' => 'datetime',
-        'end_date' => 'datetime',
+        'event_date' => 'datetime',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
+
+    // ========== RELATIONSHIPS ==========
 
     public function organization(): BelongsTo
     {
         return $this->belongsTo(Organization::class);
     }
 
-    public function reports(): HasMany
+    public function creator(): BelongsTo
     {
-        return $this->hasMany(Report::class);
+        return $this->belongsTo(User::class, 'created_by');
     }
 
-    // Helper: Cek apakah event sedang berlangsung
-    public function isOngoing(): bool
+    // ========== SCOPES ==========
+
+    public function scopePublished($query)
     {
-        return $this->status === 'ongoing' || 
-               (now()->between($this->start_date, $this->end_date) && $this->status === 'approved');
+        return $query->where('status', 'published');
     }
 
-    // Helper: Cek apakah event sudah selesai
-    public function isCompleted(): bool
+    public function scopeUpcoming($query)
     {
-        return now()->isAfter($this->end_date);
+        return $query->whereDate('event_date', '>=', now()->toDateString());
     }
 
-    // Helper: Status badge
-    public function getStatusBadge(): string
+    public function scopeByCategory($query, string $category)
     {
-        if ($this->isOngoing()) return 'Berjalan';
-        if ($this->isCompleted()) return 'Selesai';
-        if ($this->status === 'approved') return 'Akan Datang';
-        return ucfirst($this->status);
+        return $query->where('category', $category);
+    }
+
+    // ========== HELPER METHODS ==========
+
+    /**
+     * Warna badge untuk kategori event
+     */
+    public function getCategoryColor(): string
+    {
+        return match($this->category) {
+            'rapat' => 'info',
+            'event' => 'primary',
+            'akademik' => 'success',
+            'sosial' => 'warning',
+            default => 'secondary',
+        };
+    }
+
+    /**
+     * Label kategori dengan icon
+     */
+    public function getCategoryLabel(): string
+    {
+        return match($this->category) {
+            'rapat' => '📘 Rapat',
+            'event' => '🎉 Event',
+            'akademik' => '📚 Akademik',
+            'sosial' => '🤝 Sosial',
+            default => 'Kegiatan',
+        };
+    }
+
+    /**
+     * Bootstrap badge class untuk status
+     */
+    public function getStatusBadgeClass(): string
+    {
+        return match($this->status) {
+            'draft' => 'secondary',
+            'published' => 'success',
+            'ongoing' => 'info',
+            'completed' => 'secondary',
+            'cancelled' => 'danger',
+            default => 'secondary',
+        };
+    }
+
+    /**
+     * Cek event apakah upcoming
+     */
+    public function isUpcoming(): bool
+    {
+        return $this->event_date > now();
+    }
+
+    /**
+     * Cek event apakah sudah penuh
+     */
+    public function isFull(): bool
+    {
+        return $this->capacity && $this->registered >= $this->capacity;
+    }
+
+    /**
+     * Dapatkan slot yang tersedia
+     */
+    public function getAvailableSlots(): int
+    {
+        if (!$this->capacity) return 999;
+        return max(0, $this->capacity - $this->registered);
     }
 }

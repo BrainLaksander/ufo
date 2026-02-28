@@ -88,3 +88,12 @@ Route::prefix('/portal/admin')->group(function () {
 Route::prefix('/portal/kemahasiswaan')->group(function () {
     Route::view('/', 'pages.kemahasiswaan.dashboard')->name('portal.kemahasiswaan.dashboard');
 });
+
+/*
+|--------------------------------------------------------------------------
+| DASHBOARD ORGANISASI (NEW - Server-side Rendering)
+|--------------------------------------------------------------------------
+| System dashboard dengan Blade templating, role-based access,
+| dan approval workflows untuk organisasi kampus
+*/
+require __DIR__ . '/dashboard.php';

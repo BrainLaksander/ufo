@@ -4,50 +4,158 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
+/**
+ * Organization Model
+ * Mewakili organisasi/divisi kampus
+ * 
+ * Relationship:
+ * - Memiliki banyak event
+ * - Memiliki banyak announcement
+ * - Memiliki banyak proposal
+ * - Memiliki banyak lost & found items
+ * - Dipimpin oleh leader (user)
+ */
 class Organization extends Model
 {
     use SoftDeletes;
 
     protected $fillable = [
-        'name', 'shortname', 'logo', 'banner', 'description', 'vision', 'mission',
-        'email', 'phone', 'instagram', 'line_id', 'profile_status', 'profile_completion_percentage'
+        'name',
+        'slug',
+        'description',
+        'logo',
+        'email',
+        'phone',
+        'location',
+        'established_date',
+        'status',
+        'leader_id',
     ];
 
     protected $casts = [
-        'mission' => 'json',
+        'established_date' => 'date',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
-    public function members(): HasMany {
-        return $this->hasMany(Member::class);
+    // ========== RELATIONSHIPS ==========
+
+    /**
+     * Ketua/Leader organisasi
+     */
+    public function leader(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'leader_id');
     }
 
-    public function events(): HasMany {
+    /**
+     * Anggota organisasi
+     */
+    public function users(): HasMany
+    {
+        return $this->hasMany(User::class);
+    }
+
+    public function members(): HasMany
+    {
+        return $this->hasMany(User::class);
+    }
+
+    /**
+     * Event organisasi
+     */
+    public function events(): HasMany
+    {
         return $this->hasMany(Event::class);
     }
 
-    public function submissions(): HasMany {
-        return $this->hasMany(Submission::class);
+    /**
+     * Pengumuman organisasi
+     */
+    public function announcements(): HasMany
+    {
+        return $this->hasMany(Announcement::class);
     }
 
-    public function reports(): HasMany {
-        return $this->hasMany(Report::class);
+    /**
+     * Pengajuan/Proposal organisasi
+     */
+    public function proposals(): HasMany
+    {
+        return $this->hasMany(Proposal::class);
     }
 
-    public function tasks(): HasMany {
-        return $this->hasMany(Task::class);
+    /**
+     * Lost & Found items
+     */
+    public function lostFoundItems(): HasMany
+    {
+        return $this->hasMany(LostFoundItem::class);
     }
 
-    public function activityLogs(): HasMany {
-        return $this->hasMany(ActivityLog::class);
+    /**
+     * Contact messages
+     */
+    public function contactMessages(): HasMany
+    {
+        return $this->hasMany(ContactMessage::class);
     }
 
-    public function getActiveMembers() {
-        return $this->members()->where('status', 'aktif')->count();
+    // ========== SCOPES ==========
+
+    public function scopeActive($query)
+    {
+        return $query->where('status', 'active');
     }
 
-    public function getActiveEvents() {
+    public function scopeSlug($query, string $slug)
+    {
+        return $query->where('slug', $slug);
+    }
+
+    // ========== HELPER METHODS ==========
+
+    public function getActiveMembers()
+    {
+        return $this->users()->count();
+    }
+
+    public function getActiveEvents()
+    {
+        return $this->events()
+            ->whereIn('status', ['published', 'ongoing'])
+            ->count();
+    }
+
+    public function getUpcomingEvents()
+    {
+        return $this->events()
+            ->where('status', 'published')
+            ->where('event_date', '>=', now())
+            ->orderBy('event_date')
+            ->limit(5)
+            ->get();
+    }
+
+    public function getRecentAnnouncements()
+    {
+        return $this->announcements()
+            ->where('status', 'published')
+            ->orderBy('published_at', 'desc')
+            ->limit(5)
+            ->get();
+    }
+
+    public function getPendingProposals()
+    {
+        return $this->proposals()
+            ->whereIn('status', ['submitted', 'under_review'])
+            ->count();
+    }
+}
         return $this->events()->whereIn('status', ['approved', 'berjalan'])->count();
     }
 
