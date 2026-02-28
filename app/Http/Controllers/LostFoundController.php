@@ -2,194 +2,242 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\LostFoundItem;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 class LostFoundController extends Controller
 {
     /**
-     * Display the Lost & Found page
+     * Daftar barang hilang & ditemukan
      */
     public function index(): View
     {
-        $items = [
-            [
-                'id' => 1,
-                'name' => 'Dompet Kulit Hitam',
-                'status' => 'approved',
-                'itemStatus' => 'hilang',
-                'priority' => true,
-                'date' => '2024-03-15',
-                'location' => 'Aula Utama',
-                'description' => 'Dompet kulit hitam dengan inisial AB, berisi kartu pelajar, KTP, dan uang. Ditemukan di area depan aula sebelah tempat duduk besi.',
-                'contact' => 'aldi.pratama@unklab.ac.id',
-                'phone' => '0821-1234-5678',
-                'category' => 'Dompet'
-            ],
-            [
-                'id' => 2,
-                'name' => 'Gantungan Kunci Biru',
-                'status' => 'approved',
-                'itemStatus' => 'ditemukan',
-                'priority' => false,
-                'date' => '2024-03-10',
-                'location' => 'Perpustakaan, Rak Buku Zona C',
-                'description' => 'Gantungan kunci biru dengan logo kampus UNKLAB, isi 3 kunci (warna emas). Sangat mudah dikenali.',
-                'contact' => 'perpus@unklab.ac.id',
-                'phone' => '0821-9876-5432',
-                'category' => 'Kunci'
-            ],
-            [
-                'id' => 3,
-                'name' => 'Buku Catatan MATH101',
-                'status' => 'approved',
-                'itemStatus' => 'hilang',
-                'priority' => false,
-                'date' => '2024-03-18',
-                'location' => 'Ruang Kelas Lt. 2',
-                'description' => 'Buku catatan merah dengan nama "Sinta" di halaman depan. Isi catatan kuliah Matematika Dasar dari bulan Februari-Maret.',
-                'contact' => 'sinta.wijaya@unklab.ac.id',
-                'phone' => '0821-5555-5555',
-                'category' => 'Buku'
-            ],
-            [
-                'id' => 4,
-                'name' => 'Laptop Asus ROG',
-                'status' => 'approved',
-                'itemStatus' => 'hilang',
-                'priority' => true,
-                'date' => '2024-03-19',
-                'location' => 'Ruang Laboratorium Komputer Lt. 4',
-                'description' => 'Laptop Asus ROG warna hitam dengan sticker logo. Casing dalam keadaan bagus, layar masih normal. Memiliki nilai tinggi.',
-                'contact' => 'ricky.pram@unklab.ac.id',
-                'phone' => '0821-2222-2222',
-                'category' => 'Elektronik'
-            ],
-            [
-                'id' => 5,
-                'name' => 'Kartu Pelajar Plastik',
-                'status' => 'approved',
-                'itemStatus' => 'ditemukan',
-                'priority' => false,
-                'date' => '2024-03-12',
-                'location' => 'Kantin Area Meja Makan',
-                'description' => 'Kartu pelajar UNKLAB dengan foto nama. Ditemukan dalam kondisi baik di salah satu meja kantin.',
-                'contact' => 'kemahasiswaan@unklab.ac.id',
-                'phone' => '0821-3333-3333',
-                'category' => 'Kartu Identitas'
-            ],
-            [
-                'id' => 6,
-                'name' => 'Headphone Wireless JBL',
-                'status' => 'approved',
-                'itemStatus' => 'ditemukan',
-                'priority' => false,
-                'date' => '2024-03-08',
-                'location' => 'Mushola Lt. 1',
-                'description' => 'Headphone nirkabel warna hitam dengan warna merah di bagian telinga. Masih dalam kondisi hidup dengan baterai 60%.',
-                'contact' => 'doni.herm@unklab.ac.id',
-                'phone' => '0821-4444-4444',
-                'category' => 'Elektronik'
-            ]
+        $organization = auth()->user()->organization;
+
+        $filter = request('filter', 'active'); // active, lost, found, claimed, closed
+        $query = $organization->lostFoundItems();
+
+        if ($filter === 'lost') {
+            $query->where('type', 'lost');
+        } elseif ($filter === 'found') {
+            $query->where('type', 'found');
+        } elseif ($filter === 'claimed') {
+            $query->where('status', 'claimed');
+        } elseif ($filter === 'closed') {
+            $query->where('status', 'closed');
+        } else {
+            $query->where('status', 'active');
+        }
+
+        $items = $query->orderBy('created_at', 'desc')->paginate(12);
+
+        $stats = [
+            'active' => $organization->lostFoundItems()->where('status', 'active')->count(),
+            'claimed' => $organization->lostFoundItems()->where('status', 'claimed')->count(),
+            'lost' => $organization->lostFoundItems()->where('type', 'lost')->count(),
+            'found' => $organization->lostFoundItems()->where('type', 'found')->count(),
         ];
 
-        return view('mahasiswa.lost-found', [
-            'items' => $items
+        return view('dashboard.lostfound.index', compact('organization', 'items', 'stats', 'filter'));
+    }
+
+    /**
+     * Form lapor barang hilang/ditemukan
+     */
+    public function create()
+    {
+        return view('dashboard.lostfound.create');
+    }
+
+    /**
+     * Simpan laporan barang
+     */
+    public function store(Request $request)
+    {
+        $organization = auth()->user()->organization;
+
+        $validated = $request->validate([
+            'type' => 'required|in:lost,found',
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'location' => 'required|string|max:255',
+            'report_date' => 'required|date|before_or_equal:today',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        // Handle photo upload
+        if ($request->hasFile('photo')) {
+            $validated['photo'] = $request->file('photo')->store('lost-found', 'public');
+        }
+
+        $validated['organization_id'] = $organization->id;
+        $validated['reporter_id'] = auth()->id();
+        $validated['status'] = 'active';
+
+        LostFoundItem::create($validated);
+
+        $typeName = $validated['type'] === 'lost' ? 'Hilang' : 'Ditemukan';
+
+        return redirect()->route('lostfound.index')
+            ->with('success', "Laporan \"$typeName\" berhasil dibuat");
+    }
+
+    /**
+     * Tampilkan detail barang
+     */
+    public function show(LostFoundItem $item)
+    {
+        $this->authorize('view', $item);
+
+        return view('dashboard.lostfound.show', compact('item'));
+    }
+
+    /**
+     * Form edit barang
+     */
+    public function edit(LostFoundItem $item)
+    {
+        $this->authorize('update', $item);
+
+        if ($item->status !== 'active') {
+            return back()->with('error', 'Barang tidak dapat diedit');
+        }
+
+        return view('dashboard.lostfound.edit', compact('item'));
+    }
+
+    /**
+     * Update barang
+     */
+    public function update(Request $request, LostFoundItem $item)
+    {
+        $this->authorize('update', $item);
+
+        if ($item->status !== 'active') {
+            return back()->with('error', 'Barang tidak dapat diedit');
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:255',
+            'description' => 'required|string',
+            'location' => 'required|string|max:255',
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        // Handle photo upload
+        if ($request->hasFile('photo')) {
+            if ($item->photo) {
+                \Storage::disk('public')->delete($item->photo);
+            }
+            $validated['photo'] = $request->file('photo')->store('lost-found', 'public');
+        }
+
+        $item->update($validated);
+
+        return redirect()->route('lostfound.show', $item)
+            ->with('success', 'Laporan berhasil diperbarui');
+    }
+
+    /**
+     * Hapus laporan barang
+     */
+    public function destroy(LostFoundItem $item)
+    {
+        $this->authorize('delete', $item);
+
+        if ($item->photo) {
+            \Storage::disk('public')->delete($item->photo);
+        }
+
+        $item->delete();
+
+        return redirect()->route('lostfound.index')
+            ->with('success', 'Laporan berhasil dihapus');
+    }
+
+    /**
+     * Claim barang yang ditemukan (sebagai pemilik barang yang hilang)
+     * atau tandai barang hilang sebagai sudah ditemukan
+     */
+    public function claim(Request $request, LostFoundItem $item)
+    {
+        if ($item->status !== 'active') {
+            return back()->with('error', 'Barang tidak dapat diklaim');
+        }
+
+        $item->claim(auth()->user());
+
+        return back()->with('success', 'Barang berhasil diklaim. Hubungi pelapor untuk koordinasi lebih lanjut.');
+    }
+
+    /**
+     * Tandai barang sebagai sudah ditemukan
+     */
+    public function markAsFound(Request $request, LostFoundItem $item)
+    {
+        $this->authorize('update', $item);
+
+        if ($item->status !== 'active') {
+            return back()->with('error', 'Barang tidak dapat ditandai');
+        }
+
+        $item->markAsFound();
+
+        return back()->with('success', 'Barang ditandai sebagai sudah ditemukan');
+    }
+
+    /**
+     * Tutup laporan barang
+     */
+    public function close(Request $request, LostFoundItem $item)
+    {
+        $this->authorize('update', $item);
+
+        $item->close();
+
+        return back()->with('success', 'Laporan ditutup');
+    }
+
+    /**
+     * API endpoint untuk detail barang (untuk legacy view jika perlu)
+     */
+    public function detail($id)
+    {
+        $item = LostFoundItem::findOrFail($id);
+
+        return response()->json([
+            'id' => $item->id,
+            'title' => $item->title,
+            'description' => $item->description,
+            'type' => $item->type,
+            'status' => $item->status,
+            'location' => $item->location,
+            'reporter' => $item->reporter->name,
+            'report_date' => $item->report_date->format('d M Y'),
+            'photo_url' => $item->photo_url,
         ]);
     }
 
     /**
-     * Get item detail (API)
+     * API endpoint untuk pencarian barang (AJAX)
      */
-    public function detail($id)
+    public function search(Request $request)
     {
-        $items = [
-            [
-                'id' => 1,
-                'name' => 'Dompet Kulit Hitam',
-                'status' => 'approved',
-                'itemStatus' => 'hilang',
-                'priority' => true,
-                'date' => '2024-03-15',
-                'location' => 'Aula Utama',
-                'description' => 'Dompet kulit hitam dengan inisial AB, berisi kartu pelajar, KTP, dan uang. Ditemukan di area depan aula sebelah tempat duduk besi.',
-                'contact' => 'aldi.pratama@unklab.ac.id',
-                'phone' => '0821-1234-5678',
-                'category' => 'Dompet'
-            ],
-            [
-                'id' => 2,
-                'name' => 'Gantungan Kunci Biru',
-                'status' => 'approved',
-                'itemStatus' => 'ditemukan',
-                'priority' => false,
-                'date' => '2024-03-10',
-                'location' => 'Perpustakaan, Rak Buku Zona C',
-                'description' => 'Gantungan kunci biru dengan logo kampus UNKLAB, isi 3 kunci (warna emas). Sangat mudah dikenali.',
-                'contact' => 'perpus@unklab.ac.id',
-                'phone' => '0821-9876-5432',
-                'category' => 'Kunci'
-            ],
-            [
-                'id' => 3,
-                'name' => 'Buku Catatan MATH101',
-                'status' => 'approved',
-                'itemStatus' => 'hilang',
-                'priority' => false,
-                'date' => '2024-03-18',
-                'location' => 'Ruang Kelas Lt. 2',
-                'description' => 'Buku catatan merah dengan nama "Sinta" di halaman depan. Isi catatan kuliah Matematika Dasar dari bulan Februari-Maret.',
-                'contact' => 'sinta.wijaya@unklab.ac.id',
-                'phone' => '0821-5555-5555',
-                'category' => 'Buku'
-            ],
-            [
-                'id' => 4,
-                'name' => 'Laptop Asus ROG',
-                'status' => 'approved',
-                'itemStatus' => 'hilang',
-                'priority' => true,
-                'date' => '2024-03-19',
-                'location' => 'Ruang Laboratorium Komputer Lt. 4',
-                'description' => 'Laptop Asus ROG warna hitam dengan sticker logo. Casing dalam keadaan bagus, layar masih normal. Memiliki nilai tinggi.',
-                'contact' => 'ricky.pram@unklab.ac.id',
-                'phone' => '0821-2222-2222',
-                'category' => 'Elektronik'
-            ],
-            [
-                'id' => 5,
-                'name' => 'Kartu Pelajar Plastik',
-                'status' => 'approved',
-                'itemStatus' => 'ditemukan',
-                'priority' => false,
-                'date' => '2024-03-12',
-                'location' => 'Kantin Area Meja Makan',
-                'description' => 'Kartu pelajar UNKLAB dengan foto nama. Ditemukan dalam kondisi baik di salah satu meja kantin.',
-                'contact' => 'kemahasiswaan@unklab.ac.id',
-                'phone' => '0821-3333-3333',
-                'category' => 'Kartu Identitas'
-            ],
-            [
-                'id' => 6,
-                'name' => 'Headphone Wireless JBL',
-                'status' => 'approved',
-                'itemStatus' => 'ditemukan',
-                'priority' => false,
-                'date' => '2024-03-08',
-                'location' => 'Mushola Lt. 1',
-                'description' => 'Headphone nirkabel warna hitam dengan warna merah di bagian telinga. Masih dalam kondisi hidup dengan baterai 60%.',
-                'contact' => 'doni.herm@unklab.ac.id',
-                'phone' => '0821-4444-4444',
-                'category' => 'Elektronik'
-            ]
-        ];
+        $organization = auth()->user()->organization;
+        $query = $request->input('q');
 
-        $item = collect($items)->firstWhere('id', (int) $id);
+        $items = $organization->lostFoundItems()
+            ->where('status', 'active')
+            ->where(function ($q) use ($query) {
+                $q->where('title', 'LIKE', "%$query%")
+                    ->orWhere('description', 'LIKE', "%$query%")
+                    ->orWhere('location', 'LIKE', "%$query%");
+            })
+            ->limit(10)
+            ->get(['id', 'title', 'type', 'location', 'report_date']);
 
-        if (!$item) {
-            return response()->json(['error' => 'Item not found'], 404);
-        }
-
-        return response()->json($item);
+        return response()->json($items);
     }
 }
+
