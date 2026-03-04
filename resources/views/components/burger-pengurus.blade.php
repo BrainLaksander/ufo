@@ -12,7 +12,7 @@
             <li><a href="#" data-close>Pengumuman</a></li>
             <li><a href="#" data-close>Pengajuan & Laporan</a></li>
             <li><a href="#" data-close>Pendaftaran Organisasi</a></li>
-            <li><a href="#" data-close>Lost & Found</a></li>
+            <li><a href="/lost-found" data-close>Lost & Found</a></li>
             <li><a href="#" data-close>Chat & Konsultasi</a></li>
             <li class="burger-divider"></li>
             <li><a href="/portal/login" id="logout-btn" data-close>Keluar</a></li>

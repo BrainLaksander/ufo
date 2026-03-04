@@ -1,46 +1,120 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../auth/useAuth';
+import LoginCard from '../../components/ui/LoginCard';
+import FormInput from '../../components/ui/FormInput';
 
+/**
+ * Pengurus Login Page
+ *
+ * Halaman login untuk pengurus organisasi, admin, dan kemahasiswaan
+ * Dengan form email, password, dan role selection
+ */
 export default function Login() {
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const navigate = useNavigate();
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('');
+  const navigate = useNavigate();
 
-    function handleSubmit(e) {
-        e.preventDefault();
-        // dummy auth: accept anything and navigate to /pengurus
-        navigate("/pengurus");
+  const { login } = useAuth();
+
+  async function handleSubmit(e) {
+    e.preventDefault();
+    if (!role) return; // require role selection
+
+    // Simple client-side auth: store role and redirect accordingly
+    await login({ email, role, name: email });
+
+    // Role-based redirect
+    if (role === 'pengurus') {
+      navigate('/pengurus');
+    } else if (role === 'admin') {
+      navigate('/admin');
+    } else if (role === 'kemahasiswaan') {
+      navigate('/kemahasiswaan');
+    } else {
+      // default fallback - go back to portal login
+      navigate('/portal/login');
     }
+  }
 
-    return (
-        <div className="max-w-md mx-auto bg-white p-6 rounded shadow">
-            <h2 className="text-xl font-semibold mb-4">Login Pengurus</h2>
-            <form onSubmit={handleSubmit} className="space-y-3">
-                <div>
-                    <label className="block text-sm">Email</label>
-                    <input
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="mt-1 block w-full border px-3 py-2 rounded"
-                        placeholder="pengurus@contoh.test"
-                    />
-                </div>
-                <div>
-                    <label className="block text-sm">Password</label>
-                    <input
-                        type="password"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="mt-1 block w-full border px-3 py-2 rounded"
-                        placeholder="••••••••"
-                    />
-                </div>
-                <div className="flex justify-end">
-                    <button className="px-4 py-2 bg-blue-600 text-white rounded">
-                        Login
-                    </button>
-                </div>
-            </form>
+  const roleOptions = [
+    { value: 'pengurus', label: 'Pengurus Organisasi' },
+    { value: 'admin', label: 'Admin Sistem' },
+    { value: 'kemahasiswaan', label: 'Kemahasiswaan' },
+  ];
+
+  return (
+    <div className="portal-login-wrapper">
+      {/* Header Section */}
+      <div className="portal-login-header">
+        <div className="portal-login-header-content">
+          <div className="portal-login-header-icon">👤</div>
+          <div>
+            <h1 className="portal-login-header-title">Sistem Kemahasiswaan</h1>
+            <p className="portal-login-header-subtitle">Universitas Klabat</p>
+          </div>
         </div>
-    );
+      </div>
+
+      {/* Login Container */}
+      <div className="portal-login-container">
+        <LoginCard title="Selamat Datang" subtitle="Silakan masuk ke akun Anda">
+          <form onSubmit={handleSubmit}>
+            {/* Email Input */}
+            <FormInput
+              label="Email"
+              type="email"
+              icon="✉️"
+              placeholder="Masukkan email"
+              name="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
+
+            {/* Password Input */}
+            <FormInput
+              label="Password"
+              type="password"
+              icon="🔒"
+              placeholder="Masukkan password"
+              name="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+            />
+
+            {/* Role Select */}
+            <FormInput
+              label="Pilih Role"
+              type="select"
+              icon="🎯"
+              placeholder="Pilih role Anda"
+              options={roleOptions}
+              name="role"
+              value={role}
+              onChange={(e) => setRole(e.target.value)}
+              required
+            />
+
+            {/* Submit Button */}
+            <button type="submit" className="portal-login-btn">
+              Masuk
+            </button>
+          </form>
+        </LoginCard>
+
+        {/* Footer Info */}
+        <div className="portal-login-page-footer">
+          <p className="portal-login-footer-main">
+            Sistem Administrasi & Kontrol Organisasi Mahasiswa
+          </p>
+          <p className="portal-login-footer-sub">
+            Departemen Kemahasiswaan Universitas Klabat
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 }

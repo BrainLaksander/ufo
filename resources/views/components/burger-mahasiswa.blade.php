@@ -9,10 +9,10 @@
             <li><a href="/" data-close>Dashboard</a></li>
             <li><a href="/mahasiswa/organisasi" data-close>Organisasi</a></li>
             <li><a href="/mahasiswa/event" data-close>Event</a></li>
-            <li><a href="#" data-close>Lost & Found</a></li>
+            <li><a href="/lost-found" data-close>Lost & Found</a></li>
             <li><a href="#" data-close>Pengumuman</a></li>
             <li class="burger-divider"></li>
-            <li><a href="/portal/login" data-close>Login Portal</a></li>
+            <li><a href="/portal/login" data-close>Portal Internal</a></li>
         </ul>
     </nav>
 </aside>
