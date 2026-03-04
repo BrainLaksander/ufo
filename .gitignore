@@ -33,3 +33,9 @@ Thumbs.db
 *_backup.js
 *.swp
 *.swo
+
+# Local history / temp that can contain merge markers
+.lh/
+*.orig
+*.rej
+*~

@@ -17,18 +17,40 @@
 </header>
 
 <div id="burger-overlay" class="overlay hidden"></div>
-<aside id="burger-menu" class="burger-menu" aria-hidden="true">
+<aside id="burger-menu" class="burger-menu burger-mahasiswa" aria-hidden="true">
     <div class="burger-header">
-        <div class="burger-title">Menu</div>
+        <div class="burger-header-content">
+            <span class="burger-icon">🛸</span>
+            <div class="burger-title">Menu UFO</div>
+        </div>
         <button id="burger-close" class="burger-close" aria-label="Close menu">✕</button>
     </div>
     <nav class="burger-nav">
         <ul>
-            <li><a href="/" data-close>Beranda</a></li>
-            <li><a href="/mahasiswa/organisasi" data-close>Organisasi</a></li>
-            <li><a href="/mahasiswa/event" data-close>Event</a></li>
-            <li class="burger-divider"></li>
-            <li><a href="/portal/login" data-close>Portal Internal</a></li>
+            <li><a href="/mahasiswa/organisasi" class="burger-link organisasi-link" data-close>
+                <span class="burger-link-icon">👥</span>
+                <span class="burger-link-text">Organisasi</span>
+            </a></li>
+            <li><a href="/mahasiswa/event" class="burger-link" data-close>
+                <span class="burger-link-icon">📅</span>
+                <span class="burger-link-text">Event</span>
+            </a></li>
+            <li><a href="/lost-found" class="burger-link" data-close>
+                <span class="burger-link-icon">🔍</span>
+                <span class="burger-link-text">Lost & Found</span>
+            </a></li>
+            <li><a href="{{ route('pengumuman.index') }}" class="burger-link" data-close>
+                <span class="burger-link-icon">📢</span>
+                <span class="burger-link-text">Pengumuman</span>
+            </a></li>
+            <li><a href="{{ route('mahasiswa.tentang') }}" class="burger-link" data-close>
+                <span class="burger-link-icon">ℹ️</span>
+                <span class="burger-link-text">Tentang UFO</span>
+            </a></li>
+            <li><a href="/portal/login" class="burger-link" data-close>
+                <span class="burger-link-icon">🔐</span>
+                <span class="burger-link-text">Portal Internal</span>
+            </a></li>
         </ul>
     </nav>
 </aside>
