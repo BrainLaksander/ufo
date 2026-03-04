@@ -1,0 +1,415 @@
+/* Kemahasiswaan custom styles — overrides for layout and components */
+:root {
+  --km-primary: #3b1c57;
+  --km-accent: #5f3a74;
+  --km-yellow: #ffcc00;
+  --km-muted: #f4f5f7;
+}
+
+/* Sidebar: visible by default for kemahasiswaan */
+.kemahasiswaan-sidebar {
+  background: linear-gradient(
+    180deg,
+    var(--km-accent) 0%,
+    var(--km-primary) 100%
+  );
+  color: white;
+  width: 280px;
+}
+
+/* Hide global portal header when using kemahasiswaan layout (dashboard provides its own fixed header) */
+body.kemahasiswaan-layout .header.header-portal {
+  display: none;
+}
+
+.kemahasiswaan-sidebar .sidebar-top {
+  padding: 28px 20px;
+}
+
+.kemahasiswaan-sidebar .dept-title h2 {
+  margin: 0 0 16px;
+  font-size: 32px;
+  line-height: 1.05;
+  font-weight: 800;
+}
+
+.kemahasiswaan-sidebar .university {
+  color: var(--km-yellow);
+  font-weight: 700;
+  font-size: 13px;
+}
+
+.sidebar-nav {
+  padding: 14px 20px 140px; /* keep large bottom padding so footer never overlaps */
+  overflow-y: auto; /* scroll only inside nav */
+  flex: 1 1 auto;
+}
+.sidebar-nav ul {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.sidebar-nav li {
+  margin-bottom: 12px;
+}
+
+/* full-width pill style for menu items (compact) */
+.sidebar-nav .nav-link {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  color: rgba(255, 255, 255, 0.95);
+  text-decoration: none;
+  border-radius: 12px;
+  width: calc(100% - 0px);
+  box-sizing: border-box;
+  background: transparent;
+  transition:
+    background 0.12s ease,
+    transform 0.06s ease;
+}
+.sidebar-nav .nav-link:hover {
+  background: rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
+}
+.sidebar-nav .nav-link.active {
+  background: #ffffff;
+  color: var(--km-primary);
+  font-weight: 700;
+  box-shadow: 0 6px 18px rgba(27, 13, 46, 0.12);
+  border-radius: 12px;
+}
+
+/* icon and text styles */
+.sidebar-nav .nav-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.06);
+  color: white;
+  flex-shrink: 0;
+  font-size: 14px;
+}
+
+.sidebar-nav .nav-text {
+  font-size: 15px;
+  display: inline-block;
+  font-weight: 600;
+  color: inherit;
+  line-height: 1.2;
+}
+
+/* active pill: make icon use primary color */
+.sidebar-nav .nav-link.active .nav-icon {
+  background: transparent;
+  color: var(--km-primary);
+}
+
+/* notification badge inside nav link */
+.notif-badge {
+  margin-left: auto;
+  background: var(--km-yellow);
+  color: var(--km-primary);
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 999px;
+  font-size: 12px;
+  line-height: 1;
+  display: inline-block;
+}
+.sidebar-nav .nav-link.active .notif-badge {
+  background: var(--km-primary);
+  color: white;
+}
+
+/* footer logout style with icon */
+.sidebar-footer .logout {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.95);
+  text-decoration: none;
+  margin-top: 12px;
+}
+.sidebar-footer .logout svg {
+  width: 20px;
+  height: 20px;
+  opacity: 0.95;
+}
+
+/* Ensure footer stays above nav but doesn't block clicks on nav by keeping nav's bottom padding */
+.sidebar-footer {
+  position: absolute;
+  bottom: 20px;
+  left: 0;
+  right: 0;
+  padding: 0 20px;
+  z-index: 10;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0) 100%
+  );
+}
+
+/* Small screens: increase sidebar width slightly to avoid text clipping */
+@media (max-width: 500px) {
+  .kemahasiswaan-sidebar {
+    width: 320px;
+  }
+  .sidebar-nav {
+    padding: 12px 0 180px;
+  }
+}
+
+.sidebar-divider {
+  height: 1px;
+  margin: 12px 14px;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Footer: static in flow (flex-end) so it never overlaps nav */
+.sidebar-footer {
+  padding: 16px 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  background: transparent;
+  z-index: 20;
+  flex-shrink: 0;
+  min-height: 110px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.sidebar-footer .profile {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.sidebar-footer .avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #ffcc33;
+  color: #3b1c57;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+}
+.sidebar-footer .name {
+  font-weight: 700;
+}
+.sidebar-footer .role {
+  font-size: 12px;
+  opacity: 0.9;
+}
+.sidebar-footer .logout {
+  display: block;
+  margin-top: 12px;
+  color: rgba(255, 255, 255, 0.9);
+  text-decoration: none;
+}
+
+/* Layout tweaks for kemahasiswaan pages */
+.kemahasiswaan-sidebar {
+  height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+  display: flex; /* make sidebar a column container */
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden; /* prevent double scrollbars */
+  width: 280px;
+}
+.kemahasiswaan-sidebar .sidebar-top {
+  padding-top: 96px;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+
+/* Ensure nav scroll area doesn't extend under footer on very small screens */
+@media (max-height: 700px) {
+  .sidebar-nav {
+    max-height: calc(100vh - 220px);
+  }
+}
+
+.page-header {
+  position: fixed;
+  left: 280px;
+  right: 0;
+  top: 0;
+  height: 96px;
+  padding: 22px 36px;
+  background: var(--km-primary);
+  color: white;
+  z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.page-header h1 {
+  margin: 0;
+  font-size: 32px;
+}
+.page-header .page-subtitle {
+  margin: 6px 0 0;
+  color: rgba(255, 255, 255, 0.9);
+  font-size: 14px;
+}
+
+body.kemahasiswaan-layout .main-content {
+  padding-top: 120px;
+  margin-left: 280px;
+  background: #f3f4f6;
+  min-height: calc(100vh - 120px);
+}
+
+.content-grid {
+  padding: 24px 36px;
+}
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 20px;
+  margin-top: 20px;
+}
+.stat-card {
+  background: white;
+  border-radius: 8px;
+  padding: 18px;
+  box-shadow: 0 1px 6px rgba(29, 30, 34, 0.06);
+  position: relative;
+}
+.stat-card .stat-label {
+  color: #666;
+  font-size: 14px;
+}
+.stat-card .stat-value {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--km-primary);
+  margin-top: 8px;
+}
+.stat-card .stat-icon {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  background: var(--km-accent);
+  color: white;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+}
+
+.main-grid {
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 20px;
+  margin-top: 24px;
+  align-items: start;
+}
+.chart-card {
+  background: white;
+  border-radius: 8px;
+  padding: 18px;
+  box-shadow: 0 1px 6px rgba(29, 30, 34, 0.06);
+}
+.chart-placeholder {
+  height: 260px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #999;
+}
+.quick-actions {
+  background: white;
+  border-radius: 8px;
+  padding: 18px;
+  box-shadow: 0 1px 6px rgba(29, 30, 34, 0.06);
+}
+.quick-actions h3 {
+  margin-top: 0;
+  color: var(--km-primary);
+}
+.quick-actions .quick-create {
+  background: var(--km-yellow);
+  border-radius: 8px;
+  padding: 12px;
+  width: 100%;
+  border: none;
+  color: var(--km-primary);
+  font-weight: 700;
+  margin-top: 12px;
+}
+
+/* Responsiveness */
+@media (max-width: 1000px) {
+  .stats-row {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .main-grid {
+    grid-template-columns: 1fr;
+  }
+  /* Ensure content uses full width and has no left offset on small screens */
+  body.kemahasiswaan-layout .main-content {
+    margin-left: 0;
+    padding-left: 0;
+  }
+
+  /* Make header full-width on small screens so there's no leftover sidebar gap */
+  .page-header {
+    left: 0;
+    right: 0;
+    padding-left: 16px;
+    padding-right: 16px;
+    z-index: 100; /* keep header above overlays */
+  }
+
+  /* Sidebar off-canvas on mobile */
+  #sidebar {
+    position: fixed;
+    transform: translateX(-110%);
+  }
+}
+
+/* Minor visual tweaks */
+.kemahasiswaan-sidebar::-webkit-scrollbar {
+  width: 10px;
+}
+.kemahasiswaan-sidebar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.22);
+  border-radius: 10px;
+}
+.stat-card {
+  min-height: 120px;
+}
+.quick-actions .btn.btn-dark {
+  background: var(--km-accent);
+  color: white;
+  border: none;
+}
+.badge.bg-success {
+  background: #e8f9ec;
+  color: #05632a;
+  border-radius: 16px;
+  padding: 6px 12px;
+}
+.badge.bg-secondary {
+  background: #f3f4f6;
+  color: #666;
+  padding: 6px 12px;
+  border-radius: 12px;
+}
+.table-responsive .table tbody tr td {
+  vertical-align: middle;
+}
