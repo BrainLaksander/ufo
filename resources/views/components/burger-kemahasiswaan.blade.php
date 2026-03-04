@@ -7,9 +7,9 @@
     <nav class="burger-nav">
         <ul>
             <li><a href="/portal/kemahasiswaan" data-close>Dashboard</a></li>
-            <li><a href="#" data-close>Manajemen Organisasi</a></li>
-            <li><a href="#" data-close>Pendaftaran Organisasi</a></li>
-            <li><a href="#" data-close>Event Organisasi</a></li>
+            <li><a href="/portal/kemahasiswaan/organisasi" data-close>Manajemen Organisasi</a></li>
+            <li><a href="/portal/kemahasiswaan/organisasi" data-close>Pendaftaran Organisasi</a></li>
+            <li><a href="/portal/kemahasiswaan/pengajuan" data-close>Event Organisasi</a></li>
             <li class="burger-divider"></li>
             <li><a href="/portal/login" id="logout-btn" data-close>Keluar</a></li>
         </ul>

@@ -57,4 +57,8 @@ Route::prefix('/portal/admin')->group(function () {
 
 Route::prefix('/portal/kemahasiswaan')->group(function () {
     Route::view('/', 'pages.kemahasiswaan.dashboard')->name('portal.kemahasiswaan.dashboard');
+    Route::view('/organisasi', 'pages.portal.kemahasiswaan.organisasi')->name('portal.kemahasiswaan.organisasi');
+    Route::view('/pengajuan', 'pages.portal.kemahasiswaan.pengajuan')->name('portal.kemahasiswaan.pengajuan');
+    Route::view('/pengumuman', 'pages.portal.kemahasiswaan.pengumuman')->name('portal.kemahasiswaan.pengumuman');
+    Route::view('/notifikasi', 'pages.portal.kemahasiswaan.notifikasi')->name('portal.kemahasiswaan.notifikasi');
 });

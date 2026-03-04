@@ -5,7 +5,11 @@ import App from './App';
 // Mount React app to element added in Blade
 const mount = () => {
   const el = document.getElementById('portal-root');
-  if (!el) return;
+  if (!el) {
+    console.warn('React: mount point "portal-root" not found on this page.');
+    return;
+  }
+  console.log('React: mounting App into', el);
   const root = createRoot(el);
   root.render(<App />);
 };
