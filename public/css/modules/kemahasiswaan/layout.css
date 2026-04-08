@@ -1,0 +1,156 @@
+/* Kemahasiswaan layout */
+
+/* ===== LAYOUT ===== */
+.page-header {
+    position: fixed;
+    top: 0;
+    left: 280px;
+    right: 0;
+    z-index: 90;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 96px;
+    padding: 22px 36px;
+    background: var(--km-primary);
+    color: white;
+}
+
+.page-header h1 {
+    margin: 0;
+    font-size: 32px;
+}
+
+.page-header .page-subtitle {
+    margin: 6px 0 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 14px;
+}
+
+body.kemahasiswaan-layout .main-content {
+    margin-left: 280px;
+    min-height: calc(100vh - 120px);
+    padding-top: 120px;
+    background: #f3f4f6;
+}
+
+.content-grid {
+    padding: 24px 36px;
+}
+
+.stats-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.stat-card {
+    position: relative;
+    min-height: 120px;
+    padding: 18px;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 1px 6px rgba(29, 30, 34, 0.06);
+}
+
+.stat-card .stat-label {
+    color: #666;
+    font-size: 14px;
+}
+
+.stat-card .stat-value {
+    margin-top: 8px;
+    color: var(--km-primary);
+    font-size: 36px;
+    font-weight: 700;
+}
+
+.stat-card .stat-icon {
+    position: absolute;
+    top: 18px;
+    right: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 8px;
+    background: var(--km-accent);
+    color: white;
+}
+
+.main-grid {
+    display: grid;
+    align-items: start;
+    grid-template-columns: 1fr 320px;
+    gap: 20px;
+    margin-top: 24px;
+}
+
+.chart-card,
+.quick-actions {
+    padding: 18px;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 1px 6px rgba(29, 30, 34, 0.06);
+}
+
+.chart-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 260px;
+    color: #999;
+}
+
+.quick-actions h3 {
+    margin-top: 0;
+    color: var(--km-primary);
+}
+
+.quick-actions .quick-create {
+    width: 100%;
+    margin-top: 12px;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    background: var(--km-yellow);
+    color: var(--km-primary);
+    font-weight: 700;
+}
+
+.quick-actions .btn.btn-dark {
+    border: none;
+    background: var(--km-accent);
+    color: white;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1000px) {
+    .stats-row {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .main-grid {
+        grid-template-columns: 1fr;
+    }
+
+    body.kemahasiswaan-layout .main-content {
+        margin-left: 0;
+        padding-left: 0;
+    }
+
+    .page-header {
+        left: 0;
+        right: 0;
+        z-index: 100;
+        padding-left: 16px;
+        padding-right: 16px;
+    }
+
+    #sidebar {
+        position: fixed;
+        transform: translateX(-110%);
+    }
+}

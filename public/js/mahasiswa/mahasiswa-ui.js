@@ -3,13 +3,17 @@
     // Drawer toggle
     var drawer = document.getElementById("drawer");
     var overlay = document.getElementById("drawer-overlay");
+
     function openDrawer() {
+        if (!drawer || !overlay) return;
         drawer.classList.add("open");
         overlay.classList.add("open");
         drawer.setAttribute("aria-hidden", "false");
         overlay.setAttribute("aria-hidden", "false");
     }
+
     function closeDrawer() {
+        if (!drawer || !overlay) return;
         drawer.classList.remove("open");
         overlay.classList.remove("open");
         drawer.setAttribute("aria-hidden", "true");
@@ -21,7 +25,9 @@
             openDrawer();
         });
     });
-    overlay.addEventListener("click", closeDrawer);
+    if (overlay) {
+        overlay.addEventListener("click", closeDrawer);
+    }
 
     // Carousel simple
     var track = document.querySelector(".carousel-track");
@@ -46,6 +52,7 @@
     var sortSelect = document.getElementById("mh-sort");
     var grid = document.getElementById("org-grid");
     function applyFilters() {
+        if (!grid) return;
         var q = search ? search.value.trim().toLowerCase() : "";
         var activeCat = "all";
         document.querySelectorAll(".filter-btn").forEach(function (b) {
@@ -63,6 +70,7 @@
         applySort();
     }
     function applySort() {
+        if (!grid) return;
         var val = sortSelect ? sortSelect.value : "name_asc";
         var cards = Array.prototype.slice
             .call(grid.querySelectorAll(".org-card"))

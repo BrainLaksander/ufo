@@ -1,0 +1,46 @@
+/* Portal and role layout */
+
+/* ===== LAYOUT ===== */
+.main-content {
+    min-height: 100vh;
+    padding-top: 64px;
+}
+
+.role-layout {
+    display: flex;
+}
+
+.role-layout .role-main-content {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    padding: 30px;
+}
+
+.role-layout .kemahasiswaan-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 1020;
+    width: 280px;
+    height: 100vh;
+    overflow-y: auto;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .role-layout {
+        display: block;
+    }
+
+    .role-layout .kemahasiswaan-sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+    }
+
+    .role-layout .role-main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 20px 12px;
+    }
+}

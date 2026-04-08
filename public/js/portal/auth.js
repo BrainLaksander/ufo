@@ -1,4 +1,4 @@
-// portal-login.js - Handle role selection and redirect
+// portal/auth.js - Handle role selection and redirect
 (function () {
     var roleCards = document.querySelectorAll(".role-card");
 

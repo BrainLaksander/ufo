@@ -1,0 +1,14 @@
+/* Mahasiswa layout */
+
+/* ===== LAYOUT ===== */
+.mahasiswa-layout {
+    min-height: 100vh;
+    position: relative;
+    background: var(--bg-light);
+}
+
+.mahasiswa-layout-content {
+    min-height: 100vh;
+    padding-top: 56px;
+    background: var(--bg-light);
+}

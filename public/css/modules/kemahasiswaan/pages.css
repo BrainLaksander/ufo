@@ -1,0 +1,122 @@
+/* Kemahasiswaan pages */
+
+/* ===== PENGUMUMAN PAGE ===== */
+
+.pengumuman-page .page-title {
+    color: #1565c0;
+}
+
+.pengumuman-page .stat-card {
+    background: #f8f9fa;
+    border-radius: 1rem;
+}
+
+.pengumuman-page .stat-total h2 {
+    color: #1565c0;
+}
+
+.pengumuman-page .stat-published h2 {
+    color: #2e7d32;
+}
+
+.pengumuman-page .stat-scheduled h2 {
+    color: #1976d2;
+}
+
+.pengumuman-page .stat-draft h2 {
+    color: #757575;
+}
+
+.pengumuman-page .btn-create-announcement {
+    border-color: #1565c0;
+    border-radius: 0.8rem;
+    background: #1565c0;
+    font-weight: 700;
+}
+
+.pengumuman-page .btn-create-announcement:hover {
+    background: #0d47a1;
+    border-color: #0d47a1;
+}
+
+.pengumuman-page .email-distribution-alert {
+    background: #e3f2fd;
+    color: #1f2937;
+    border-radius: 1rem;
+}
+
+.pengumuman-page #tablePengumuman thead {
+    background: #f8f9fa;
+}
+
+.pengumuman-page #tablePengumuman th {
+    color: #374151;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+.pengumuman-page #tablePengumuman tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.pengumuman-page #tablePengumuman tbody tr:hover {
+    background-color: #f5f8ff;
+}
+
+.pengumuman-page .announcement-title {
+    color: #1565c0;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.pengumuman-page .announcement-title:hover {
+    color: #0d47a1;
+}
+
+.pengumuman-page .action-link {
+    font-size: 0.87rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.pengumuman-page .action-view {
+    color: #1565c0;
+}
+
+.pengumuman-page .action-edit {
+    color: #4b5563;
+}
+
+.pengumuman-page .action-delete {
+    color: #dc2626;
+}
+
+.pengumuman-page .status-published {
+    background: #c8e6c9;
+    color: #1b5e20;
+}
+
+.pengumuman-page .status-scheduled {
+    background: #bbdefb;
+    color: #0d47a1;
+}
+
+.pengumuman-page .status-draft {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+    .pengumuman-page .page-title {
+        font-size: 1.75rem;
+    }
+
+    .pengumuman-page .stat-card {
+        margin-bottom: 0.25rem;
+    }
+
+    .pengumuman-page #tablePengumuman {
+        font-size: 0.9rem;
+    }
+}

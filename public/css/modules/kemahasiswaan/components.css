@@ -1,0 +1,236 @@
+/* Kemahasiswaan components and sidebar theme */
+
+/* ===== TOKENS ===== */
+:root {
+    --km-primary: #3b1c57;
+    --km-accent: #5f3a74;
+    --km-yellow: #ffcc00;
+    --km-muted: #f4f5f7;
+}
+
+/* ===== SIDEBAR COMPONENTS ===== */
+body.kemahasiswaan-layout .header.header-portal {
+    display: none;
+}
+
+.kemahasiswaan-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 280px;
+    height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(180deg, var(--km-accent) 0%, var(--km-primary) 100%);
+    color: white;
+}
+
+.kemahasiswaan-sidebar .sidebar-top {
+    padding: 96px 24px 0;
+}
+
+.kemahasiswaan-sidebar .dept-title h2 {
+    margin: 0 0 16px;
+    font-size: 32px;
+    font-weight: 800;
+    line-height: 1.05;
+}
+
+.kemahasiswaan-sidebar .university {
+    color: var(--km-yellow);
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.kemahasiswaan-sidebar .sidebar-nav {
+    flex: 1 1 auto;
+    padding: 14px 20px 140px;
+    overflow-y: auto;
+}
+
+.kemahasiswaan-sidebar .sidebar-nav ul {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.kemahasiswaan-sidebar .sidebar-nav li {
+    margin-bottom: 12px;
+}
+
+.kemahasiswaan-sidebar .sidebar-nav .nav-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-sizing: border-box;
+    width: 100%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    background: transparent;
+    color: rgba(255, 255, 255, 0.95);
+    text-decoration: none;
+    transition: background 0.12s ease, transform 0.06s ease;
+}
+
+.kemahasiswaan-sidebar .sidebar-nav .nav-link:hover {
+    background: rgba(255, 255, 255, 0.04);
+    transform: translateY(-1px);
+}
+
+.kemahasiswaan-sidebar .sidebar-nav .nav-link.active {
+    background: #fff;
+    box-shadow: 0 6px 18px rgba(27, 13, 46, 0.12);
+    color: var(--km-primary);
+    font-weight: 700;
+}
+
+.kemahasiswaan-sidebar .sidebar-nav .nav-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.06);
+    color: white;
+    font-size: 14px;
+}
+
+.kemahasiswaan-sidebar .sidebar-nav .nav-text {
+    display: inline-block;
+    color: inherit;
+    font-size: 15px;
+    font-weight: 600;
+    line-height: 1.2;
+}
+
+.kemahasiswaan-sidebar .sidebar-nav .nav-link.active .nav-icon {
+    background: transparent;
+    color: var(--km-primary);
+}
+
+.kemahasiswaan-sidebar .notif-badge {
+    display: inline-block;
+    margin-left: auto;
+    padding: 4px 8px;
+    border-radius: 999px;
+    background: var(--km-yellow);
+    color: var(--km-primary);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.kemahasiswaan-sidebar .sidebar-nav .nav-link.active .notif-badge {
+    background: var(--km-primary);
+    color: white;
+}
+
+.kemahasiswaan-sidebar .sidebar-divider {
+    height: 1px;
+    margin: 12px 14px;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+.kemahasiswaan-sidebar .sidebar-footer {
+    z-index: 20;
+    display: flex;
+    flex-shrink: 0;
+    flex-direction: column;
+    justify-content: center;
+    min-height: 110px;
+    padding: 16px 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.04);
+    background: transparent;
+}
+
+.kemahasiswaan-sidebar .sidebar-footer .profile {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.kemahasiswaan-sidebar .sidebar-footer .avatar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #ffcc33;
+    color: #3b1c57;
+    font-weight: 700;
+}
+
+.kemahasiswaan-sidebar .sidebar-footer .name {
+    font-weight: 700;
+}
+
+.kemahasiswaan-sidebar .sidebar-footer .role {
+    font-size: 12px;
+    opacity: 0.9;
+}
+
+.kemahasiswaan-sidebar .sidebar-footer .logout {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-top: 12px;
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 18px;
+    text-decoration: none;
+}
+
+.kemahasiswaan-sidebar .sidebar-footer .logout svg {
+    width: 20px;
+    height: 20px;
+    opacity: 0.95;
+}
+
+.kemahasiswaan-sidebar::-webkit-scrollbar {
+    width: 10px;
+}
+
+.kemahasiswaan-sidebar::-webkit-scrollbar-thumb {
+    border-radius: 10px;
+    background: rgba(0, 0, 0, 0.22);
+}
+
+/* ===== COMPONENT OVERRIDES ===== */
+.badge.bg-success {
+    padding: 6px 12px;
+    border-radius: 16px;
+    background: #e8f9ec;
+    color: #05632a;
+}
+
+.badge.bg-secondary {
+    padding: 6px 12px;
+    border-radius: 12px;
+    background: #f3f4f6;
+    color: #666;
+}
+
+.table-responsive .table tbody tr td {
+    vertical-align: middle;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 500px) {
+    .kemahasiswaan-sidebar {
+        width: 320px;
+    }
+
+    .kemahasiswaan-sidebar .sidebar-nav {
+        padding: 12px 0 180px;
+    }
+}
+
+@media (max-height: 700px) {
+    .kemahasiswaan-sidebar .sidebar-nav {
+        max-height: calc(100vh - 220px);
+    }
+}
