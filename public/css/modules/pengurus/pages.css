@@ -1,0 +1,189 @@
+/* Pengurus pages: layout, cards, and forms */
+
+/* ===== LOGIN ===== */
+.pengurus-login-wrap {
+  min-height: calc(100vh - 64px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+}
+
+.pengurus-login-card {
+  background: #fff;
+  width: 380px;
+  padding: 28px;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+.login-title {
+  font-size: 20px;
+  margin: 8px 0 18px;
+}
+
+/* ===== FORM ===== */
+.form-label {
+  display: block;
+  margin: 8px 0 6px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.form-input {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #e6e6f0;
+  border-radius: 8px;
+}
+
+.btn-primary {
+  padding: 10px 14px;
+  margin-top: 12px;
+  border: 0;
+  border-radius: 10px;
+  background: var(--primary);
+  color: #fff;
+  cursor: pointer;
+}
+
+.btn-sm {
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #eee;
+  border: 0;
+  cursor: pointer;
+}
+
+.btn-secondary {
+  background: #f3f3f6;
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: #fff;
+}
+
+/* ===== PAGE / STATS ===== */
+.page-title {
+  font-size: 28px;
+  margin: 0 0 18px;
+}
+
+.stats-grid {
+  display: flex;
+  gap: 16px;
+}
+
+.stat-card {
+  background: #fff;
+  padding: 18px;
+  border-radius: 12px;
+  flex: 1;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.stat-value {
+  font-size: 22px;
+  font-weight: 700;
+}
+
+.stats-grid .stat-value {
+  color: #fcb900;
+}
+
+.stat-label {
+  color: #666;
+}
+
+.card {
+  background: #fff;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+}
+
+.card-title {
+  font-size: 18px;
+  margin: 0 0 8px;
+}
+
+/* ===== PROFILE ===== */
+.profil-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 20px;
+}
+
+.logo-placeholder {
+  width: 84px;
+  height: 84px;
+  background: #f3f3f6;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.banner-placeholder {
+  height: 84px;
+  background: #eae6ff;
+  border-radius: 8px;
+  flex: 1;
+  margin-left: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.card-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+/* ===== PROGRAM / EDITABLE BLOCKS ===== */
+.form-row {
+  margin-top: 12px;
+}
+
+.stat-large {
+  font-size: 20px;
+  font-weight: 700;
+}
+
+.editable-block .edit-mode.hidden,
+.prog-detail.hidden {
+  display: none;
+}
+
+.program-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.program-list li {
+  border-bottom: 1px solid #f0f0f6;
+  padding: 10px 0;
+}
+
+.prog-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.social-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 900px) {
+  .profil-grid {
+    grid-template-columns: 1fr;
+  }
+}

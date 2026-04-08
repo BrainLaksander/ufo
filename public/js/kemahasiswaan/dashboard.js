@@ -38,21 +38,11 @@
       '<div class="col-12 col-sm-6 col-lg-3">' +
       '  <div class="bg-white p-3 p-md-4 stat-card border">' +
       '    <div class="d-flex align-items-start justify-content-between">' +
-      '      <div class="flex-grow-1 pe-2">' +
-      '        <div class="text-muted small">' +
-      stat.label +
-      '</div>' +
-      '        <div class="display-6 fw-semibold text-primary" style="color:var(' +
-      stat.color +
-      ')">' +
-      stat.value +
-      '</div>' +
+      '      <div>' +
+      '        <div class="stat-label">' + stat.label + '</div>' +
+      '        <div class="stat-value">' + stat.value + '</div>' +
       '      </div>' +
-      '      <div class="icon-box" style="background:var(' +
-      stat.color +
-      ');color:#fff;font-weight:600;border-radius:12px"> ' +
-      '        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="20" height="20" rx="4" fill="currentColor"/></svg>' +
-      '      </div>' +
+      '      <div class="stat-icon" style="background: var(' + stat.color + ');"></div>' +
       '    </div>' +
       '  </div>' +
       '</div>'
@@ -175,7 +165,6 @@
     var root = document.getElementById('portal-root');
     if (root) {
       renderDashboard(root);
-      console.log('Kemahasiswaan dashboard: initialized (root)');
       return;
     }
 
@@ -221,7 +210,6 @@
           },
         },
       });
-      console.log('Kemahasiswaan dashboard: chart initialized (static)');
     }
   });
 })();

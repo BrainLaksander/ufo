@@ -1,0 +1,302 @@
+/* Mahasiswa components */
+
+/* ===== MAHASISWA BURGER ===== */
+.burger-mahasiswa {
+    background: #ffcc00;
+    color: #111;
+}
+
+.burger-mahasiswa .burger-header {
+    padding: 20px;
+    border-bottom: none;
+}
+
+.burger-mahasiswa .burger-header-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.burger-mahasiswa .burger-icon {
+    font-size: 28px;
+}
+
+.burger-mahasiswa .burger-title {
+    color: #111;
+    font-size: 22px;
+    font-weight: 800;
+}
+
+.burger-mahasiswa .burger-close {
+    color: #111;
+    font-size: 28px;
+    font-weight: bold;
+}
+
+.burger-mahasiswa .burger-close:hover {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.burger-mahasiswa .burger-nav {
+    padding: 12px;
+}
+
+.burger-mahasiswa .burger-link {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 8px;
+    padding: 16px 20px;
+    border-radius: 16px;
+    background: transparent;
+    color: #111;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s;
+}
+
+.burger-mahasiswa .burger-link:hover {
+    background: rgba(102, 51, 153, 0.1);
+    transform: translateX(4px);
+}
+
+.burger-mahasiswa .burger-link-icon {
+    display: flex;
+    align-items: center;
+    width: 32px;
+    height: 32px;
+    font-size: 24px;
+}
+
+.burger-mahasiswa .burger-link-text {
+    font-size: 16px;
+}
+
+.burger-mahasiswa .organisasi-link {
+    background: #663399;
+    color: white;
+    border-radius: 16px;
+}
+
+.burger-mahasiswa .organisasi-link:hover {
+    background: #5a2d7f;
+    transform: translateX(0);
+}
+
+/* ===== STUDENT BURGER MENU ===== */
+.student-menu-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 95;
+    background: rgba(0, 0, 0, 0.45);
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.student-burger-menu {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 96;
+    display: flex;
+    flex-direction: column;
+    width: 280px;
+    overflow-y: auto;
+    background: linear-gradient(135deg, var(--accent) 0%, #ffb800 100%);
+    color: var(--text-primary);
+    transform: translateX(-110%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: var(--shadow-lg);
+}
+
+.student-burger-menu.student-burger-menu--open {
+    transform: translateX(0);
+}
+
+.student-burger-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    padding: 16px;
+    border-bottom: 2px solid rgba(102, 51, 153, 0.2);
+    background: rgba(102, 51, 153, 0.08);
+}
+
+.student-burger-header-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.student-burger-icon {
+    display: inline-block;
+    font-size: 28px;
+}
+
+.student-burger-title {
+    color: #663399;
+    font-size: 18px;
+    font-weight: 700;
+}
+
+.student-burger-close {
+    border: none;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border-radius: 6px;
+    color: #663399;
+    font-size: 24px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.2s ease, color 0.2s ease;
+}
+
+.student-burger-close:hover {
+    background: rgba(102, 51, 153, 0.15);
+    color: #663399;
+}
+
+.student-burger-close:active {
+    background: rgba(102, 51, 153, 0.25);
+}
+
+.student-burger-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 0;
+}
+
+.student-burger-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.student-burger-item {
+    margin: 0;
+}
+
+.student-burger-link {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+    border-left: 4px solid transparent;
+    color: var(--text-primary);
+    font-weight: 500;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.student-burger-link:hover {
+    background: rgba(102, 51, 153, 0.1);
+    border-left-color: #663399;
+    padding-left: 18px;
+}
+
+.student-burger-link--active {
+    background: #663399;
+    color: white;
+    border-left-color: white;
+}
+
+.student-burger-link--active .student-burger-icon-item {
+    filter: brightness(1.2);
+}
+
+.student-burger-link:active {
+    background: rgba(102, 51, 153, 0.15);
+}
+
+.student-burger-icon-item {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 24px;
+    font-size: 20px;
+}
+
+.student-burger-divider {
+    height: 1px;
+    margin: 8px 0;
+    background: rgba(102, 51, 153, 0.15);
+}
+
+.student-burger-footer {
+    margin-top: auto;
+    padding: 16px;
+    border-top: 2px solid rgba(102, 51, 153, 0.2);
+    background: rgba(102, 51, 153, 0.08);
+    flex-shrink: 0;
+    text-align: center;
+}
+
+.student-burger-footer-title {
+    margin: 0;
+    color: #663399;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.4;
+}
+
+.student-burger-footer-version {
+    margin-top: 4px;
+    color: #663399;
+    opacity: 0.8;
+    font-size: 11px;
+}
+
+.student-burger-menu::-webkit-scrollbar {
+    width: 6px;
+}
+
+.student-burger-menu::-webkit-scrollbar-track {
+    background: rgba(102, 51, 153, 0.05);
+}
+
+.student-burger-menu::-webkit-scrollbar-thumb {
+    border-radius: 3px;
+    background: rgba(102, 51, 153, 0.3);
+}
+
+.student-burger-menu::-webkit-scrollbar-thumb:hover {
+    background: rgba(102, 51, 153, 0.5);
+}
+
+/* ===== MAHASISWA HEADER ===== */
+.mahasiswa-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 40;
+    height: 56px;
+    background: linear-gradient(135deg, var(--primary) 0%, #5a2d7f 100%);
+    color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 640px) {
+    .mahasiswa-header {
+        height: 52px;
+    }
+}

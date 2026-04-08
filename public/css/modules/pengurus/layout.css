@@ -1,0 +1,25 @@
+/* Pengurus layout and base */
+
+/* ===== TOKENS ===== */
+:root {
+  --primary: #5f3a74;
+  --accent: #ffcc00;
+  --danger: #cc0000;
+}
+
+/* ===== GLOBAL RESET ===== */
+* {
+  box-sizing: border-box;
+}
+
+/* ===== BASE ELEMENTS ===== */
+body {
+  margin: 0;
+  font-family: Inter, system-ui, Arial, Helvetica, sans-serif;
+  background: #f7f7fb;
+  color: #111;
+}
+
+.content {
+  padding-top: 64px;
+}
