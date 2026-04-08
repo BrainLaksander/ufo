@@ -12,13 +12,25 @@ return new class extends Migration {
     public function up(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->enum('role', ['admin', 'pengurus', 'mahasiswa'])->default('mahasiswa')->after('email');
-            $table->unsignedBigInteger('organization_id')->nullable()->after('role');
-            $table->string('phone')->nullable()->after('organization_id');
-            $table->string('avatar')->nullable()->after('phone');
-            $table->timestamp('last_login_at')->nullable()->after('avatar');
+            // Role column already created in create_users_table.php, skip re-adding
+            // $table->enum('role', ['admin', 'pengurus', 'mahasiswa'])->default('mahasiswa')->after('email');
+            
+            if (!Schema::hasColumn('users', 'organization_id')) {
+                $table->unsignedBigInteger('organization_id')->nullable()->after('role');
+            }
+            if (!Schema::hasColumn('users', 'phone')) {
+                $table->string('phone')->nullable()->after('organization_id');
+            }
+            if (!Schema::hasColumn('users', 'avatar')) {
+                $table->string('avatar')->nullable()->after('phone');
+            }
+            if (!Schema::hasColumn('users', 'last_login_at')) {
+                $table->timestamp('last_login_at')->nullable()->after('avatar');
+            }
 
-            $table->foreign('organization_id')->references('id')->on('organizations')->nullOnDelete();
+            if (Schema::hasTable('organizations') && !Schema::hasColumn('users', 'foreign_organization_id')) {
+                $table->foreign('organization_id')->references('id')->on('organizations')->nullOnDelete();
+            }
         });
     }
 

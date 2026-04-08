@@ -94,10 +94,10 @@ class Proposal extends Model
     public function getTypeLabel(): string
     {
         return match($this->type) {
-            'dana' => '💰 Pengajuan Dana',
-            'acara' => '🎯 Pengajuan Acara',
-            'fasilitas' => '🏢 Pengajuan Fasilitas',
-            'lainnya' => '📋 Pengajuan Lainnya',
+            'dana' => ' Pengajuan Dana',
+            'acara' => ' Pengajuan Acara',
+            'fasilitas' => ' Pengajuan Fasilitas',
+            'lainnya' => ' Pengajuan Lainnya',
             default => 'Pengajuan',
         };
     }

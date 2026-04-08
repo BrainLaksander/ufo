@@ -101,8 +101,8 @@ class LostFoundItem extends Model
     public function getTypeLabel(): string
     {
         return match($this->type) {
-            'lost' => '❌ Barang Hilang',
-            'found' => '✅ Barang Ditemukan',
+            'lost' => ' Barang Hilang',
+            'found' => ' Barang Ditemukan',
             default => 'Barang',
         };
     }

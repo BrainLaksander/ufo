@@ -18,7 +18,7 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
 
-            // 🔐 ROLE USER
+            //  ROLE USER
             // admin | kemahasiswaan | pengurus | mahasiswa
             $table->string('role')->default('mahasiswa');
 
