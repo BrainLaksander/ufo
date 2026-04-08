@@ -13,7 +13,7 @@
 <div class="row mb-4">
     <div class="col-12">
         <button class="btn btn-primary-custom" data-bs-toggle="modal" data-bs-target="#eventModal">
-            <i class="fas fa-plus"></i> Buat Event Baru
+            <i class="bi bi-plus-circle-fill"></i> Buat Event Baru
         </button>
     </div>
 </div>
@@ -43,7 +43,7 @@
                     <div>
                         <h5 class="card-title">Workshop Python Basics</h5>
                         <small class="text-muted">
-                            <i class="fas fa-calendar"></i> 15 Mar 2026 - <i class="fas fa-clock"></i> 14:00
+                            <i class="bi bi-calendar-date-fill"></i> 15 Mar 2026 - <i class="bi bi-clock-fill"></i> 14:00
                         </small>
                     </div>
                     <span class="badge bg-success">Terjadwal</span>
@@ -57,10 +57,10 @@
                 </div>
                 <div class="d-flex gap-2">
                     <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailModal">
-                        <i class="fas fa-eye"></i> Lihat
+                        <i class="bi bi-eye-fill"></i> Lihat
                     </button>
-                    <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Hapus</button>
+                    <button class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</button>
+                    <button class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i> Hapus</button>
                 </div>
             </div>
         </div>
@@ -73,7 +73,7 @@
                     <div>
                         <h5 class="card-title">Seminar Digital Marketing</h5>
                         <small class="text-muted">
-                            <i class="fas fa-calendar"></i> 20 Mar 2026 - <i class="fas fa-clock"></i> 10:00
+                            <i class="bi bi-calendar-date-fill"></i> 20 Mar 2026 - <i class="bi bi-clock-fill"></i> 10:00
                         </small>
                     </div>
                     <span class="badge bg-success">Confirmed</span>
@@ -87,10 +87,10 @@
                 </div>
                 <div class="d-flex gap-2">
                     <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailModal">
-                        <i class="fas fa-eye"></i> Lihat
+                        <i class="bi bi-eye-fill"></i> Lihat
                     </button>
-                    <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Hapus</button>
+                    <button class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</button>
+                    <button class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i> Hapus</button>
                 </div>
             </div>
         </div>
@@ -103,7 +103,7 @@
                     <div>
                         <h5 class="card-title">Gathering Bulanan UFO</h5>
                         <small class="text-muted">
-                            <i class="fas fa-calendar"></i> 25 Mar 2026 - <i class="fas fa-clock"></i> 15:30
+                            <i class="bi bi-calendar-date-fill"></i> 25 Mar 2026 - <i class="bi bi-clock-fill"></i> 15:30
                         </small>
                     </div>
                     <span class="badge bg-warning text-dark">Planning</span>
@@ -117,10 +117,10 @@
                 </div>
                 <div class="d-flex gap-2">
                     <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailModal">
-                        <i class="fas fa-eye"></i> Lihat
+                        <i class="bi bi-eye-fill"></i> Lihat
                     </button>
-                    <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Hapus</button>
+                    <button class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</button>
+                    <button class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i> Hapus</button>
                 </div>
             </div>
         </div>
@@ -133,7 +133,7 @@
                     <div>
                         <h5 class="card-title">Konferensi Tahunan UFO 2026</h5>
                         <small class="text-muted">
-                            <i class="fas fa-calendar"></i> 30 Mar 2026 - <i class="fas fa-clock"></i> 09:00
+                            <i class="bi bi-calendar-date-fill"></i> 30 Mar 2026 - <i class="bi bi-clock-fill"></i> 09:00
                         </small>
                     </div>
                     <span class="badge bg-primary">Draft</span>
@@ -147,10 +147,10 @@
                 </div>
                 <div class="d-flex gap-2">
                     <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#detailModal">
-                        <i class="fas fa-eye"></i> Lihat
+                        <i class="bi bi-eye-fill"></i> Lihat
                     </button>
-                    <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Hapus</button>
+                    <button class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</button>
+                    <button class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i> Hapus</button>
                 </div>
             </div>
         </div>

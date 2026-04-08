@@ -9,14 +9,14 @@
 </div>
 
 <div class="form-org">
-    <h3 class="text-primary mb-4" style="font-weight: 700;">📋 Informasi Dasar Organisasi</h3>
+    <h3 class="text-primary mb-4" style="font-weight: 700;"> Informasi Dasar Organisasi</h3>
 
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
                 <label>Nama Organisasi</label>
                 <input type="text" value="{{ $orgData['name'] }}" disabled style="background: #f0f0f0; cursor: not-allowed;">
-                <small class="text-muted d-block mt-2">⚠️ Nama organisasi tidak dapat diubah</small>
+                <small class="text-muted d-block mt-2"> Nama organisasi tidak dapat diubah</small>
             </div>
         </div>
         <div class="col-md-6">
@@ -34,7 +34,7 @@
 
     <hr class="my-4">
 
-    <h3 class="text-primary mb-4" style="font-weight: 700;">🎯 Visi & Misi</h3>
+    <h3 class="text-primary mb-4" style="font-weight: 700;"> Visi & Misi</h3>
 
     <div class="form-group">
         <label>Visi Organisasi</label>
@@ -44,12 +44,12 @@
     <div class="form-group">
         <label>Misi Organisasi</label>
         <textarea placeholder="Masukkan misi, pisahkan dengan baris baru..." style="min-height: 150px;">{{ implode("\n", $orgData['mission']) }}</textarea>
-        <small class="text-muted d-block mt-2">💡 Setiap baris misi akan dipisahkan sebagai item berbeda</small>
+        <small class="text-muted d-block mt-2"> Setiap baris misi akan dipisahkan sebagai item berbeda</small>
     </div>
 
     <hr class="my-4">
 
-    <h3 class="text-primary mb-4" style="font-weight: 700;">📞 Kontak & Sosial Media</h3>
+    <h3 class="text-primary mb-4" style="font-weight: 700;"> Kontak & Sosial Media</h3>
 
     <div class="row">
         <div class="col-md-6">
@@ -83,7 +83,7 @@
 
     <hr class="my-4">
 
-    <h3 class="text-primary mb-4" style="font-weight: 700;">🖼️ Logo & Banner</h3>
+    <h3 class="text-primary mb-4" style="font-weight: 700;"> Logo & Banner</h3>
 
     <div class="row">
         <div class="col-md-6">
@@ -103,7 +103,7 @@
     </div>
 
     <div style="display: flex; gap: 10px; margin-top: 30px;">
-        <button type="submit" class="btn-primary-org">💾 Simpan Perubahan</button>
+        <button type="submit" class="btn-primary-org"> Simpan Perubahan</button>
         <button type="button" class="btn-secondary-org">↻ Batal</button>
     </div>
 </div>

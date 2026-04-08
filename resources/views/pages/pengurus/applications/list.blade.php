@@ -28,11 +28,11 @@
                     </td>
                     <td style="padding: 15px;">{{ $app['nim'] }}</td>
                     <td style="padding: 15px;">{{ $app['faculty'] }}</td>
-                    <td style="padding: 15px;">📅 {{ date('d M Y', strtotime($app['date'])) }}</td>
+                    <td style="padding: 15px;"><i class="bi bi-calendar-date me-1"></i>{{ date('d M Y', strtotime($app['date'])) }}</td>
                     <td style="padding: 15px;">
-                        <button class="btn btn-sm btn-success" style="background: var(--success); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;">✓ Terima</button>
-                        <button class="btn btn-sm btn-danger" style="background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-left: 5px;">✕ Tolak</button>
-                        <button class="btn btn-sm" style="background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-left: 5px;">Detail</button>
+                        <button class="btn btn-sm btn-success" style="background: var(--success); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;"><i class="bi bi-check-lg me-1"></i>Terima</button>
+                        <button class="btn btn-sm btn-danger" style="background: var(--danger); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-left: 5px;"><i class="bi bi-x-lg me-1"></i>Tolak</button>
+                        <button class="btn btn-sm" style="background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-left: 5px;"><i class="bi bi-eye-fill me-1"></i>Detail</button>
                     </td>
                 </tr>
                 @endforeach

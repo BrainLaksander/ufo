@@ -6,10 +6,10 @@
     <title>@yield('title', 'Dashboard') - UFO Organisasi Kampus</title>
 
     {{-- Bootstrap 5 CSS --}}
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
     
     {{-- Bootstrap Icons --}}
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <link rel="stylesheet" href="{{ asset('vendor/bootstrap-icons/font/bootstrap-icons.min.css') }}">
 
     {{-- Custom Styles --}}
     <style>
@@ -384,6 +384,13 @@
     <aside class="sidebar" id="sidebar">
         <ul class="sidebar-menu">
             <li>
+                <a href="{{ route('home') }}" class="menu-item {{ request()->routeIs('home') ? 'active' : '' }}">
+                    <i class="bi bi-house-door-fill"></i>
+                    <span>Landing Page</span>
+                </a>
+            </li>
+
+            <li>
                 <a href="{{ route('dashboard') }}" class="menu-item {{ request()->routeIs('dashboard') ? 'active' : '' }}">
                     <i class="bi bi-speedometer2"></i>
                     <span>Dashboard</span>
@@ -478,7 +485,7 @@
     </div>
 
     {{-- Bootstrap JS Bundle --}}
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
     {{-- Mobile Sidebar Toggle --}}
     <script>

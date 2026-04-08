@@ -8,7 +8,7 @@
     <!-- Header Section: Ungu dengan icon & text -->
     <div class="portal-login-header">
         <div class="portal-login-header-content">
-            <div class="portal-login-header-icon">👤</div>
+            <div class="portal-login-header-icon"><i class="bi bi-mortarboard-fill"></i></div>
             <div>
                 <h1 class="portal-login-header-title">Sistem Kemahasiswaan</h1>
                 <p class="portal-login-header-subtitle">Universitas Klabat</p>
@@ -28,14 +28,14 @@
             </div>
 
             <!-- Login Form -->
-            <form class="portal-login-form" method="POST" action="{{ route('portal.login') }}">
+            <form class="portal-login-form" method="POST" action="{{ route('portal.login.perform') }}">
                 @csrf
 
                 <!-- Email Input -->
                 <div class="portal-form-group">
                     <label for="email" class="portal-form-label">Email</label>
                     <div class="portal-form-input-wrapper">
-                        <span class="portal-form-icon">✉️</span>
+                        <span class="portal-form-icon"><i class="bi bi-envelope-fill"></i></span>
                         <input
                             type="email"
                             id="email"
@@ -51,7 +51,7 @@
                 <div class="portal-form-group">
                     <label for="password" class="portal-form-label">Password</label>
                     <div class="portal-form-input-wrapper">
-                        <span class="portal-form-icon">🔒</span>
+                        <span class="portal-form-icon"><i class="bi bi-key-fill"></i></span>
                         <input
                             type="password"
                             id="password"
@@ -67,7 +67,7 @@
                 <div class="portal-form-group">
                     <label for="role" class="portal-form-label">Pilih Role</label>
                     <div class="portal-form-input-wrapper">
-                        <span class="portal-form-icon">🎯</span>
+                        <span class="portal-form-icon"><i class="bi bi-person-badge-fill"></i></span>
                         <select
                             id="role"
                             name="role"
@@ -91,7 +91,7 @@
             <!-- Footer Text -->
             <div class="portal-login-card-footer">
                 <p class="portal-login-footer-text">
-                    Kembali ke <a href="/" class="portal-login-link">halaman utama</a>
+                    Kembali ke <a href="{{ route('home') }}" class="portal-login-link">halaman utama</a>
                 </p>
             </div>
         </div>

@@ -8,7 +8,7 @@
     <!-- Header: Ungu dengan icon user in yellow circle -->
     <div class="portal-login-header">
         <div class="portal-login-header-content">
-            <div class="portal-login-header-icon">👤</div>
+            <div class="portal-login-header-icon"><i class="bi bi-mortarboard-fill"></i></div>
             <div>
                 <h1 class="portal-login-header-title">Sistem Kemahasiswaan</h1>
                 <p class="portal-login-header-subtitle">Universitas Klabat</p>
@@ -25,14 +25,14 @@
             </div>
 
             <!-- Note: backend login logic not changed; this is a UI only page -->
-            <form class="portal-login-form" method="POST" action="{{ route('portal.login') }}">
+            <form class="portal-login-form" method="POST" action="{{ route('portal.login.perform') }}">
                 @csrf
 
                 <!-- Email -->
                 <div class="portal-form-group">
                     <label for="email" class="portal-form-label">Email</label>
                     <div class="portal-form-input-wrapper">
-                        <span class="portal-form-icon">✉️</span>
+                        <span class="portal-form-icon"><i class="bi bi-envelope-fill"></i></span>
                         <input type="email" id="email" name="email" class="portal-form-input" placeholder="Masukkan email" required />
                     </div>
                 </div>
@@ -41,7 +41,7 @@
                 <div class="portal-form-group">
                     <label for="password" class="portal-form-label">Password</label>
                     <div class="portal-form-input-wrapper">
-                        <span class="portal-form-icon">🔒</span>
+                        <span class="portal-form-icon"><i class="bi bi-key-fill"></i></span>
                         <input type="password" id="password" name="password" class="portal-form-input" placeholder="Masukkan password" required />
                     </div>
                 </div>
@@ -50,7 +50,7 @@
                 <div class="portal-form-group">
                     <label for="role" class="portal-form-label">Pilih Role</label>
                     <div class="portal-form-input-wrapper">
-                        <span class="portal-form-icon">🎯</span>
+                        <span class="portal-form-icon"><i class="bi bi-person-badge-fill"></i></span>
                         <select id="role" name="role" class="portal-form-input portal-form-select" required>
                             <option value="" disabled>Pilih role Anda</option>
                             <option value="pengurus">Pengurus Organisasi</option>
@@ -66,6 +66,7 @@
 
             <!-- Small footer inside card -->
             <div class="portal-login-card-footer">
+                <p class="portal-login-footer-text">Kembali ke <a href="{{ route('home') }}" class="portal-login-link">halaman utama</a></p>
                 <p class="portal-login-footer-text">Sistem Administrasi & Kontrol Organisasi Mahasiswa<br>Departemen Kemahasiswaan Universitas Klabat</p>
             </div>
         </div>

@@ -53,9 +53,9 @@
         </div>
 
         <div style="display: flex; gap: 10px; margin-top: 30px;">
-            <button type="submit" class="btn-primary-org">💾 Simpan & Publish</button>
+            <button type="submit" class="btn-primary-org"> Simpan & Publish</button>
             <button type="button" class="btn-secondary-org">Draft Saja</button>
-            <a href="/portal/pengurus/announcements" class="btn-secondary-org" style="text-decoration: none;">Batal</a>
+            <a href="{{ route('portal.pengurus.announcements') }}" class="btn-secondary-org" style="text-decoration: none;">Batal</a>
         </div>
     </form>
 </div>

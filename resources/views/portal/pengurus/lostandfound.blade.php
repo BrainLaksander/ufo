@@ -13,7 +13,7 @@
 <div class="row mb-5">
     <div class="col-md-6 col-lg-3 mb-4">
         <div class="card card-dashboard card-stat" style="background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%); color: white;">
-            <div class="card-stat-icon"><i class="fas fa-box"></i></div>
+            <div class="card-stat-icon"><i class="bi bi-box-fill"></i></div>
             <div class="card-stat-number">23</div>
             <div class="card-stat-label">Total Laporan</div>
         </div>
@@ -21,7 +21,7 @@
 
     <div class="col-md-6 col-lg-3 mb-4">
         <div class="card card-dashboard card-stat" style="background: linear-gradient(135deg, #EF4444 0%, #991B1B 100%); color: white;">
-            <div class="card-stat-icon"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="card-stat-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
             <div class="card-stat-number">8</div>
             <div class="card-stat-label">Barang Hilang</div>
         </div>
@@ -29,7 +29,7 @@
 
     <div class="col-md-6 col-lg-3 mb-4">
         <div class="card card-dashboard card-stat" style="background: linear-gradient(135deg, #22C55E 0%, #15803D 100%); color: white;">
-            <div class="card-stat-icon"><i class="fas fa-box-open"></i></div>
+            <div class="card-stat-icon"><i class="bi bi-box2-heart-fill"></i></div>
             <div class="card-stat-number">12</div>
             <div class="card-stat-label">Barang Ditemukan</div>
         </div>
@@ -37,7 +37,7 @@
 
     <div class="col-md-6 col-lg-3 mb-4">
         <div class="card card-dashboard card-stat" style="background: linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%); color: white;">
-            <div class="card-stat-icon"><i class="fas fa-check-double"></i></div>
+            <div class="card-stat-icon"><i class="bi bi-check2-all"></i></div>
             <div class="card-stat-number">3</div>
             <div class="card-stat-label">Terselesaikan</div>
         </div>
@@ -73,9 +73,9 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
-                        <h5 class="card-title"><i class="fas fa-exclamation-triangle"></i> Dompet Kulit Hitam (HILANG)</h5>
+                        <h5 class="card-title"><i class="bi bi-exclamation-triangle-fill"></i> Dompet Kulit Hitam (HILANG)</h5>
                         <small class="text-muted">
-                            <i class="fas fa-map-marker"></i> Gedung A, Lantai 2 | <i class="fas fa-calendar"></i> 24 Feb 2026
+                            <i class="bi bi-geo-alt-fill"></i> Gedung A, Lantai 2 | <i class="bi bi-calendar-date-fill"></i> 24 Feb 2026
                         </small>
                     </div>
                     <span class="badge bg-danger">Open</span>
@@ -92,10 +92,10 @@
                 </div>
                 <div>
                     <button class="btn btn-sm btn-info me-2" data-bs-toggle="modal" data-bs-target="#editNoteModal">
-                        <i class="fas fa-edit"></i> Edit Catatan
+                        <i class="bi bi-pencil-square"></i> Edit Catatan
                     </button>
-                    <button class="btn btn-sm btn-success"><i class="fas fa-check"></i> Tandai Selesai</button>
-                    <button class="btn btn-sm btn-danger"><i class="fas fa-archive"></i> Archive</button>
+                    <button class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> Tandai Selesai</button>
+                    <button class="btn btn-sm btn-danger"><i class="bi bi-archive-fill"></i> Archive</button>
                 </div>
             </div>
         </div>
@@ -106,9 +106,9 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
-                        <h5 class="card-title"><i class="fas fa-box-open"></i> Kunci Loker Kuning (DITEMUKAN)</h5>
+                        <h5 class="card-title"><i class="bi bi-box2-heart-fill"></i> Kunci Loker Kuning (DITEMUKAN)</h5>
                         <small class="text-muted">
-                            <i class="fas fa-map-marker"></i> Perpustakaan | <i class="fas fa-calendar"></i> 20 Feb 2026
+                            <i class="bi bi-geo-alt-fill"></i> Perpustakaan | <i class="bi bi-calendar-date-fill"></i> 20 Feb 2026
                         </small>
                     </div>
                     <span class="badge bg-success">Resolved</span>
@@ -125,9 +125,9 @@
                 </div>
                 <div>
                     <button class="btn btn-sm btn-info me-2" data-bs-toggle="modal" data-bs-target="#editNoteModal">
-                        <i class="fas fa-edit"></i> Edit Catatan
+                        <i class="bi bi-pencil-square"></i> Edit Catatan
                     </button>
-                    <button class="btn btn-sm btn-danger"><i class="fas fa-archive"></i> Archive</button>
+                    <button class="btn btn-sm btn-danger"><i class="bi bi-archive-fill"></i> Archive</button>
                 </div>
             </div>
         </div>
@@ -138,9 +138,9 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
-                        <h5 class="card-title"><i class="fas fa-exclamation-triangle"></i> Airpods Pro (HILANG)</h5>
+                        <h5 class="card-title"><i class="bi bi-exclamation-triangle-fill"></i> Airpods Pro (HILANG)</h5>
                         <small class="text-muted">
-                            <i class="fas fa-map-marker"></i> Ruang Rapat UFO | <i class="fas fa-calendar"></i> 18 Feb 2026
+                            <i class="bi bi-geo-alt-fill"></i> Ruang Rapat UFO | <i class="bi bi-calendar-date-fill"></i> 18 Feb 2026
                         </small>
                     </div>
                     <span class="badge bg-warning text-dark">Open</span>
@@ -157,10 +157,10 @@
                 </div>
                 <div>
                     <button class="btn btn-sm btn-info me-2" data-bs-toggle="modal" data-bs-target="#editNoteModal">
-                        <i class="fas fa-edit"></i> Edit Catatan
+                        <i class="bi bi-pencil-square"></i> Edit Catatan
                     </button>
-                    <button class="btn btn-sm btn-success"><i class="fas fa-check"></i> Tandai Selesai</button>
-                    <button class="btn btn-sm btn-danger"><i class="fas fa-archive"></i> Archive</button>
+                    <button class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> Tandai Selesai</button>
+                    <button class="btn btn-sm btn-danger"><i class="bi bi-archive-fill"></i> Archive</button>
                 </div>
             </div>
         </div>
@@ -171,9 +171,9 @@
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
-                        <h5 class="card-title"><i class="fas fa-box-open"></i> Laptop Lenovo (DITEMUKAN)</h5>
+                        <h5 class="card-title"><i class="bi bi-box2-heart-fill"></i> Laptop Lenovo (DITEMUKAN)</h5>
                         <small class="text-muted">
-                            <i class="fas fa-map-marker"></i> Kafeteria Kampus | <i class="fas fa-calendar"></i> 15 Feb 2026
+                            <i class="bi bi-geo-alt-fill"></i> Kafeteria Kampus | <i class="bi bi-calendar-date-fill"></i> 15 Feb 2026
                         </small>
                     </div>
                     <span class="badge bg-success">Resolved</span>
@@ -190,9 +190,9 @@
                 </div>
                 <div>
                     <button class="btn btn-sm btn-info me-2" data-bs-toggle="modal" data-bs-target="#editNoteModal">
-                        <i class="fas fa-edit"></i> Edit Catatan
+                        <i class="bi bi-pencil-square"></i> Edit Catatan
                     </button>
-                    <button class="btn btn-sm btn-danger"><i class="fas fa-archive"></i> Archive</button>
+                    <button class="btn btn-sm btn-danger"><i class="bi bi-archive-fill"></i> Archive</button>
                 </div>
             </div>
         </div>

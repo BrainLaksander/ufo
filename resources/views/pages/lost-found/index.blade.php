@@ -12,20 +12,20 @@
     <!-- Header Section -->
     <div class="lf-header">
       <div>
-        <h1 class="lf-title">🔍 Lost & Found</h1>
+        <h1 class="lf-title"><i class="bi bi-search me-2"></i>Lost & Found</h1>
         <p class="lf-subtitle">
           Sistem pelaporan barang hilang & ditemukan - Cari barang Anda atau laporkan barang yang ditemukan
         </p>
       </div>
       <button class="lf-btn-primary">
-        + Laporkan Barang
+        <i class="bi bi-plus-circle-fill me-1"></i>Laporkan Barang
       </button>
     </div>
 
     <!-- Priority Section - Red Background -->
     <section class="lf-priority-section">
       <div class="lf-priority-header">
-        <h2 class="lf-priority-title">🔔 Barang Penting yang Hilang</h2>
+        <h2 class="lf-priority-title"><i class="bi bi-bell-fill me-2"></i>Barang Penting yang Hilang</h2>
         <p class="lf-priority-subtitle">Segera hubungi jika menemukan barang ini</p>
       </div>
 
@@ -35,13 +35,13 @@
           <div class="lf-card-header">
             <span class="lf-badge-priority">PRIORITAS</span>
           </div>
-          <div class="lf-card-icon">💼</div>
+          <div class="lf-card-icon"><i class="bi bi-wallet2"></i></div>
           <h3 class="lf-card-title">Dompet Kulit Hitam</h3>
           <p class="lf-card-category">Dompet</p>
           <p class="lf-card-description">Dompet kulit hitam dengan inisial AB di dalam</p>
           <div class="lf-card-meta">
-            <small>📍 Aula Utama</small>
-            <small>📅 2024-01-20</small>
+            <small><i class="bi bi-geo-alt-fill me-1"></i>Aula Utama</small>
+            <small><i class="bi bi-calendar-date me-1"></i>2024-01-20</small>
           </div>
           <a href="mailto:aldi@example.test" class="lf-btn-contact">Hubungi Pelapor</a>
         </div>
@@ -51,13 +51,13 @@
           <div class="lf-card-header">
             <span class="lf-badge-priority">PRIORITAS</span>
           </div>
-          <div class="lf-card-icon">🔑</div>
+          <div class="lf-card-icon"><i class="bi bi-key-fill"></i></div>
           <h3 class="lf-card-title">Kunci Gantungan Biru</h3>
           <p class="lf-card-category">Kunci</p>
           <p class="lf-card-description">Gantungan kunci biru dengan logo kampus UFO</p>
           <div class="lf-card-meta">
-            <small>📍 Perpustakaan</small>
-            <small>📅 2024-01-19</small>
+            <small><i class="bi bi-geo-alt-fill me-1"></i>Perpustakaan</small>
+            <small><i class="bi bi-calendar-date me-1"></i>2024-01-19</small>
           </div>
           <a href="mailto:humas@example.test" class="lf-btn-contact">Hubungi Pelapor</a>
         </div>
@@ -67,13 +67,13 @@
           <div class="lf-card-header">
             <span class="lf-badge-priority">PRIORITAS</span>
           </div>
-          <div class="lf-card-icon">📱</div>
+          <div class="lf-card-icon"><i class="bi bi-phone-fill"></i></div>
           <h3 class="lf-card-title">Handphone Samsung</h3>
           <p class="lf-card-category">Elektronik</p>
           <p class="lf-card-description">Handphone Samsung warna merah dengan casing biru</p>
           <div class="lf-card-meta">
-            <small>📍 Kantin</small>
-            <small>📅 2024-01-25</small>
+            <small><i class="bi bi-geo-alt-fill me-1"></i>Kantin</small>
+            <small><i class="bi bi-calendar-date me-1"></i>2024-01-25</small>
           </div>
           <a href="mailto:nabil@example.test" class="lf-btn-contact">Hubungi Pelapor</a>
         </div>
@@ -114,15 +114,15 @@
         <!-- Card Item 1 - Hilang -->
         <article class="lf-card">
           <div class="lf-card-status">
-            <span class="lf-status-badge lost">✗ Hilang</span>
+            <span class="lf-status-badge lost"><i class="bi bi-exclamation-triangle-fill me-1"></i>Hilang</span>
           </div>
-          <div class="lf-card-icon">🔑</div>
+          <div class="lf-card-icon"><i class="bi bi-key-fill"></i></div>
           <h3 class="lf-card-title">Kunci Kos Hitam</h3>
           <p class="lf-card-category">Kunci</p>
           <p class="lf-card-description">Kunci kos stainless steel dengan label nomor 42 di asrama A</p>
           <div class="lf-card-meta">
-            <small>📍 Asrama A</small>
-            <small>📅 2024-01-20</small>
+            <small><i class="bi bi-geo-alt-fill me-1"></i>Asrama A</small>
+            <small><i class="bi bi-calendar-date me-1"></i>2024-01-20</small>
           </div>
           <div class="lf-card-footer">
             <a href="mailto:rahman@example.test" class="lf-btn-small">Hubungi</a>
@@ -132,15 +132,15 @@
         <!-- Card Item 2 - Ditemukan -->
         <article class="lf-card">
           <div class="lf-card-status">
-            <span class="lf-status-badge found">✓ Ditemukan</span>
+            <span class="lf-status-badge found"><i class="bi bi-check-circle-fill me-1"></i>Ditemukan</span>
           </div>
-          <div class="lf-card-icon">📱</div>
+          <div class="lf-card-icon"><i class="bi bi-phone-fill"></i></div>
           <h3 class="lf-card-title">Handphone Samsung Hitam</h3>
           <p class="lf-card-category">Elektronik</p>
           <p class="lf-card-description">Handphone Samsung A12 berwarna hitam, baterai masih 40%</p>
           <div class="lf-card-meta">
-            <small>📍 Cafetaria</small>
-            <small>📅 2024-01-29</small>
+            <small><i class="bi bi-geo-alt-fill me-1"></i>Cafetaria</small>
+            <small><i class="bi bi-calendar-date me-1"></i>2024-01-29</small>
           </div>
           <div class="lf-card-footer">
             <a href="mailto:sari@example.test" class="lf-btn-small">Hubungi</a>
@@ -150,15 +150,15 @@
         <!-- Card Item 3 - Hilang -->
         <article class="lf-card">
           <div class="lf-card-status">
-            <span class="lf-status-badge lost">✗ Hilang</span>
+            <span class="lf-status-badge lost"><i class="bi bi-exclamation-triangle-fill me-1"></i>Hilang</span>
           </div>
-          <div class="lf-card-icon">📖</div>
+          <div class="lf-card-icon"><i class="bi bi-book-fill"></i></div>
           <h3 class="lf-card-title">Buku Catatan Merah</h3>
           <p class="lf-card-category">Buku</p>
           <p class="lf-card-description">Catatan kuliah MATH101, kulit merah dengan notes pensil di tepi</p>
           <div class="lf-card-meta">
-            <small>📍 Kantin</small>
-            <small>📅 2024-01-23</small>
+            <small><i class="bi bi-geo-alt-fill me-1"></i>Kantin</small>
+            <small><i class="bi bi-calendar-date me-1"></i>2024-01-23</small>
           </div>
           <div class="lf-card-footer">
             <a href="mailto:sinta@example.test" class="lf-btn-small">Hubungi</a>
@@ -168,15 +168,15 @@
         <!-- Card Item 4 - Ditemukan -->
         <article class="lf-card">
           <div class="lf-card-status">
-            <span class="lf-status-badge found">✓ Ditemukan</span>
+            <span class="lf-status-badge found"><i class="bi bi-check-circle-fill me-1"></i>Ditemukan</span>
           </div>
-          <div class="lf-card-icon">💼</div>
+          <div class="lf-card-icon"><i class="bi bi-wallet2"></i></div>
           <h3 class="lf-card-title">Dompet Kulit Cokelat</h3>
           <p class="lf-card-category">Dompet</p>
           <p class="lf-card-description">Dompet kulit asli warna cokelat muda, kondisi baik. Ada ID card di dalamnya</p>
           <div class="lf-card-meta">
-            <small>📍 Parkir Motor Timur</small>
-            <small>📅 2024-01-28</small>
+            <small><i class="bi bi-geo-alt-fill me-1"></i>Parkir Motor Timur</small>
+            <small><i class="bi bi-calendar-date me-1"></i>2024-01-28</small>
           </div>
           <div class="lf-card-footer">
             <a href="mailto:hendra@example.test" class="lf-btn-small">Hubungi</a>
@@ -186,15 +186,15 @@
         <!-- Card Item 5 - Hilang -->
         <article class="lf-card">
           <div class="lf-card-status">
-            <span class="lf-status-badge lost">✗ Hilang</span>
+            <span class="lf-status-badge lost"><i class="bi bi-exclamation-triangle-fill me-1"></i>Hilang</span>
           </div>
-          <div class="lf-card-icon">🎧</div>
+          <div class="lf-card-icon"><i class="bi bi-earbuds"></i></div>
           <h3 class="lf-card-title">Earbuds Wireless Putih</h3>
           <p class="lf-card-category">Elektronik</p>
           <p class="lf-card-description">Earbuds wireless putih dengan charging case merah, merk terkenal</p>
           <div class="lf-card-meta">
-            <small>📍 Lab Komputer</small>
-            <small>📅 2024-01-26</small>
+            <small><i class="bi bi-geo-alt-fill me-1"></i>Lab Komputer</small>
+            <small><i class="bi bi-calendar-date me-1"></i>2024-01-26</small>
           </div>
           <div class="lf-card-footer">
             <a href="mailto:indra@example.test" class="lf-btn-small">Hubungi</a>
@@ -204,15 +204,15 @@
         <!-- Card Item 6 - Ditemukan -->
         <article class="lf-card">
           <div class="lf-card-status">
-            <span class="lf-status-badge found">✓ Ditemukan</span>
+            <span class="lf-status-badge found"><i class="bi bi-check-circle-fill me-1"></i>Ditemukan</span>
           </div>
-          <div class="lf-card-icon">🪓</div>
+          <div class="lf-card-icon"><i class="bi bi-person-vcard-fill"></i></div>
           <h3 class="lf-card-title">ID Card Mahasiswa</h3>
           <p class="lf-card-category">Dokumen</p>
           <p class="lf-card-description">Kartu identitas mahasiswa a.n. Ahmad Rizki, tahun cetak 2022</p>
           <div class="lf-card-meta">
-            <small>📍 Lobby Gedung A</small>
-            <small>📅 2024-01-27</small>
+            <small><i class="bi bi-geo-alt-fill me-1"></i>Lobby Gedung A</small>
+            <small><i class="bi bi-calendar-date me-1"></i>2024-01-27</small>
           </div>
           <div class="lf-card-footer">
             <a href="mailto:security@example.test" class="lf-btn-small">Hubungi</a>
@@ -222,9 +222,9 @@
 
       <!-- Empty State (hidden by default) -->
       <div id="lf-empty" class="lf-empty" style="display: none;">
-        <p>📭</p>
-        <p class="font-semibold">Tidak ada barang yang sesuai</p>
-        <p class="text-sm text-gray-600">Coba ubah filter atau kata kunci pencarian Anda</p>
+        <p><i class="bi bi-inbox-fill"></i></p>
+        <p class="fw-semibold">Tidak ada barang yang sesuai</p>
+        <p class="small text-muted">Coba ubah filter atau kata kunci pencarian Anda</p>
       </div>
     </section>
 
@@ -268,5 +268,5 @@
   </div>
 </div>
 
-<script src="{{ asset('js/lost-found.js') }}"></script>
+<script src="{{ asset('js/mahasiswa/lost-found.js') }}"></script>
 @endsection

@@ -61,7 +61,7 @@
     <div class="col-md-5">
       <div class="input-group input-group-lg rounded-4 overflow-hidden">
         <span class="input-group-text bg-white border-0" style="border-radius: 8px 0 0 8px;">
-          🔍
+          
         </span>
         <input 
           type="text" 
@@ -91,7 +91,7 @@
               style="background: #5f3a74; color: white; border: none; font-size: 0.95rem; box-shadow: 0 2px 8px rgba(95, 58, 116, 0.3); transition: all 0.3s ease;"
               onmouseover="this.style.background='#4a2e5e'; this.style.boxShadow='0 4px 12px rgba(95, 58, 116, 0.4)';"
               onmouseout="this.style.background='#5f3a74'; this.style.boxShadow='0 2px 8px rgba(95, 58, 116, 0.3)';">
-        ➕ Buat Pengumuman Baru
+         Buat Pengumuman Baru
       </button>
     </div>
   </div>
@@ -99,7 +99,7 @@
   <!-- ===== 3. INFO BOX DISTRIBUSI EMAIL ===== -->
   <div class="alert rounded-4 mb-5" style="background: #E8EAF6; border: 1px solid #9FA8DA; padding: 1.5rem; border-radius: 16px;">
     <div style="display: flex; gap: 1rem;">
-      <div style="font-size: 1.5rem; flex-shrink: 0;">ℹ️</div>
+      <div style="font-size: 1.5rem; flex-shrink: 0;"></div>
       <div>
         <strong style="color: #5f3a74;">Sistem Distribusi Email:</strong>
         <div style="color: #424242; margin-top: 0.5rem; line-height: 1.6;">
@@ -134,7 +134,7 @@
             </td>
             <td style="padding: 1.25rem; vertical-align: middle; color: #424242;">Akademik</td>
             <td style="padding: 1.25rem; vertical-align: middle; color: #424242;">
-              👥 Semua Organisasi
+               Semua Organisasi
             </td>
             <td style="padding: 1.25rem; vertical-align: middle;">
               <div style="color: #424242;">16 Desember 2024</div>
@@ -147,13 +147,13 @@
               <div style="display: flex; gap: 8px; justify-content: center;">
                 <a href="#" style="font-size: 1.2rem; cursor: pointer; text-decoration: none; color: #5f3a74; transition: all 0.2s;" 
                    onmouseover="this.style.transform='scale(1.3)'"
-                   onmouseout="this.style.transform='scale(1)'" title="Lihat">👁</a>
+                   onmouseout="this.style.transform='scale(1)'" title="Lihat"></a>
                 <a href="#" style="font-size: 1.2rem; cursor: pointer; text-decoration: none; color: #757575; transition: all 0.2s;"
                    onmouseover="this.style.transform='scale(1.3)'; this.style.color='#424242';"
-                   onmouseout="this.style.transform='scale(1)'; this.style.color='#757575';" title="Edit">✏️</a>
+                   onmouseout="this.style.transform='scale(1)'; this.style.color='#757575';" title="Edit"></a>
                 <a href="#" style="font-size: 1.2rem; cursor: pointer; text-decoration: none; color: #E53935; transition: all 0.2s;"
                    onmouseover="this.style.transform='scale(1.3)'"
-                   onmouseout="this.style.transform='scale(1)'" title="Hapus">🗑️</a>
+                   onmouseout="this.style.transform='scale(1)'" title="Hapus"></a>
               </div>
             </td>
           </tr>
@@ -168,7 +168,7 @@
             </td>
             <td style="padding: 1.25rem; vertical-align: middle; color: #424242;">Non-Akademik</td>
             <td style="padding: 1.25rem; vertical-align: middle; color: #424242;">
-              👥 Fakultas &amp; Mahasiswa
+               Fakultas &amp; Mahasiswa
             </td>
             <td style="padding: 1.25rem; vertical-align: middle;">
               <div style="color: #424242;">22 Desember 2024</div>
@@ -181,13 +181,13 @@
               <div style="display: flex; gap: 8px; justify-content: center;">
                 <a href="#" style="font-size: 1.2rem; cursor: pointer; text-decoration: none; color: #5f3a74; transition: all 0.2s;" 
                    onmouseover="this.style.transform='scale(1.3)'"
-                   onmouseout="this.style.transform='scale(1)'" title="Lihat">👁</a>
+                   onmouseout="this.style.transform='scale(1)'" title="Lihat"></a>
                 <a href="#" style="font-size: 1.2rem; cursor: pointer; text-decoration: none; color: #757575; transition: all 0.2s;"
                    onmouseover="this.style.transform='scale(1.3)'; this.style.color='#424242';"
-                   onmouseout="this.style.transform='scale(1)'; this.style.color='#757575';" title="Edit">✏️</a>
+                   onmouseout="this.style.transform='scale(1)'; this.style.color='#757575';" title="Edit"></a>
                 <a href="#" style="font-size: 1.2rem; cursor: pointer; text-decoration: none; color: #E53935; transition: all 0.2s;"
                    onmouseover="this.style.transform='scale(1.3)'"
-                   onmouseout="this.style.transform='scale(1)'" title="Hapus">🗑️</a>
+                   onmouseout="this.style.transform='scale(1)'" title="Hapus"></a>
               </div>
             </td>
           </tr>
@@ -202,7 +202,7 @@
             </td>
             <td style="padding: 1.25rem; vertical-align: middle; color: #424242;">Umum</td>
             <td style="padding: 1.25rem; vertical-align: middle; color: #424242;">
-              👥 Semua Civitas
+               Semua Civitas
             </td>
             <td style="padding: 1.25rem; vertical-align: middle;">
               <div style="color: #9E9E9E;">--</div>
@@ -215,13 +215,13 @@
               <div style="display: flex; gap: 8px; justify-content: center;">
                 <a href="#" style="font-size: 1.2rem; cursor: pointer; text-decoration: none; color: #5f3a74; transition: all 0.2s;" 
                    onmouseover="this.style.transform='scale(1.3)'"
-                   onmouseout="this.style.transform='scale(1)'" title="Lihat">👁</a>
+                   onmouseout="this.style.transform='scale(1)'" title="Lihat"></a>
                 <a href="#" style="font-size: 1.2rem; cursor: pointer; text-decoration: none; color: #757575; transition: all 0.2s;"
                    onmouseover="this.style.transform='scale(1.3)'; this.style.color='#424242';"
-                   onmouseout="this.style.transform='scale(1)'; this.style.color='#757575';" title="Edit">✏️</a>
+                   onmouseout="this.style.transform='scale(1)'; this.style.color='#757575';" title="Edit"></a>
                 <a href="#" style="font-size: 1.2rem; cursor: pointer; text-decoration: none; color: #E53935; transition: all 0.2s;"
                    onmouseover="this.style.transform='scale(1.3)'"
-                   onmouseout="this.style.transform='scale(1)'" title="Hapus">🗑️</a>
+                   onmouseout="this.style.transform='scale(1)'" title="Hapus"></a>
               </div>
             </td>
           </tr>
@@ -236,7 +236,7 @@
             </td>
             <td style="padding: 1.25rem; vertical-align: middle; color: #424242;">Organisasi</td>
             <td style="padding: 1.25rem; vertical-align: middle; color: #424242;">
-              👥 Pengurus &amp; Anggota
+               Pengurus &amp; Anggota
             </td>
             <td style="padding: 1.25rem; vertical-align: middle;">
               <div style="color: #424242;">28 Februari 2026</div>
@@ -249,13 +249,13 @@
               <div style="display: flex; gap: 8px; justify-content: center;">
                 <a href="#" style="font-size: 1.2rem; cursor: pointer; text-decoration: none; color: #5f3a74; transition: all 0.2s;" 
                    onmouseover="this.style.transform='scale(1.3)'"
-                   onmouseout="this.style.transform='scale(1)'" title="Lihat">👁</a>
+                   onmouseout="this.style.transform='scale(1)'" title="Lihat"></a>
                 <a href="#" style="font-size: 1.2rem; cursor: pointer; text-decoration: none; color: #757575; transition: all 0.2s;"
                    onmouseover="this.style.transform='scale(1.3)'; this.style.color='#424242';"
-                   onmouseout="this.style.transform='scale(1)'; this.style.color='#757575';" title="Edit">✏️</a>
+                   onmouseout="this.style.transform='scale(1)'; this.style.color='#757575';" title="Edit"></a>
                 <a href="#" style="font-size: 1.2rem; cursor: pointer; text-decoration: none; color: #E53935; transition: all 0.2s;"
                    onmouseover="this.style.transform='scale(1.3)'"
-                   onmouseout="this.style.transform='scale(1)'" title="Hapus">🗑️</a>
+                   onmouseout="this.style.transform='scale(1)'" title="Hapus"></a>
               </div>
             </td>
           </tr>
@@ -270,7 +270,7 @@
             </td>
             <td style="padding: 1.25rem; vertical-align: middle; color: #424242;">Akademik</td>
             <td style="padding: 1.25rem; vertical-align: middle; color: #424242;">
-              👥 Mahasiswa S1
+               Mahasiswa S1
             </td>
             <td style="padding: 1.25rem; vertical-align: middle;">
               <div style="color: #424242;">15 Maret 2026</div>
@@ -283,13 +283,13 @@
               <div style="display: flex; gap: 8px; justify-content: center;">
                 <a href="#" style="font-size: 1.2rem; cursor: pointer; text-decoration: none; color: #5f3a74; transition: all 0.2s;" 
                    onmouseover="this.style.transform='scale(1.3)'"
-                   onmouseout="this.style.transform='scale(1)'" title="Lihat">👁</a>
+                   onmouseout="this.style.transform='scale(1)'" title="Lihat"></a>
                 <a href="#" style="font-size: 1.2rem; cursor: pointer; text-decoration: none; color: #757575; transition: all 0.2s;"
                    onmouseover="this.style.transform='scale(1.3)'; this.style.color='#424242';"
-                   onmouseout="this.style.transform='scale(1)'; this.style.color='#757575';" title="Edit">✏️</a>
+                   onmouseout="this.style.transform='scale(1)'; this.style.color='#757575';" title="Edit"></a>
                 <a href="#" style="font-size: 1.2rem; cursor: pointer; text-decoration: none; color: #E53935; transition: all 0.2s;"
                    onmouseover="this.style.transform='scale(1.3)'"
-                   onmouseout="this.style.transform='scale(1)'" title="Hapus">🗑️</a>
+                   onmouseout="this.style.transform='scale(1)'" title="Hapus"></a>
               </div>
             </td>
           </tr>
@@ -304,7 +304,7 @@
             </td>
             <td style="padding: 1.25rem; vertical-align: middle; color: #424242;">Akademik</td>
             <td style="padding: 1.25rem; vertical-align: middle; color: #424242;">
-              👥 Semua Mahasiswa
+               Semua Mahasiswa
             </td>
             <td style="padding: 1.25rem; vertical-align: middle;">
               <div style="color: #9E9E9E;">--</div>
@@ -317,13 +317,13 @@
               <div style="display: flex; gap: 8px; justify-content: center;">
                 <a href="#" style="font-size: 1.2rem; cursor: pointer; text-decoration: none; color: #5f3a74; transition: all 0.2s;" 
                    onmouseover="this.style.transform='scale(1.3)'"
-                   onmouseout="this.style.transform='scale(1)'" title="Lihat">👁</a>
+                   onmouseout="this.style.transform='scale(1)'" title="Lihat"></a>
                 <a href="#" style="font-size: 1.2rem; cursor: pointer; text-decoration: none; color: #757575; transition: all 0.2s;"
                    onmouseover="this.style.transform='scale(1.3)'; this.style.color='#424242';"
-                   onmouseout="this.style.transform='scale(1)'; this.style.color='#757575';" title="Edit">✏️</a>
+                   onmouseout="this.style.transform='scale(1)'; this.style.color='#757575';" title="Edit"></a>
                 <a href="#" style="font-size: 1.2rem; cursor: pointer; text-decoration: none; color: #E53935; transition: all 0.2s;"
                    onmouseover="this.style.transform='scale(1.3)'"
-                   onmouseout="this.style.transform='scale(1)'" title="Hapus">🗑️</a>
+                   onmouseout="this.style.transform='scale(1)'" title="Hapus"></a>
               </div>
             </td>
           </tr>

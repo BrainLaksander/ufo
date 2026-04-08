@@ -13,7 +13,7 @@
 <div class="row mb-5">
     <div class="col-md-6 col-lg-3 mb-4">
         <div class="card card-dashboard card-stat" style="background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%); color: white;">
-            <div class="card-stat-icon"><i class="fas fa-users"></i></div>
+            <div class="card-stat-icon"><i class="bi bi-people-fill"></i></div>
             <div class="card-stat-number">8</div>
             <div class="card-stat-label">Total Pendaftaran</div>
         </div>
@@ -21,7 +21,7 @@
 
     <div class="col-md-6 col-lg-3 mb-4">
         <div class="card card-dashboard card-stat" style="background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%); color: white;">
-            <div class="card-stat-icon"><i class="fas fa-clock"></i></div>
+            <div class="card-stat-icon"><i class="bi bi-clock-fill"></i></div>
             <div class="card-stat-number">3</div>
             <div class="card-stat-label">Pending Review</div>
         </div>
@@ -29,7 +29,7 @@
 
     <div class="col-md-6 col-lg-3 mb-4">
         <div class="card card-dashboard card-stat" style="background: linear-gradient(135deg, #22C55E 0%, #15803D 100%); color: white;">
-            <div class="card-stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="card-stat-icon"><i class="bi bi-check-circle-fill"></i></div>
             <div class="card-stat-number">4</div>
             <div class="card-stat-label">Diterima</div>
         </div>
@@ -37,7 +37,7 @@
 
     <div class="col-md-6 col-lg-3 mb-4">
         <div class="card card-dashboard card-stat" style="background: linear-gradient(135deg, #EF4444 0%, #991B1B 100%); color: white;">
-            <div class="card-stat-icon"><i class="fas fa-times-circle"></i></div>
+            <div class="card-stat-icon"><i class="bi bi-x-circle-fill"></i></div>
             <div class="card-stat-number">1</div>
             <div class="card-stat-label">Ditolak</div>
         </div>
@@ -68,7 +68,7 @@
                     <div>
                         <h5 class="card-title">Muhammad Rizki</h5>
                         <small class="text-muted">
-                            <i class="fas fa-id-card"></i> 20251001 | <i class="fas fa-graduation-cap"></i> Teknik Informatika
+                            <i class="bi bi-person-vcard-fill"></i> 20251001 | <i class="bi bi-mortarboard-fill"></i> Teknik Informatika
                         </small>
                     </div>
                     <span class="badge bg-warning text-dark">Pending</span>
@@ -79,14 +79,14 @@
                     <strong>Alasan Bergabung:</strong> Ingin mengembangkan skill dan belajar dari senior organisasi
                 </p>
                 <small class="text-muted">
-                    <i class="fas fa-calendar"></i> Pendaftaran: 26 Feb 2026
+                    <i class="bi bi-calendar-date-fill"></i> Pendaftaran: 26 Feb 2026
                 </small>
                 <div class="mt-3">
                     <button class="btn btn-sm btn-info me-2" data-bs-toggle="modal" data-bs-target="#detailModal">
-                        <i class="fas fa-eye"></i> Lihat Detail
+                        <i class="bi bi-eye-fill"></i> Lihat Detail
                     </button>
-                    <button class="btn btn-sm btn-success"><i class="fas fa-check"></i> Terima</button>
-                    <button class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Tolak</button>
+                    <button class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> Terima</button>
+                    <button class="btn btn-sm btn-danger"><i class="bi bi-x-lg"></i> Tolak</button>
                 </div>
             </div>
         </div>
@@ -99,7 +99,7 @@
                     <div>
                         <h5 class="card-title">Eka Pratiwi</h5>
                         <small class="text-muted">
-                            <i class="fas fa-id-card"></i> 20251002 | <i class="fas fa-graduation-cap"></i> Manajemen Bisnis
+                            <i class="bi bi-person-vcard-fill"></i> 20251002 | <i class="bi bi-mortarboard-fill"></i> Manajemen Bisnis
                         </small>
                     </div>
                     <span class="badge bg-warning text-dark">Pending</span>
@@ -110,14 +110,14 @@
                     <strong>Alasan Bergabung:</strong> Tertarik dengan kegiatan organisasi dan ingin berkontribusi
                 </p>
                 <small class="text-muted">
-                    <i class="fas fa-calendar"></i> Pendaftaran: 25 Feb 2026
+                    <i class="bi bi-calendar-date-fill"></i> Pendaftaran: 25 Feb 2026
                 </small>
                 <div class="mt-3">
                     <button class="btn btn-sm btn-info me-2" data-bs-toggle="modal" data-bs-target="#detailModal">
-                        <i class="fas fa-eye"></i> Lihat Detail
+                        <i class="bi bi-eye-fill"></i> Lihat Detail
                     </button>
-                    <button class="btn btn-sm btn-success"><i class="fas fa-check"></i> Terima</button>
-                    <button class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Tolak</button>
+                    <button class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> Terima</button>
+                    <button class="btn btn-sm btn-danger"><i class="bi bi-x-lg"></i> Tolak</button>
                 </div>
             </div>
         </div>
@@ -130,7 +130,7 @@
                     <div>
                         <h5 class="card-title">Rido Firmandan</h5>
                         <small class="text-muted">
-                            <i class="fas fa-id-card"></i> 20251003 | <i class="fas fa-graduation-cap"></i> Teknik Sipil
+                            <i class="bi bi-person-vcard-fill"></i> 20251003 | <i class="bi bi-mortarboard-fill"></i> Teknik Sipil
                         </small>
                     </div>
                     <span class="badge bg-warning text-dark">Pending</span>
@@ -141,14 +141,14 @@
                     <strong>Alasan Bergabung:</strong> Ingin mendapatkan pengalaman organisasi dan networking
                 </p>
                 <small class="text-muted">
-                    <i class="fas fa-calendar"></i> Pendaftaran: 24 Feb 2026
+                    <i class="bi bi-calendar-date-fill"></i> Pendaftaran: 24 Feb 2026
                 </small>
                 <div class="mt-3">
                     <button class="btn btn-sm btn-info me-2" data-bs-toggle="modal" data-bs-target="#detailModal">
-                        <i class="fas fa-eye"></i> Lihat Detail
+                        <i class="bi bi-eye-fill"></i> Lihat Detail
                     </button>
-                    <button class="btn btn-sm btn-success"><i class="fas fa-check"></i> Terima</button>
-                    <button class="btn btn-sm btn-danger"><i class="fas fa-times"></i> Tolak</button>
+                    <button class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> Terima</button>
+                    <button class="btn btn-sm btn-danger"><i class="bi bi-x-lg"></i> Tolak</button>
                 </div>
             </div>
         </div>
@@ -161,7 +161,7 @@
                     <div>
                         <h5 class="card-title">Siti Nurhaliza</h5>
                         <small class="text-muted">
-                            <i class="fas fa-id-card"></i> 20251004 | <i class="fas fa-graduation-cap"></i> Sastra Inggris
+                            <i class="bi bi-person-vcard-fill"></i> 20251004 | <i class="bi bi-mortarboard-fill"></i> Sastra Inggris
                         </small>
                     </div>
                     <span class="badge bg-success">Diterima</span>
@@ -172,13 +172,13 @@
                     <strong>Alasan Bergabung:</strong> Ingin meningkatkan soft skills dan komunikasi
                 </p>
                 <small class="text-muted">
-                    <i class="fas fa-calendar"></i> Pendaftaran: 20 Feb 2026 | <i class="fas fa-check"></i> Disetujui: 23 Feb 2026
+                    <i class="bi bi-calendar-date-fill"></i> Pendaftaran: 20 Feb 2026 | <i class="bi bi-check-lg"></i> Disetujui: 23 Feb 2026
                 </small>
                 <div class="mt-3">
                     <button class="btn btn-sm btn-info me-2" data-bs-toggle="modal" data-bs-target="#detailModal">
-                        <i class="fas fa-eye"></i> Lihat Detail
+                        <i class="bi bi-eye-fill"></i> Lihat Detail
                     </button>
-                    <button class="btn btn-sm btn-danger"><i class="fas fa-undo"></i> Batalkan</button>
+                    <button class="btn btn-sm btn-danger"><i class="bi bi-undo"></i> Batalkan</button>
                 </div>
             </div>
         </div>
@@ -239,8 +239,8 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                <button type="button" class="btn btn-danger me-2"><i class="fas fa-times"></i> Tolak</button>
-                <button type="button" class="btn btn-success"><i class="fas fa-check"></i> Terima</button>
+                <button type="button" class="btn btn-danger me-2"><i class="bi bi-x-lg"></i> Tolak</button>
+                <button type="button" class="btn btn-success"><i class="bi bi-check-lg"></i> Terima</button>
             </div>
         </div>
     </div>

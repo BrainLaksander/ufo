@@ -1,9 +1,13 @@
 @extends('layouts.app')
 
+@push('styles')
+  <link rel="stylesheet" href="{{ asset('css/pengurus.css') }}">
+@endpush
+
 @section('content')
   <div class="pengurus-login-wrap">
     <div class="pengurus-login-card">
-      <div class="login-brand">🛸 UFO</div>
+      <div class="login-brand"> UFO</div>
       <h2 class="login-title">Login Pengurus</h2>
 
       <form id="pengurus-login-form">

@@ -1,9 +1,9 @@
 <aside class="pengurus-sidebar">
   <div class="sidebar-inner">
-    <div class="sidebar-brand">🛸 UFO</div>
+    <div class="sidebar-brand"> UFO</div>
     <ul class="sidebar-list">
-      <li><a href="/pengurus/dashboard">Dashboard Organisasi</a></li>
-      <li><a href="/pengurus/profil">Profil Organisasi</a></li>
+      <li><a href="{{ route('portal.pengurus.dashboard') }}">Dashboard Organisasi</a></li>
+      <li><a href="{{ route('profil.show') }}">Profil Organisasi</a></li>
     </ul>
   </div>
 </aside>

@@ -13,7 +13,7 @@
 <div class="row mb-4">
     <div class="col-12">
         <button class="btn btn-primary-custom" data-bs-toggle="modal" data-bs-target="#uploadModal">
-            <i class="fas fa-cloud-upload-alt"></i> Upload Dokumen Baru
+            <i class="bi bi-cloud-arrow-up-fill"></i> Upload Dokumen Baru
         </button>
     </div>
 </div>
@@ -41,12 +41,12 @@
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div class="d-flex align-items-center gap-3">
                         <div style="font-size: 2.5rem; color: #3B82F6;">
-                            <i class="fas fa-file-pdf"></i>
+                            <i class="bi bi-file-earmark-pdf-fill"></i>
                         </div>
                         <div>
                             <h5 class="card-title mb-1">Laporan Kegiatan Februari 2026</h5>
                             <small class="text-muted">
-                                <i class="fas fa-calendar"></i> 28 Feb 2026 | <i class="fas fa-user"></i> Ahmad Rifki
+                                <i class="bi bi-calendar-date-fill"></i> 28 Feb 2026 | <i class="bi bi-person-fill"></i> Ahmad Rifki
                             </small>
                         </div>
                     </div>
@@ -54,9 +54,9 @@
                 </div>
                 <p class="text-muted mb-3">Laporan lengkap kegiatan organisasi UFO selama bulan Februari 2026 mencakup semua event dan kegiatan rutin.</p>
                 <div>
-                    <button class="btn btn-sm btn-info me-2"><i class="fas fa-download"></i> Download</button>
-                    <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Hapus</button>
+                    <button class="btn btn-sm btn-info me-2"><i class="bi bi-download"></i> Download</button>
+                    <button class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</button>
+                    <button class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i> Hapus</button>
                 </div>
             </div>
         </div>
@@ -68,12 +68,12 @@
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div class="d-flex align-items-center gap-3">
                         <div style="font-size: 2.5rem; color: #22C55E;">
-                            <i class="fas fa-file-word"></i>
+                            <i class="bi bi-file-earmark-word-fill"></i>
                         </div>
                         <div>
                             <h5 class="card-title mb-1">Proposal Program Kerja Tahunan 2026</h5>
                             <small class="text-muted">
-                                <i class="fas fa-calendar"></i> 15 Feb 2026 | <i class="fas fa-user"></i> Siti Nurhaliza
+                                <i class="bi bi-calendar-date-fill"></i> 15 Feb 2026 | <i class="bi bi-person-fill"></i> Siti Nurhaliza
                             </small>
                         </div>
                     </div>
@@ -81,9 +81,9 @@
                 </div>
                 <p class="text-muted mb-3">Proposal lengkap program kerja organisasi UFO untuk tahun 2026 dengan target dan timeline yang jelas.</p>
                 <div>
-                    <button class="btn btn-sm btn-info me-2"><i class="fas fa-download"></i> Download</button>
-                    <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Hapus</button>
+                    <button class="btn btn-sm btn-info me-2"><i class="bi bi-download"></i> Download</button>
+                    <button class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</button>
+                    <button class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i> Hapus</button>
                 </div>
             </div>
         </div>
@@ -95,12 +95,12 @@
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div class="d-flex align-items-center gap-3">
                         <div style="font-size: 2.5rem; color: #FBBF24;">
-                            <i class="fas fa-file-pdf"></i>
+                            <i class="bi bi-file-earmark-pdf-fill"></i>
                         </div>
                         <div>
                             <h5 class="card-title mb-1">Laporan Keuangan Januari 2026</h5>
                             <small class="text-muted">
-                                <i class="fas fa-calendar"></i> 05 Feb 2026 | <i class="fas fa-user"></i> Muhammad Hendra
+                                <i class="bi bi-calendar-date-fill"></i> 05 Feb 2026 | <i class="bi bi-person-fill"></i> Muhammad Hendra
                             </small>
                         </div>
                     </div>
@@ -108,9 +108,9 @@
                 </div>
                 <p class="text-muted mb-3">Laporan keuangan detail untuk periode Januari 2026 menunggu review dan persetujuan dari bendahara.</p>
                 <div>
-                    <button class="btn btn-sm btn-info me-2"><i class="fas fa-download"></i> Download</button>
-                    <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Hapus</button>
+                    <button class="btn btn-sm btn-info me-2"><i class="bi bi-download"></i> Download</button>
+                    <button class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</button>
+                    <button class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i> Hapus</button>
                 </div>
             </div>
         </div>
@@ -122,12 +122,12 @@
                 <div class="d-flex justify-content-between align-items-start mb-3">
                     <div class="d-flex align-items-center gap-3">
                         <div style="font-size: 2.5rem; color: #A78BFA;">
-                            <i class="fas fa-file-archive"></i>
+                            <i class="bi bi-file-earmark-zip-fill"></i>
                         </div>
                         <div>
                             <h5 class="card-title mb-1">Arsip Dokumen 2024</h5>
                             <small class="text-muted">
-                                <i class="fas fa-calendar"></i> 10 Jan 2026 | <i class="fas fa-user"></i> Sistem
+                                <i class="bi bi-calendar-date-fill"></i> 10 Jan 2026 | <i class="bi bi-person-fill"></i> Sistem
                             </small>
                         </div>
                     </div>
@@ -135,8 +135,8 @@
                 </div>
                 <p class="text-muted mb-3">Kumpulan dokumen arsip hasil kegiatan organisasi tahun 2024 untuk referensi dan dokumentasi.</p>
                 <div>
-                    <button class="btn btn-sm btn-info me-2"><i class="fas fa-download"></i> Download</button>
-                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Hapus</button>
+                    <button class="btn btn-sm btn-info me-2"><i class="bi bi-download"></i> Download</button>
+                    <button class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i> Hapus</button>
                 </div>
             </div>
         </div>
@@ -173,7 +173,7 @@
                     <div class="mb-3">
                         <label class="form-label">File Upload</label>
                         <div class="border border-2 border-dashed p-4 text-center rounded" style="border-color: #3B82F6;">
-                            <i class="fas fa-cloud-upload-alt" style="font-size: 2.5rem; color: #3B82F6; margin-bottom: 10px;"></i><br>
+                            <i class="bi bi-cloud-arrow-up-fill" style="font-size: 2.5rem; color: #3B82F6; margin-bottom: 10px;"></i><br>
                             <p>Drag dan drop file di sini, atau <strong>klik untuk memilih</strong></p>
                             <small class="text-muted">Format: PDF, DOC, DOCX, XLS, XLSX (Max 10MB)</small>
                             <input type="file" class="form-control d-none">

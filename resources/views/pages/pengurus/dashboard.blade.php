@@ -13,7 +13,7 @@
     @foreach($stats as $stat)
     <div class="col-md-6 col-lg-3">
         <div class="stat-card">
-            <div class="stat-card-icon">{{ $stat['icon'] }}</div>
+            <div class="stat-card-icon"><i class="bi {{ $stat['icon'] }}"></i></div>
             <div class="stat-card-value">{{ $stat['value'] }}</div>
             <div class="stat-card-label">{{ $stat['label'] }}</div>
         </div>
@@ -25,16 +25,16 @@
     <!-- QUICK ACTIONS -->
     <div class="col-lg-6">
         <div class="bg-white p-4 rounded-3 shadow-sm border" style="border: 2px solid #f0f0f0;">
-            <h4 class="text-primary mb-3" style="font-weight: 700;">⚡ Quick Actions</h4>
+            <h4 class="text-primary mb-3" style="font-weight: 700;"><i class="bi bi-lightning-charge-fill me-2"></i>Quick Actions</h4>
             <div class="d-flex flex-column gap-2">
-                <a href="/portal/pengurus/events/create" class="btn-primary-org">
-                    <span>➕</span> Buat Event
+                <a href="{{ route('portal.pengurus.events.create') }}" class="btn-primary-org">
+                    <span><i class="bi bi-plus-circle-fill me-1"></i></span> Buat Event
                 </a>
-                <a href="/portal/pengurus/announcements/create" class="btn-primary-org">
-                    <span>➕</span> Buat Pengumuman
+                <a href="{{ route('portal.pengurus.announcements.create') }}" class="btn-primary-org">
+                    <span><i class="bi bi-plus-circle-fill me-1"></i></span> Buat Pengumuman
                 </a>
-                <a href="/portal/pengurus/lostandfound" class="btn-primary-org">
-                    <span>➕</span> Lapor Lost & Found
+                <a href="{{ route('portal.pengurus.lostandfound') }}" class="btn-primary-org">
+                    <span><i class="bi bi-plus-circle-fill me-1"></i></span> Lapor Lost & Found
                 </a>
             </div>
         </div>
@@ -43,7 +43,7 @@
     <!-- RECENT APPLICATIONS -->
     <div class="col-lg-6">
         <div class="bg-white p-4 rounded-3 shadow-sm border" style="border: 2px solid #f0f0f0;">
-            <h4 class="text-primary mb-3" style="font-weight: 700;">📋 Pendaftaran Terbaru</h4>
+            <h4 class="text-primary mb-3" style="font-weight: 700;"><i class="bi bi-clipboard-check me-2"></i>Pendaftaran Terbaru</h4>
             <div class="table-responsive">
                 <table class="table table-sm mb-0">
                     <tbody>
@@ -54,8 +54,8 @@
                                 <small class="text-muted">{{ $app['nim'] }}</small>
                             </td>
                             <td class="text-end">
-                                <button class="btn btn-sm btn-success" style="background: var(--success); border: none; color: white; cursor: pointer;">✓</button>
-                                <button class="btn btn-sm btn-danger" style="background: var(--danger); border: none; color: white; cursor: pointer;">✕</button>
+                                <button class="btn btn-sm btn-success" style="background: var(--success); border: none; color: white; cursor: pointer;"><i class="bi bi-check-lg"></i></button>
+                                <button class="btn btn-sm btn-danger" style="background: var(--danger); border: none; color: white; cursor: pointer;"><i class="bi bi-x-lg"></i></button>
                             </td>
                         </tr>
                         @endforeach
@@ -63,7 +63,7 @@
                 </table>
             </div>
             <div class="mt-3">
-                <a href="/portal/pengurus/applications" class="btn-secondary-org" style="text-decoration: none; display: inline-block;">Lihat Semua →</a>
+                <a href="{{ route('portal.pengurus.applications') }}" class="btn-secondary-org" style="text-decoration: none; display: inline-block;">Lihat Semua →</a>
             </div>
         </div>
     </div>
@@ -73,13 +73,13 @@
     <!-- RECENT EVENTS -->
     <div class="col-lg-6">
         <div class="bg-white p-4 rounded-3 shadow-sm border" style="border: 2px solid #f0f0f0;">
-            <h4 class="text-primary mb-3" style="font-weight: 700;">📅 Event Terdekat</h4>
+            <h4 class="text-primary mb-3" style="font-weight: 700;"><i class="bi bi-calendar-event me-2"></i>Event Terdekat</h4>
             <div class="d-flex flex-column gap-3">
                 @foreach($recent_events as $event)
                 <div style="border-left: 4px solid var(--primary); padding-left: 15px;">
                     <div style="font-weight: 600; color: var(--primary);">{{ $event['name'] }}</div>
                     <div style="font-size: 12px; color: var(--text-secondary);">
-                        📅 {{ date('d M Y', strtotime($event['date'])) }} | 👥 {{ $event['participants'] }} peserta
+                        <i class="bi bi-calendar-date me-1"></i>{{ date('d M Y', strtotime($event['date'])) }} | <i class="bi bi-people me-1"></i>{{ $event['participants'] }} peserta
                     </div>
                     <div class="mt-1">
                         @if($event['status'] == 'Draft')
@@ -94,7 +94,7 @@
                 @endforeach
             </div>
             <div class="mt-3">
-                <a href="/portal/pengurus/events" class="btn-secondary-org" style="text-decoration: none; display: inline-block;">Lihat Semua →</a>
+                <a href="{{ route('portal.pengurus.events') }}" class="btn-secondary-org" style="text-decoration: none; display: inline-block;">Lihat Semua →</a>
             </div>
         </div>
     </div>
@@ -102,7 +102,7 @@
     <!-- RECENT LOST & FOUND -->
     <div class="col-lg-6">
         <div class="bg-white p-4 rounded-3 shadow-sm border" style="border: 2px solid #f0f0f0;">
-            <h4 class="text-primary mb-3" style="font-weight: 700;">🔍 Lost & Found Terbaru</h4>
+            <h4 class="text-primary mb-3" style="font-weight: 700;"><i class="bi bi-search me-2"></i>Lost & Found Terbaru</h4>
             <div class="table-responsive">
                 <table class="table table-sm mb-0">
                     <thead>
@@ -131,7 +131,7 @@
                 </table>
             </div>
             <div class="mt-3">
-                <a href="/portal/pengurus/lostandfound" class="btn-secondary-org" style="text-decoration: none; display: inline-block;">Lihat Semua →</a>
+                <a href="{{ route('portal.pengurus.lostandfound') }}" class="btn-secondary-org" style="text-decoration: none; display: inline-block;">Lihat Semua →</a>
             </div>
         </div>
     </div>
@@ -139,21 +139,21 @@
 
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-icon">👥</div>
+            <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
             <div class="stat-content">
                 <div class="stat-value">128</div>
                 <div class="stat-label">Total Anggota</div>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon">📅</div>
+            <div class="stat-icon"><i class="bi bi-calendar-event-fill"></i></div>
             <div class="stat-content">
                 <div class="stat-value">12</div>
                 <div class="stat-label">Total Event</div>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon">📝</div>
+            <div class="stat-icon"><i class="bi bi-file-earmark-text-fill"></i></div>
             <div class="stat-content">
                 <div class="stat-value">3</div>
                 <div class="stat-label">Pengajuan Aktif</div>

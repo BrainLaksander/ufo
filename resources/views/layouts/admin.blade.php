@@ -4,7 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Dashboard Admin - UFO')</title>
-    <link rel="stylesheet" href="/css/app.css">
+    <link rel="stylesheet" href="{{ asset('vendor/bootstrap-icons/font/bootstrap-icons.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
 
     <style>
         /* sidebar/master layout helpers */
@@ -52,7 +53,7 @@
         </main>
     </div>
 
-    <script src="/js/global.js"></script>
-    <script src="/js/sidebar-toggle.js"></script>
+    <script src="/js/core/utils.js"></script>
+    <script src="/js/core/navigation.js"></script>
 </body>
 </html>

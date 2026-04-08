@@ -21,7 +21,7 @@
     <section class="mahasiswa-search-section">
         <!-- Search Bar -->
         <div class="mahasiswa-search-wrapper">
-            <span class="search-icon">🔍</span>
+            <span class="search-icon"><i class="bi bi-search"></i></span>
             <input
                 type="text"
                 class="mahasiswa-search-input"
@@ -69,8 +69,8 @@
             <!-- Organization Card 1 -->
             <div class="mahasiswa-org-card">
                 <div class="org-card-header">
-                    <div class="org-card-logo">👥</div>
-                    <button class="org-card-favorite">♡</button>
+                    <div class="org-card-logo"><i class="bi bi-stars"></i></div>
+                    <button class="org-card-favorite"><i class="bi bi-heart"></i></button>
                 </div>
                 <div class="org-card-body">
                     <h3 class="org-card-name">Organisasi Rohani</h3>
@@ -82,8 +82,8 @@
             <!-- Organization Card 2 -->
             <div class="mahasiswa-org-card">
                 <div class="org-card-header">
-                    <div class="org-card-logo">🎵</div>
-                    <button class="org-card-favorite">♡</button>
+                    <div class="org-card-logo"><i class="bi bi-music-note-beamed"></i></div>
+                    <button class="org-card-favorite"><i class="bi bi-heart"></i></button>
                 </div>
                 <div class="org-card-body">
                     <h3 class="org-card-name">Paduan Suara</h3>
@@ -95,8 +95,8 @@
             <!-- Organization Card 3 -->
             <div class="mahasiswa-org-card">
                 <div class="org-card-header">
-                    <div class="org-card-logo">🎭</div>
-                    <button class="org-card-favorite">♡</button>
+                    <div class="org-card-logo"><i class="bi bi-mask"></i></div>
+                    <button class="org-card-favorite"><i class="bi bi-heart"></i></button>
                 </div>
                 <div class="org-card-body">
                     <h3 class="org-card-name">Teater</h3>
@@ -108,8 +108,8 @@
             <!-- Organization Card 4 -->
             <div class="mahasiswa-org-card">
                 <div class="org-card-header">
-                    <div class="org-card-logo">⚽</div>
-                    <button class="org-card-favorite">♡</button>
+                    <div class="org-card-logo"><i class="bi bi-trophy-fill"></i></div>
+                    <button class="org-card-favorite"><i class="bi bi-heart"></i></button>
                 </div>
                 <div class="org-card-body">
                     <h3 class="org-card-name">Olahraga</h3>
@@ -121,8 +121,8 @@
             <!-- Organization Card 5 -->
             <div class="mahasiswa-org-card">
                 <div class="org-card-header">
-                    <div class="org-card-logo">💻</div>
-                    <button class="org-card-favorite">♡</button>
+                    <div class="org-card-logo"><i class="bi bi-cpu-fill"></i></div>
+                    <button class="org-card-favorite"><i class="bi bi-heart"></i></button>
                 </div>
                 <div class="org-card-body">
                     <h3 class="org-card-name">Tech Club</h3>
@@ -134,8 +134,8 @@
             <!-- Organization Card 6 -->
             <div class="mahasiswa-org-card">
                 <div class="org-card-header">
-                    <div class="org-card-logo">🌱</div>
-                    <button class="org-card-favorite">♡</button>
+                    <div class="org-card-logo"><i class="bi bi-tree-fill"></i></div>
+                    <button class="org-card-favorite"><i class="bi bi-heart"></i></button>
                 </div>
                 <div class="org-card-body">
                     <h3 class="org-card-name">Lingkungan</h3>
@@ -149,7 +149,7 @@
     <!-- Floating Chat Button -->
     <div class="mahasiswa-floating-chat">
         <button class="floating-chat-btn">
-            💬
+            <i class="bi bi-chat-dots-fill"></i>
             <span class="chat-badge">3</span>
         </button>
     </div>

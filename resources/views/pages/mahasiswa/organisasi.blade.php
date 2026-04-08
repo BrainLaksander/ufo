@@ -26,8 +26,8 @@
                 <p class="org-category">Himpunan</p>
                 <p class="org-desc">Organisasi untuk mahasiswa Teknik Informatika yang peduli dengan pengembangan teknologi.</p>
                 <div class="org-stats">
-                    <span>👥 245 Anggota</span>
-                    <span>📅 20 Event/Tahun</span>
+                    <span> 245 Anggota</span>
+                    <span> 20 Event/Tahun</span>
                 </div>
                 <button class="btn btn-primary">Lihat Profil</button>
             </div>
@@ -40,8 +40,8 @@
                 <p class="org-category">Himpunan</p>
                 <p class="org-desc">Organisasi untuk mahasiswa program studi Bisnis.</p>
                 <div class="org-stats">
-                    <span>👥 180 Anggota</span>
-                    <span>📅 15 Event/Tahun</span>
+                    <span> 180 Anggota</span>
+                    <span> 15 Event/Tahun</span>
                 </div>
                 <button class="btn btn-primary">Lihat Profil</button>
             </div>
@@ -54,8 +54,8 @@
                 <p class="org-category">BEM</p>
                 <p class="org-desc">Badan Eksekutif Mahasiswa UNKLAB untuk tahun 2024.</p>
                 <div class="org-stats">
-                    <span>👥 50 Anggota</span>
-                    <span>📅 25 Event/Tahun</span>
+                    <span> 50 Anggota</span>
+                    <span> 25 Event/Tahun</span>
                 </div>
                 <button class="btn btn-primary">Lihat Profil</button>
             </div>
@@ -65,5 +65,5 @@
 @endsection
 
 @section('scripts')
-<script src="/js/mahasiswa.js"></script>
+<script src="/js/mahasiswa/components.js"></script>
 @endsection

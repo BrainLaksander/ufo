@@ -2,16 +2,17 @@
 <aside id="burger-kemahasiswaan" class="burger-menu kemahasiswaan-burger" aria-hidden="true">
     <div class="burger-header">
         <div class="burger-title">Menu Kemahasiswaan</div>
-        <button class="burger-close" aria-label="Close menu">✕</button>
+        <button class="burger-close" aria-label="Close menu"><i class="bi bi-x-lg"></i></button>
     </div>
     <nav class="burger-nav">
         <ul>
-            <li><a href="/portal/kemahasiswaan" data-close>Dashboard</a></li>
-            <li><a href="/portal/kemahasiswaan/organisasi" data-close>Manajemen Organisasi</a></li>
-            <li><a href="/portal/kemahasiswaan/organisasi" data-close>Pendaftaran Organisasi</a></li>
-            <li><a href="/portal/kemahasiswaan/pengajuan" data-close>Event Organisasi</a></li>
+            <li><a href="{{ route('home') }}" data-close>Landing Page</a></li>
+            <li><a href="{{ route('portal.kemahasiswaan.dashboard') }}" data-close>Dashboard</a></li>
+            <li><a href="{{ route('portal.kemahasiswaan.organisasi') }}" data-close>Manajemen Organisasi</a></li>
+            <li><a href="{{ route('portal.kemahasiswaan.organisasi') }}" data-close>Pendaftaran Organisasi</a></li>
+            <li><a href="{{ route('portal.kemahasiswaan.pengajuan') }}" data-close>Event Organisasi</a></li>
             <li class="burger-divider"></li>
-            <li><a href="/portal/login" id="logout-btn" data-close>Keluar</a></li>
+            <li><a href="{{ route('portal.login') }}" id="logout-btn" data-close>Keluar</a></li>
         </ul>
     </nav>
 </aside>

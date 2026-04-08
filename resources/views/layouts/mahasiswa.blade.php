@@ -4,11 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'UFO - UNKLAB Forum Organization')</title>
-    <!-- Tailwind CSS CDN for Organisasi Page -->
-    <script src="https://cdn.tailwindcss.com"></script>
     <!-- Bootstrap 5 CSS for Lost & Found & Pengumuman -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="/css/app.css">
+    <link href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link rel="stylesheet" href="{{ asset('vendor/bootstrap-icons/font/bootstrap-icons.min.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/app.css') }}">
+    @stack('styles')
     <style>
         body {
             padding-top: 64px;
@@ -47,9 +47,10 @@
     </div>
 
     <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="/js/global.js"></script>
-    <script src="/js/sidebar-toggle.js"></script>
+    <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="/js/core/utils.js"></script>
+    <script src="/js/core/navigation.js"></script>
+    @stack('scripts')
     <script>
         // Global function untuk open detail modal
         function openDetail(id) {
@@ -65,23 +66,23 @@
             const modalBody = document.querySelector('.modal-body');
             
             const categoryIcons = {
-                'Dompet': '💼',
-                'Kunci': '🔑',
-                'Buku': '📖',
-                'Elektronik': '💻',
-                'Kartu Identitas': '🆔'
+                'Dompet': 'bi-wallet2',
+                'Kunci': 'bi-key-fill',
+                'Buku': 'bi-book-fill',
+                'Elektronik': 'bi-phone-fill',
+                'Kartu Identitas': 'bi-person-vcard-fill'
             };
 
-            const icon = categoryIcons[item.category] || '📦';
+            const iconClass = categoryIcons[item.category] || 'bi-box-seam-fill';
             const statusBadge = item.itemStatus === 'ditemukan' 
-                ? '<span class="badge bg-success">✓ Ditemukan</span>'
-                : '<span class="badge bg-danger">✗ Hilang</span>';
+                ? '<span class="badge bg-success"><i class="bi bi-check-circle-fill me-1"></i>Ditemukan</span>'
+                : '<span class="badge bg-danger"><i class="bi bi-exclamation-triangle-fill me-1"></i>Hilang</span>';
 
             modalBody.innerHTML = `
                 <div class="mb-3">
-                    <div style="font-size: 3rem;">${icon}</div>
+                    <div style="font-size: 2.5rem;"><i class="bi ${iconClass}"></i></div>
                     ${statusBadge}
-                    ${item.priority ? '<span class="badge bg-warning">⭐ Penting</span>' : ''}
+                    ${item.priority ? '<span class="badge bg-warning text-dark"><i class="bi bi-star-fill me-1"></i>Penting</span>' : ''}
                 </div>
                 <h5>Kategori: ${item.category}</h5>
                 <p><strong>Lokasi:</strong> ${item.location}</p>
@@ -90,8 +91,8 @@
                 <p>${item.description.replace(/\n/g, '<br>')}</p>
                 <div class="mt-3 border-top pt-3">
                     <h6>Hubungi Pelapor:</h6>
-                    <a href="mailto:${item.contact}" class="btn btn-sm btn-primary me-2">✉️ Email</a>
-                    <a href="https://wa.me/62${item.phone.substring(1)}" target="_blank" class="btn btn-sm btn-success">💬 WhatsApp</a>
+                    <a href="mailto:${item.contact}" class="btn btn-sm btn-primary me-2"><i class="bi bi-envelope-fill me-1"></i>Email</a>
+                    <a href="https://wa.me/62${item.phone.substring(1)}" target="_blank" class="btn btn-sm btn-success"><i class="bi bi-whatsapp me-1"></i>WhatsApp</a>
                 </div>
             `;
             

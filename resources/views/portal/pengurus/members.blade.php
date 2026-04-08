@@ -13,7 +13,7 @@
 <div class="row mb-5">
     <div class="col-md-6 col-lg-3 mb-4">
         <div class="card card-dashboard card-stat" style="background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%); color: white;">
-            <div class="card-stat-icon"><i class="fas fa-users"></i></div>
+            <div class="card-stat-icon"><i class="bi bi-people-fill"></i></div>
             <div class="card-stat-number">142</div>
             <div class="card-stat-label">Total Anggota</div>
         </div>
@@ -21,7 +21,7 @@
 
     <div class="col-md-6 col-lg-3 mb-4">
         <div class="card card-dashboard card-stat" style="background: linear-gradient(135deg, #22C55E 0%, #15803D 100%); color: white;">
-            <div class="card-stat-icon"><i class="fas fa-user-tie"></i></div>
+            <div class="card-stat-icon"><i class="bi bi-person-badge-fill"></i></div>
             <div class="card-stat-number">12</div>
             <div class="card-stat-label">Pengurus</div>
         </div>
@@ -29,7 +29,7 @@
 
     <div class="col-md-6 col-lg-3 mb-4">
         <div class="card card-dashboard card-stat" style="background: linear-gradient(135deg, #FBBF24 0%, #D97706 100%); color: white;">
-            <div class="card-stat-icon"><i class="fas fa-check-circle"></i></div>
+            <div class="card-stat-icon"><i class="bi bi-check-circle-fill"></i></div>
             <div class="card-stat-number">130</div>
             <div class="card-stat-label">Anggota Aktif</div>
         </div>
@@ -37,7 +37,7 @@
 
     <div class="col-md-6 col-lg-3 mb-4">
         <div class="card card-dashboard card-stat" style="background: linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%); color: white;">
-            <div class="card-stat-icon"><i class="fas fa-ban"></i></div>
+            <div class="card-stat-icon"><i class="bi bi-slash-circle-fill"></i></div>
             <div class="card-stat-number">12</div>
             <div class="card-stat-label">Anggota Nonaktif</div>
         </div>
@@ -50,9 +50,9 @@
         <div class="card card-dashboard">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="card-title mb-0"><i class="fas fa-building"></i> Informasi Organisasi</h5>
+                    <h5 class="card-title mb-0"><i class="bi bi-buildings-fill"></i> Informasi Organisasi</h5>
                     <button class="btn btn-sm btn-primary-custom" id="editOrgBtn">
-                        <i class="fas fa-edit"></i> Edit
+                        <i class="bi bi-pencil-square"></i> Edit
                     </button>
                 </div>
                 
@@ -106,10 +106,10 @@
                             </div>
                             <div class="col-12">
                                 <button type="button" class="btn btn-primary-custom" id="saveOrgBtn">
-                                    <i class="fas fa-save"></i> Simpan
+                                    <i class="bi bi-floppy-fill"></i> Simpan
                                 </button>
                                 <button type="button" class="btn btn-secondary ms-2" id="cancelOrgBtn">
-                                    <i class="fas fa-times"></i> Batal
+                                    <i class="bi bi-x-lg"></i> Batal
                                 </button>
                             </div>
                         </div>
@@ -126,9 +126,9 @@
         <div class="card card-dashboard">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center mb-4">
-                    <h5 class="card-title mb-0"><i class="fas fa-users"></i> Daftar Anggota</h5>
+                    <h5 class="card-title mb-0"><i class="bi bi-people-fill"></i> Daftar Anggota</h5>
                     <button class="btn btn-sm btn-primary-custom">
-                        <i class="fas fa-plus"></i> Tambah Anggota
+                        <i class="bi bi-plus-circle-fill"></i> Tambah Anggota
                     </button>
                 </div>
 
@@ -167,8 +167,8 @@
                                 <td><span class="badge bg-success">Aktif</span></td>
                                 <td>rifki@email.com</td>
                                 <td>
-                                    <button class="btn btn-sm btn-info me-2"><i class="fas fa-eye"></i></button>
-                                    <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-sm btn-info me-2"><i class="bi bi-eye-fill"></i></button>
+                                    <button class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i></button>
                                 </td>
                             </tr>
                             <tr>
@@ -178,8 +178,8 @@
                                 <td><span class="badge bg-success">Aktif</span></td>
                                 <td>siti.nur@email.com</td>
                                 <td>
-                                    <button class="btn btn-sm btn-info me-2"><i class="fas fa-eye"></i></button>
-                                    <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-sm btn-info me-2"><i class="bi bi-eye-fill"></i></button>
+                                    <button class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i></button>
                                 </td>
                             </tr>
                             <tr>
@@ -189,8 +189,8 @@
                                 <td><span class="badge bg-success">Aktif</span></td>
                                 <td>hendra.m@email.com</td>
                                 <td>
-                                    <button class="btn btn-sm btn-info me-2"><i class="fas fa-eye"></i></button>
-                                    <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-sm btn-info me-2"><i class="bi bi-eye-fill"></i></button>
+                                    <button class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i></button>
                                 </td>
                             </tr>
                             <tr>
@@ -200,8 +200,8 @@
                                 <td><span class="badge bg-success">Aktif</span></td>
                                 <td>budi.s@email.com</td>
                                 <td>
-                                    <button class="btn btn-sm btn-info me-2"><i class="fas fa-eye"></i></button>
-                                    <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-sm btn-info me-2"><i class="bi bi-eye-fill"></i></button>
+                                    <button class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i></button>
                                 </td>
                             </tr>
                             <tr>
@@ -211,8 +211,8 @@
                                 <td><span class="badge bg-secondary">Nonaktif</span></td>
                                 <td>eka.putri@email.com</td>
                                 <td>
-                                    <button class="btn btn-sm btn-info me-2"><i class="fas fa-eye"></i></button>
-                                    <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i></button>
+                                    <button class="btn btn-sm btn-info me-2"><i class="bi bi-eye-fill"></i></button>
+                                    <button class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i></button>
                                 </td>
                             </tr>
                         </tbody>

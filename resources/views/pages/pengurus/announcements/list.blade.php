@@ -8,7 +8,7 @@
         <h1>Pengumuman Organisasi</h1>
         <p class="page-subtitle">Kelola pengumuman untuk anggota organisasi</p>
     </div>
-    <a href="/portal/pengurus/announcements/create" class="btn-primary-org">➕ Buat Pengumuman</a>
+    <a href="{{ route('portal.pengurus.announcements.create') }}" class="btn-primary-org"> Buat Pengumuman</a>
 </div>
 
 <div class="bg-white rounded-3 shadow-sm border" style="border: 2px solid #f0f0f0; overflow: hidden;">
@@ -32,7 +32,7 @@
                     <td style="padding: 15px;">
                         <span class="badge-org info">{{ $announcement['category'] }}</span>
                     </td>
-                    <td style="padding: 15px;">📅 {{ date('d M Y', strtotime($announcement['date'])) }}</td>
+                    <td style="padding: 15px;"> {{ date('d M Y', strtotime($announcement['date'])) }}</td>
                     <td style="padding: 15px;">
                         @if($announcement['status'] == 'Published')
                             <span class="badge-org success">Published</span>
