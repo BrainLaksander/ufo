@@ -238,7 +238,7 @@
       <div class="card border-0 shadow-sm">
         <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
           <h5 class="card-title mb-0">Pengumuman Terbaru</h5>
-          <a href="/portal/kemahasiswaan/pengumuman" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
+          <a href="{{ route('portal.kemahasiswaan.pengumuman') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
         </div>
         <div class="card-body p-0">
           <div class="table-responsive">

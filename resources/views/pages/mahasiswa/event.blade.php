@@ -20,9 +20,9 @@
                 <span class="event-badge">Workshop</span>
                 <h3>Workshop Coding & Web Development</h3>
                 <div class="event-meta">
-                    <span>📅 23 Desember 2024</span>
-                    <span>⏰ 13:00 - 17:00</span>
-                    <span>📍 Ruang Lab A</span>
+                    <span> 23 Desember 2024</span>
+                    <span> 13:00 - 17:00</span>
+                    <span> Ruang Lab A</span>
                 </div>
                 <p class="event-desc">Belajar fundamental web development dengan HTML, CSS, dan JavaScript dari praktisi industri.</p>
                 <button class="btn btn-primary">Daftar</button>
@@ -35,9 +35,9 @@
                 <span class="event-badge">Seminar</span>
                 <h3>Seminar Karir & Entrepreneurship</h3>
                 <div class="event-meta">
-                    <span>📅 28 Desember 2024</span>
-                    <span>⏰ 10:00 - 12:00</span>
-                    <span>📍 Aula Utama</span>
+                    <span> 28 Desember 2024</span>
+                    <span> 10:00 - 12:00</span>
+                    <span> Aula Utama</span>
                 </div>
                 <p class="event-desc">Dengarkan kisah sukses entrepreneur dan profesional tentang persiapan memasuki dunia kerja.</p>
                 <button class="btn btn-primary">Daftar</button>
@@ -50,9 +50,9 @@
                 <span class="event-badge">Gathering</span>
                 <h3>Gathering & Networking BEM UNKLAB</h3>
                 <div class="event-meta">
-                    <span>📅 30 Desember 2024</span>
-                    <span>⏰ 18:00 - 21:00</span>
-                    <span>📍 Outdoor Area</span>
+                    <span> 30 Desember 2024</span>
+                    <span> 18:00 - 21:00</span>
+                    <span> Outdoor Area</span>
                 </div>
                 <p class="event-desc">Acara gathering untuk mempererat silaturahmi antar organisasi di UNKLAB.</p>
                 <button class="btn btn-primary">Daftar</button>
@@ -63,5 +63,5 @@
 @endsection
 
 @section('scripts')
-<script src="/js/mahasiswa.js"></script>
+<script src="/js/mahasiswa/components.js"></script>
 @endsection

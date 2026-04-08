@@ -6,10 +6,7 @@
     <title>@yield('title', 'Dashboard Pengurus') - UFO Organisasi</title>
 
     <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
 
     <!-- Custom CSS -->
     <style>
@@ -857,10 +854,10 @@
 <body>
     <!-- Header Navigation -->
     <nav class="navbar-pengurus">
-        <div class="navbar-brand">
-            <i class="fas fa-graduation-cap"></i>
+        <a class="navbar-brand" href="{{ route('home') }}" aria-label="Kembali ke landing page UFO">
+            <i class="bi bi-mortarboard-fill"></i>
             UFO Pengurus
-        </div>
+        </a>
 
         <div class="navbar-center">
             <span style="color: #666; font-weight: 600;">Portal Manajemen Organisasi</span>
@@ -869,7 +866,7 @@
         <div class="navbar-right">
             <!-- Notification Button -->
             <a class="nav-link" href="#" id="notificationBtn" title="Notifikasi">
-                <i class="fas fa-bell"></i>
+                <i class="bi bi-bell-fill"></i>
                 <span class="badge bg-danger position-absolute" style="font-size: 0.65rem; padding: 2px 5px; top: -5px; right: -5px;">3</span>
             </a>
 
@@ -879,16 +876,16 @@
                     <img src="https://ui-avatars.com/api/?name=Ahmad+Rifki&background=3B82F6&color=fff&size=32" alt="User" class="rounded-circle" width="32" height="32">
                 </a>
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userMenu">
-                    <li><a class="dropdown-item" href="#"><i class="fas fa-user me-2"></i>Profile</a></li>
-                    <li><a class="dropdown-item" href="#"><i class="fas fa-cog me-2"></i>Settings</a></li>
+                    <li><a class="dropdown-item" href="#"><i class="bi bi-person-fill me-2"></i>Profile</a></li>
+                    <li><a class="dropdown-item" href="#"><i class="bi bi-cog me-2"></i>Settings</a></li>
                     <li><hr class="dropdown-divider"></li>
-                    <li><a class="dropdown-item text-danger" href="#"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+                    <li><a class="dropdown-item text-danger" href="#"><i class="bi bi-box-arrow-right me-2"></i>Logout</a></li>
                 </ul>
             </div>
 
             <!-- Burger Menu Button -->
             <a class="nav-link" href="#" id="burgerBtn" title="Menu">
-                <i class="fas fa-bars"></i>
+                <i class="bi bi-list"></i>
             </a>
         </div>
     </nav>
@@ -901,50 +898,55 @@
         </div>
 
         <ul class="sidebar-nav">
+            <li><a href="{{ route('home') }}" class="@if(request()->routeIs('home')) active @endif">
+                <i class="bi bi-house-door-fill"></i>
+                <span>Landing Page</span>
+            </a></li>
+
             <li><a href="{{ route('portal.pengurus.dashboard') }}" class="@if(request()->routeIs('portal.pengurus.dashboard')) active @endif">
-                <i class="fas fa-chart-line"></i>
+                <i class="bi bi-graph-up-arrow"></i>
                 <span>Dashboard</span>
             </a></li>
 
             <li><a href="{{ route('portal.pengurus.members') }}" class="@if(request()->routeIs('portal.pengurus.members')) active @endif">
-                <i class="fas fa-building"></i>
+                <i class="bi bi-buildings-fill"></i>
                 <span>Profil Organisasi</span>
             </a></li>
 
             <li><a href="{{ route('portal.pengurus.events') }}" class="@if(request()->routeIs('portal.pengurus.events')) active @endif">
-                <i class="fas fa-calendar-alt"></i>
+                <i class="bi bi-calendar-event-fill"></i>
                 <span>Event</span>
             </a></li>
 
             <li><a href="{{ route('portal.pengurus.announcements') }}" class="@if(request()->routeIs('portal.pengurus.announcements')) active @endif">
-                <i class="fas fa-bullhorn"></i>
+                <i class="bi bi-megaphone-fill"></i>
                 <span>Pengumuman</span>
             </a></li>
 
             <li><a href="{{ route('portal.pengurus.proposals') }}" class="@if(request()->routeIs('portal.pengurus.proposals')) active @endif">
-                <i class="fas fa-file-alt"></i>
+                <i class="bi bi-file-earmark-text-fill"></i>
                 <span>Pengajuan Laporan</span>
             </a></li>
 
             <li><a href="{{ route('portal.pengurus.applications') }}" class="@if(request()->routeIs('portal.pengurus.applications')) active @endif">
-                <i class="fas fa-user-check"></i>
+                <i class="bi bi-person-check-fill"></i>
                 <span>Pendaftaran</span>
             </a></li>
 
             <li><a href="{{ route('portal.pengurus.lostandfound') }}" class="@if(request()->routeIs('portal.pengurus.lostandfound')) active @endif">
-                <i class="fas fa-search"></i>
+                <i class="bi bi-search"></i>
                 <span>Lost & Found</span>
             </a></li>
 
             <li><a href="#" class="">
-                <i class="fas fa-comments"></i>
+                <i class="bi bi-chat-dots-fill"></i>
                 <span>Chat</span>
             </a></li>
         </ul>
 
         <div class="sidebar-footer">
             <a href="#" onclick="event.preventDefault();">
-                <i class="fas fa-sign-out-alt"></i>
+                <i class="bi bi-box-arrow-right"></i>
                 <span>Logout</span>
             </a>
         </div>
@@ -1000,11 +1002,11 @@
 
     <!-- Floating Chatbot Button -->
     <button class="floating-chatbot" id="chatbotBtn" title="UFO Bot">
-        <i class="fas fa-robot"></i>
+        <i class="bi bi-robot"></i>
     </button>
 
     <!-- Bootstrap 5 JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
     <!-- Custom JS -->
     <script>

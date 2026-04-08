@@ -10,10 +10,10 @@
 
 <ul class="nav nav-tabs mb-4" role="tablist" style="border-bottom: 2px solid var(--primary);">
     <li class="nav-item" role="presentation">
-        <button class="nav-link active" id="lost-tab" data-bs-toggle="tab" data-bs-target="#lost" type="button" role="tab">🔍 Barang Hilang</button>
+        <button class="nav-link active" id="lost-tab" data-bs-toggle="tab" data-bs-target="#lost" type="button" role="tab"><i class="bi bi-search me-1"></i>Barang Hilang</button>
     </li>
     <li class="nav-item" role="presentation">
-        <button class="nav-link" id="found-tab" data-bs-toggle="tab" data-bs-target="#found" type="button" role="tab">✓ Barang Ditemukan</button>
+        <button class="nav-link" id="found-tab" data-bs-toggle="tab" data-bs-target="#found" type="button" role="tab"><i class="bi bi-check-circle-fill me-1"></i>Barang Ditemukan</button>
     </li>
 </ul>
 
@@ -39,7 +39,7 @@
                             <tr style="border-bottom: 1px solid #f0f0f0;">
                                 <td style="padding: 15px;"><strong>{{ $item['item'] }}</strong></td>
                                 <td style="padding: 15px;">{{ $item['category'] }}</td>
-                                <td style="padding: 15px;">📍 {{ $item['location'] }}</td>
+                                <td style="padding: 15px;"><i class="bi bi-geo-alt-fill me-1"></i>{{ $item['location'] }}</td>
                                 <td style="padding: 15px;">{{ $item['reporter'] }}</td>
                                 <td style="padding: 15px;">
                                     @if($item['status'] == 'Pending')
@@ -49,8 +49,8 @@
                                     @endif
                                 </td>
                                 <td style="padding: 15px;">
-                                    <button class="btn btn-sm" style="background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;">Detail</button>
-                                    <button class="btn btn-sm btn-success" style="background: var(--success); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-left: 5px;">✓ Selesai</button>
+                                    <button class="btn btn-sm" style="background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;"><i class="bi bi-eye-fill me-1"></i>Detail</button>
+                                    <button class="btn btn-sm btn-success" style="background: var(--success); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-left: 5px;"><i class="bi bi-check-lg me-1"></i>Selesai</button>
                                 </td>
                             </tr>
                             @endif
@@ -82,14 +82,14 @@
                             <tr style="border-bottom: 1px solid #f0f0f0;">
                                 <td style="padding: 15px;"><strong>{{ $item['item'] }}</strong></td>
                                 <td style="padding: 15px;">{{ $item['category'] }}</td>
-                                <td style="padding: 15px;">📍 {{ $item['location'] }}</td>
+                                <td style="padding: 15px;"><i class="bi bi-geo-alt-fill me-1"></i>{{ $item['location'] }}</td>
                                 <td style="padding: 15px;">{{ $item['reporter'] }}</td>
                                 <td style="padding: 15px;">
-                                    <span class="badge-org success">✓ Ditemukan</span>
+                                    <span class="badge-org success"><i class="bi bi-check-circle-fill me-1"></i>Ditemukan</span>
                                 </td>
                                 <td style="padding: 15px;">
-                                    <button class="btn btn-sm" style="background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;">Detail</button>
-                                    <button class="btn btn-sm btn-success" style="background: var(--success); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-left: 5px;">✓ Selesai</button>
+                                    <button class="btn btn-sm" style="background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer;"><i class="bi bi-eye-fill me-1"></i>Detail</button>
+                                    <button class="btn btn-sm btn-success" style="background: var(--success); color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-left: 5px;"><i class="bi bi-check-lg me-1"></i>Selesai</button>
                                 </td>
                             </tr>
                             @endif

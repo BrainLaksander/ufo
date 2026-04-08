@@ -8,7 +8,7 @@
         <h1>Event Organisasi</h1>
         <p class="page-subtitle">Kelola event dan kegiatan organisasi Anda</p>
     </div>
-    <a href="/portal/pengurus/events/create" class="btn-primary-org">➕ Buat Event</a>
+    <a href="{{ route('portal.pengurus.events.create') }}" class="btn-primary-org"> Buat Event</a>
 </div>
 
 <div class="bg-white rounded-3 shadow-sm border" style="border: 2px solid #f0f0f0; overflow: hidden;">
@@ -31,9 +31,9 @@
                         <strong>{{ $event['name'] }}</strong><br>
                         <small class="text-muted">{{ $event['time'] }}</small>
                     </td>
-                    <td style="padding: 15px;">📅 {{ date('d M Y', strtotime($event['date'])) }}</td>
-                    <td style="padding: 15px;">📍 {{ $event['location'] }}</td>
-                    <td style="padding: 15px;">👥 {{ $event['participants'] }}/{{ $event['quota'] }}</td>
+                    <td style="padding: 15px;"> {{ date('d M Y', strtotime($event['date'])) }}</td>
+                    <td style="padding: 15px;"> {{ $event['location'] }}</td>
+                    <td style="padding: 15px;"> {{ $event['participants'] }}/{{ $event['quota'] }}</td>
                     <td style="padding: 15px;">
                         @if($event['status'] == 'Draft')
                             <span class="badge-org warning">Draft</span>
@@ -46,7 +46,7 @@
                         @endif
                     </td>
                     <td style="padding: 15px;">
-                        <a href="/portal/pengurus/events/{{ $event['id'] }}" class="btn btn-sm" style="background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; text-decoration: none; cursor: pointer;">Detail</a>
+                        <a href="{{ route('portal.pengurus.events.detail', ['id' => $event['id']]) }}" class="btn btn-sm" style="background: var(--primary); color: white; border: none; padding: 6px 12px; border-radius: 6px; text-decoration: none; cursor: pointer;">Detail</a>
                         <button class="btn btn-sm" style="background: var(--accent); color: #333; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; margin-left: 5px;">Edit</button>
                     </td>
                 </tr>

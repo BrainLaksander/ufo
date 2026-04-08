@@ -13,7 +13,7 @@
 <div class="row mb-4">
     <div class="col-12">
         <button class="btn btn-primary-custom" data-bs-toggle="modal" data-bs-target="#announcementModal">
-            <i class="fas fa-plus"></i> Buat Pengumuman Baru
+            <i class="bi bi-plus-circle-fill"></i> Buat Pengumuman Baru
         </button>
     </div>
 </div>
@@ -41,17 +41,17 @@
                     <div>
                         <h5 class="card-title">Jadwal Rapat Rutin Bulan Maret</h5>
                         <small class="text-muted">
-                            <i class="fas fa-calendar"></i> Dipublikasikan 28 Feb 2026
+                            <i class="bi bi-calendar-date-fill"></i> Dipublikasikan 28 Feb 2026
                         </small>
                     </div>
                     <span class="badge bg-success">Dipublikasikan</span>
                 </div>
                 <p class="text-muted mb-3">Informasi jadwal rapat rutin semua anggota pengurus UFO untuk bulan Maret. Rapat akan membahas program kerja tahunan dan evaluasi kegiatan bulan Februari.</p>
-                <small class="text-muted"><i class="fas fa-tag"></i> Kategori: Jadwal</small>
+                <small class="text-muted"><i class="bi bi-tag-fill"></i> Kategori: Jadwal</small>
                 <div class="mt-3">
-                    <button class="btn btn-sm btn-info me-2"><i class="fas fa-eye"></i> Lihat</button>
-                    <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Hapus</button>
+                    <button class="btn btn-sm btn-info me-2"><i class="bi bi-eye-fill"></i> Lihat</button>
+                    <button class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</button>
+                    <button class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i> Hapus</button>
                 </div>
             </div>
         </div>
@@ -64,17 +64,17 @@
                     <div>
                         <h5 class="card-title">Pembukaan Pendaftaran Anggota Baru 2026</h5>
                         <small class="text-muted">
-                            <i class="fas fa-calendar"></i> Dipublikasikan 25 Feb 2026
+                            <i class="bi bi-calendar-date-fill"></i> Dipublikasikan 25 Feb 2026
                         </small>
                     </div>
                     <span class="badge bg-success">Dipublikasikan</span>
                 </div>
                 <p class="text-muted mb-3">Pendaftaran anggota baru UFO telah resmi dibuka! Jika Anda tertarik bergabung dengan organisasi kami, silakan daftar melalui portal ini sebelum 10 Maret 2026.</p>
-                <small class="text-muted"><i class="fas fa-tag"></i> Kategori: Pendaftaran</small>
+                <small class="text-muted"><i class="bi bi-tag-fill"></i> Kategori: Pendaftaran</small>
                 <div class="mt-3">
-                    <button class="btn btn-sm btn-info me-2"><i class="fas fa-eye"></i> Lihat</button>
-                    <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Hapus</button>
+                    <button class="btn btn-sm btn-info me-2"><i class="bi bi-eye-fill"></i> Lihat</button>
+                    <button class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</button>
+                    <button class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i> Hapus</button>
                 </div>
             </div>
         </div>
@@ -87,17 +87,17 @@
                     <div>
                         <h5 class="card-title">Workshop Python for Beginners - Minggu Depan</h5>
                         <small class="text-muted">
-                            <i class="fas fa-calendar"></i> Dipublikasikan 23 Feb 2026
+                            <i class="bi bi-calendar-date-fill"></i> Dipublikasikan 23 Feb 2026
                         </small>
                     </div>
                     <span class="badge bg-success">Dipublikasikan</span>
                 </div>
                 <p class="text-muted mb-3">Reminder: Workshop Python for Beginners akan dilaksanakan minggu depan. Jangan lupa untuk mendaftar dan hadir tepat waktu. Tempat terbatas hanya 100 peserta.</p>
-                <small class="text-muted"><i class="fas fa-tag"></i> Kategori: Event</small>
+                <small class="text-muted"><i class="bi bi-tag-fill"></i> Kategori: Event</small>
                 <div class="mt-3">
-                    <button class="btn btn-sm btn-info me-2"><i class="fas fa-eye"></i> Lihat</button>
-                    <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Hapus</button>
+                    <button class="btn btn-sm btn-info me-2"><i class="bi bi-eye-fill"></i> Lihat</button>
+                    <button class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</button>
+                    <button class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i> Hapus</button>
                 </div>
             </div>
         </div>
@@ -110,17 +110,17 @@
                     <div>
                         <h5 class="card-title">Draft: Pengumuman Rapat Darurat</h5>
                         <small class="text-muted">
-                            <i class="fas fa-calendar"></i> Dibuat 20 Feb 2026
+                            <i class="bi bi-calendar-date-fill"></i> Dibuat 20 Feb 2026
                         </small>
                     </div>
                     <span class="badge bg-warning text-dark">Draft</span>
                 </div>
                 <p class="text-muted mb-3">Pengumuman tentang rapat darurat untuk membahas situasi khusus. Masih dalam tahap draft dan belum dipublikasikan.</p>
-                <small class="text-muted"><i class="fas fa-tag"></i> Kategori: Pengumuman</small>
+                <small class="text-muted"><i class="bi bi-tag-fill"></i> Kategori: Pengumuman</small>
                 <div class="mt-3">
-                    <button class="btn btn-sm btn-info me-2"><i class="fas fa-eye"></i> Lihat</button>
-                    <button class="btn btn-sm btn-warning"><i class="fas fa-edit"></i> Edit</button>
-                    <button class="btn btn-sm btn-danger"><i class="fas fa-trash"></i> Hapus</button>
+                    <button class="btn btn-sm btn-info me-2"><i class="bi bi-eye-fill"></i> Lihat</button>
+                    <button class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</button>
+                    <button class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i> Hapus</button>
                 </div>
             </div>
         </div>

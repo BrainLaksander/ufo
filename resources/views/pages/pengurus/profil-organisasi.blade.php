@@ -1,5 +1,9 @@
 @extends('layouts.app')
 
+@push('styles')
+  <link rel="stylesheet" href="{{ asset('css/pengurus.css') }}">
+@endpush
+
 @section('content')
   <div class="profil-wrap">
     <div class="profil-grid">

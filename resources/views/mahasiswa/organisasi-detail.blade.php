@@ -7,13 +7,13 @@
     <!-- Back Button -->
     <div class="mb-4">
         <a href="{{ route('mahasiswa.organisasi.index') }}" class="btn btn-outline-secondary btn-sm">
-            ← Kembali ke Daftar
+            <i class="bi bi-arrow-left me-1"></i>Kembali ke Daftar
         </a>
     </div>
 
     <!-- Header with Banner -->
     <div class="bg-gradient-to-r {{ $organisasi['banner_gradient'] }} text-white rounded-lg p-5 mb-5">
-        <h1 class="display-4 fw-bold mb-2">{{ $organisasi['emoji'] }} {{ $organisasi['nama'] }}</h1>
+        <h1 class="display-4 fw-bold mb-2"><i class="bi bi-people-fill me-2"></i>{{ $organisasi['nama'] }}</h1>
         <p class="lead mb-0">{{ $organisasi['tagline'] }}</p>
     </div>
 
@@ -23,7 +23,7 @@
             <!-- Deskripsi -->
             <div class="card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title text-primary">📝 Tentang Organisasi</h5>
+                    <h5 class="card-title text-primary"><i class="bi bi-card-text me-2"></i>Tentang Organisasi</h5>
                     <p class="card-text">{{ $organisasi['deskripsi'] }}</p>
                 </div>
             </div>
@@ -31,11 +31,11 @@
             <!-- Visi & Misi -->
             <div class="card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title text-primary">🎯 Visi & Misi</h5>
+                    <h5 class="card-title text-primary"><i class="bi bi-bullseye me-2"></i>Visi & Misi</h5>
                     <div class="row">
                         @foreach($organisasi['visiMisi'] as $item)
                         <div class="col-md-6 mb-3">
-                            <h6 class="fw-bold text-dark">{{ $item['type'] === 'visi' ? '🔭 Visi' : '🎪 Misi' }}</h6>
+                            <h6 class="fw-bold text-dark">{{ $item['type'] === 'visi' ? 'Visi' : 'Misi' }}</h6>
                             <p class="text-muted mb-0">{{ $item['value'] }}</p>
                         </div>
                         @endforeach
@@ -46,7 +46,7 @@
             <!-- Budaya Organisasi -->
             <div class="card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title text-primary">🌟 Budaya Organisasi</h5>
+                    <h5 class="card-title text-primary"><i class="bi bi-stars me-2"></i>Budaya Organisasi</h5>
                     <p class="card-text">{{ $organisasi['budaya'] }}</p>
                 </div>
             </div>
@@ -54,7 +54,7 @@
             <!-- Program -->
             <div class="card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title text-primary">📌 Program & Kegiatan</h5>
+                    <h5 class="card-title text-primary"><i class="bi bi-list-check me-2"></i>Program & Kegiatan</h5>
                     <div class="list-group list-group-flush">
                         @forelse($organisasi['programs'] as $program)
                         <div class="list-group-item">
@@ -71,7 +71,7 @@
             <!-- Acara Mendatang -->
             <div class="card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title text-primary">📅 Acara Mendatang</h5>
+                    <h5 class="card-title text-primary"><i class="bi bi-calendar-event me-2"></i>Acara Mendatang</h5>
                     <div class="list-group list-group-flush">
                         @forelse($organisasi['events'] as $event)
                         <div class="list-group-item">
@@ -93,7 +93,7 @@
             <!-- Struktur Organisasi -->
             <div class="card mb-4">
                 <div class="card-body">
-                    <h5 class="card-title text-primary">👥 Struktur Organisasi</h5>
+                    <h5 class="card-title text-primary"><i class="bi bi-diagram-3-fill me-2"></i>Struktur Organisasi</h5>
                     <div class="row">
                         @forelse($organisasi['struktur'] as $posisi)
                         <div class="col-md-6 mb-3">
@@ -115,7 +115,7 @@
             <!-- Info Card -->
             <div class="card position-sticky" style="top: 20px;">
                 <div class="card-body">
-                    <h5 class="card-title text-primary mb-3">📋 Informasi</h5>
+                    <h5 class="card-title text-primary mb-3"><i class="bi bi-info-circle-fill me-2"></i>Informasi</h5>
                     
                     <div class="mb-4">
                         <label class="text-muted small fw-bold">KATEGORI</label>
@@ -126,7 +126,7 @@
 
                     <div class="mb-4">
                         <label class="text-muted small fw-bold">ANGGOTA</label>
-                        <p class="mb-0 fw-bold text-dark">👥 {{ $organisasi['members'] }} Anggota</p>
+                        <p class="mb-0 fw-bold text-dark"><i class="bi bi-people-fill me-1"></i>{{ $organisasi['members'] }} Anggota</p>
                     </div>
 
                     <div class="mb-4">
@@ -147,9 +147,9 @@
                         <label class="text-muted small fw-bold">STATUS PENDAFTARAN</label>
                         <p class="mb-0">
                             @if($organisasi['registrationOpen'])
-                                <span class="badge bg-success">🔓 Buka</span>
+                                <span class="badge bg-success"><i class="bi bi-unlock-fill me-1"></i>Buka</span>
                             @else
-                                <span class="badge bg-danger">🔒 Tutup</span>
+                                <span class="badge bg-danger"><i class="bi bi-lock-fill me-1"></i>Tutup</span>
                             @endif
                         </p>
                     </div>
@@ -158,19 +158,19 @@
                     <div class="d-grid gap-2">
                         @if($organisasi['registrationOpen'])
                         <button class="btn btn-primary btn-lg" data-bs-toggle="modal" data-bs-target="#registrationModal">
-                            📝 Daftar Sekarang
+                               <i class="bi bi-pencil-square me-1"></i>Daftar Sekarang
                         </button>
                         @else
                         <button class="btn btn-secondary btn-lg" disabled>
-                            🔒 Pendaftaran Tutup
+                               <i class="bi bi-lock-fill me-1"></i>Pendaftaran Tutup
                         </button>
                         @endif
                         
                         <a href="https://wa.me/62{{ substr($organisasi['phone'], 1) }}" class="btn btn-outline-success" target="_blank">
-                            💬 WhatsApp
+                               <i class="bi bi-whatsapp me-1"></i>WhatsApp
                         </a>
                         <a href="mailto:{{ $organisasi['contact'] }}" class="btn btn-outline-primary">
-                            ✉️ Email
+                               <i class="bi bi-envelope-fill me-1"></i>Email
                         </a>
                     </div>
                 </div>

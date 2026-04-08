@@ -3,10 +3,12 @@
 @section('title', 'Event - Mahasiswa')
 
 @section('content')
-<div class="max-w-6xl mx-auto px-4 py-6">
-  <h1 class="text-3xl font-bold text-gray-800 mb-6">Event</h1>
-  <div class="bg-white rounded-lg shadow-md p-8 text-center text-gray-500">
-    <p class="text-lg">Coming Soon</p>
+<div class="container py-4">
+  <h1 class="h2 fw-bold mb-3">Event Mahasiswa</h1>
+  <div class="card border-0 shadow-sm">
+    <div class="card-body p-4 text-center text-muted">
+      <p class="mb-0">Halaman event sedang disiapkan.</p>
+    </div>
   </div>
 </div>
 @endsection

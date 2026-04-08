@@ -19,28 +19,28 @@
 
     <div class="stats-grid">
         <div class="stat-card">
-            <div class="stat-icon">🏢</div>
+            <div class="stat-icon"><i class="bi bi-buildings-fill"></i></div>
             <div class="stat-content">
                 <div class="stat-value">24</div>
                 <div class="stat-label">Total Organisasi</div>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon">👥</div>
+            <div class="stat-icon"><i class="bi bi-people-fill"></i></div>
             <div class="stat-content">
                 <div class="stat-value">1250</div>
                 <div class="stat-label">Total Pengguna</div>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon">📅</div>
+            <div class="stat-icon"><i class="bi bi-calendar-event-fill"></i></div>
             <div class="stat-content">
                 <div class="stat-value">45</div>
                 <div class="stat-label">Event Aktif</div>
             </div>
         </div>
         <div class="stat-card">
-            <div class="stat-icon">⚠️</div>
+            <div class="stat-icon"><i class="bi bi-exclamation-circle-fill"></i></div>
             <div class="stat-content">
                 <div class="stat-value">8</div>
                 <div class="stat-label">Laporan Pending</div>
@@ -73,5 +73,5 @@
 @endsection
 
 @section('scripts')
-<script src="/js/portal.js"></script>
+<script src="/js/portal/components.js"></script>
 @endsection
