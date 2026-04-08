@@ -88,10 +88,10 @@ class Event extends Model
     public function getCategoryLabel(): string
     {
         return match($this->category) {
-            'rapat' => '📘 Rapat',
-            'event' => '🎉 Event',
-            'akademik' => '📚 Akademik',
-            'sosial' => '🤝 Sosial',
+            'rapat' => ' Rapat',
+            'event' => ' Event',
+            'akademik' => ' Akademik',
+            'sosial' => ' Sosial',
             default => 'Kegiatan',
         };
     }

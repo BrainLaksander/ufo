@@ -20,7 +20,7 @@ class PengurusController extends Controller
             'id' => 1,
             'name' => 'Himpunan Mahasiswa Teknik Informatika',
             'shortname' => 'HMTI',
-            'logo' => '👨‍💻',
+            'logo' => 'bi-people-fill',
             'role' => 'Ketua',
             'members_count' => 45,
         ];
@@ -32,10 +32,10 @@ class PengurusController extends Controller
         $org = $this->getOrganization();
         
         $stats = [
-            ['label' => 'Total Anggota', 'value' => 45, 'icon' => '👥'],
-            ['label' => 'Event Aktif', 'value' => 3, 'icon' => '📅'],
-            ['label' => 'Pengumuman Aktif', 'value' => 8, 'icon' => '📢'],
-            ['label' => 'Laporan Lost & Found', 'value' => 12, 'icon' => '🔍'],
+            ['label' => 'Total Anggota', 'value' => 45, 'icon' => 'bi-people-fill'],
+            ['label' => 'Event Aktif', 'value' => 3, 'icon' => 'bi-calendar-event-fill'],
+            ['label' => 'Pengumuman Aktif', 'value' => 8, 'icon' => 'bi-megaphone-fill'],
+            ['label' => 'Laporan Lost & Found', 'value' => 12, 'icon' => 'bi-search'],
         ];
 
         $recent_events = [

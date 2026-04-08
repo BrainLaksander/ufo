@@ -43,14 +43,15 @@ class ActivityLog extends Model
         $type = $this->activity_type ?? $this->action ?? null;
 
         return match($type) {
-            'event_published' => '📅',
-            'member_joined' => '👤',
-            'submission_approved' => '✅',
-            'report_received' => '📝',
-            'announcement_created' => '📢',
-            'profile_updated' => '⚙️',
-            'task_created', 'task_completed' => '📋',
-            default => '📌'
+            'event_published' => 'bi-calendar-event-fill',
+            'member_joined' => 'bi-person-plus-fill',
+            'submission_approved' => 'bi-check-circle-fill',
+            'report_received' => 'bi-file-earmark-check-fill',
+            'announcement_created' => 'bi-megaphone-fill',
+            'profile_updated' => 'bi-pencil-square',
+            'task_created' => 'bi-list-check',
+            'task_completed' => 'bi-check2-square',
+            default => 'bi-activity'
         };
     }
 

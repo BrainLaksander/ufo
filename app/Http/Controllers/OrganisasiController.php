@@ -15,7 +15,7 @@ class OrganisasiController extends Controller
             [
                 'id' => 1,
                 'nama' => 'HIMAKOM',
-                'emoji' => '💻',
+                'emoji' => '',
                 'tagline' => 'Himpunan Mahasiswa Program Studi Teknik Informatika',
                 'deskripsi' => 'Organisasi mahasiswa Informatika yang fokus pada pengembangan teknologi dan inovasi digital.',
                 'kategori' => 'Akademik',
@@ -36,7 +36,7 @@ class OrganisasiController extends Controller
                 ],
                 'events' => [
                     ['nama' => 'Hackathon 2025', 'date' => '2025-02-15', 'deskripsi' => 'Kompetisi coding tahunan'],
-                    ['nama' => 'Tech Workshop', 'date' => '2025-01-20', 'deskripsi' => 'Workshop React dan Laravel']
+                    ['nama' => 'Tech Workshop', 'date' => '2025-01-20', 'deskripsi' => 'Workshop Frontend dan Laravel']
                 ],
                 'struktur' => [
                     ['posisi' => 'Ketua Umum', 'nama' => 'Ahmad Pratama'],
@@ -52,7 +52,7 @@ class OrganisasiController extends Controller
             [
                 'id' => 2,
                 'nama' => 'BEM UNKLAB',
-                'emoji' => '🎯',
+                'emoji' => '',
                 'tagline' => 'Badan Eksekutif Mahasiswa UNKLAB',
                 'deskripsi' => 'Organisasi pusat mahasiswa UNKLAB yang mengurus kesejahteraan dan kegiatan bersama semua mahasiswa.',
                 'kategori' => 'Akademik',
@@ -88,7 +88,7 @@ class OrganisasiController extends Controller
             [
                 'id' => 3,
                 'nama' => 'Sinematografi UNKLAB',
-                'emoji' => '🎬',
+                'emoji' => '',
                 'tagline' => 'Klub Sinematografi dan Produksi Konten UNKLAB',
                 'deskripsi' => 'Organisasi yang fokus pada seni sinematografi, fotografi, dan produksi konten kreatif.',
                 'kategori' => 'Seni & Olahraga',
@@ -123,7 +123,7 @@ class OrganisasiController extends Controller
             [
                 'id' => 4,
                 'nama' => 'FUTSAL UNKLAB',
-                'emoji' => '⚽',
+                'emoji' => '',
                 'tagline' => 'Klub Olahraga Futsal UNKLAB',
                 'deskripsi' => 'Organisasi olahraga yang mengembangkan kemampuan futsal dan membangun persahabatan antar mahasiswa.',
                 'kategori' => 'Seni & Olahraga',
@@ -158,7 +158,7 @@ class OrganisasiController extends Controller
             [
                 'id' => 5,
                 'nama' => 'ROHIS UNKLAB',
-                'emoji' => '☪️',
+                'emoji' => '',
                 'tagline' => 'Rohani Islam Mahasiswa UNKLAB',
                 'deskripsi' => 'Organisasi kerohanian Islam yang mengembangkan nilai-nilai spiritual dan moral mahasiswa.',
                 'kategori' => 'Kerohanian',
@@ -193,7 +193,7 @@ class OrganisasiController extends Controller
             [
                 'id' => 6,
                 'nama' => 'English Club UNKLAB',
-                'emoji' => '🌍',
+                'emoji' => '',
                 'tagline' => 'Klub Bahasa Inggris UNKLAB',
                 'deskripsi' => 'Organisasi yang mengembangkan kemampuan bahasa Inggris dan membangun jejaring internasional.',
                 'kategori' => 'Akademik',
@@ -240,7 +240,7 @@ class OrganisasiController extends Controller
             [
                 'id' => 1,
                 'nama' => 'HIMAKOM',
-                'emoji' => '💻',
+                'emoji' => '',
                 'tagline' => 'Himpunan Mahasiswa Program Studi Teknik Informatika',
                 'deskripsi' => 'Organisasi mahasiswa Informatika yang fokus pada pengembangan teknologi dan inovasi digital.',
                 'kategori' => 'Akademik',
@@ -261,7 +261,7 @@ class OrganisasiController extends Controller
                 ],
                 'events' => [
                     ['nama' => 'Hackathon 2025', 'date' => '2025-02-15', 'deskripsi' => 'Kompetisi coding tahunan'],
-                    ['nama' => 'Tech Workshop', 'date' => '2025-01-20', 'deskripsi' => 'Workshop React dan Laravel']
+                    ['nama' => 'Tech Workshop', 'date' => '2025-01-20', 'deskripsi' => 'Workshop Frontend dan Laravel']
                 ],
                 'struktur' => [
                     ['posisi' => 'Ketua Umum', 'nama' => 'Ahmad Pratama'],
@@ -277,7 +277,7 @@ class OrganisasiController extends Controller
             [
                 'id' => 2,
                 'nama' => 'BEM UNKLAB',
-                'emoji' => '🎯',
+                'emoji' => '',
                 'tagline' => 'Badan Eksekutif Mahasiswa UNKLAB',
                 'deskripsi' => 'Organisasi pusat mahasiswa UNKLAB yang mengurus kesejahteraan dan kegiatan bersama semua mahasiswa.',
                 'kategori' => 'Akademik',
@@ -313,7 +313,7 @@ class OrganisasiController extends Controller
             [
                 'id' => 3,
                 'nama' => 'Sinematografi UNKLAB',
-                'emoji' => '🎬',
+                'emoji' => '',
                 'tagline' => 'Klub Sinematografi dan Produksi Konten UNKLAB',
                 'deskripsi' => 'Organisasi yang fokus pada seni sinematografi, fotografi, dan produksi konten kreatif.',
                 'kategori' => 'Seni & Olahraga',
@@ -348,7 +348,7 @@ class OrganisasiController extends Controller
             [
                 'id' => 4,
                 'nama' => 'FUTSAL UNKLAB',
-                'emoji' => '⚽',
+                'emoji' => '',
                 'tagline' => 'Klub Olahraga Futsal UNKLAB',
                 'deskripsi' => 'Organisasi olahraga yang mengembangkan kemampuan futsal dan membangun persahabatan antar mahasiswa.',
                 'kategori' => 'Seni & Olahraga',
@@ -383,7 +383,7 @@ class OrganisasiController extends Controller
             [
                 'id' => 5,
                 'nama' => 'ROHIS UNKLAB',
-                'emoji' => '☪️',
+                'emoji' => '',
                 'tagline' => 'Rohani Islam Mahasiswa UNKLAB',
                 'deskripsi' => 'Organisasi kerohanian Islam yang mengembangkan nilai-nilai spiritual dan moral mahasiswa.',
                 'kategori' => 'Kerohanian',
@@ -418,7 +418,7 @@ class OrganisasiController extends Controller
             [
                 'id' => 6,
                 'nama' => 'English Club UNKLAB',
-                'emoji' => '🌍',
+                'emoji' => '',
                 'tagline' => 'Klub Bahasa Inggris UNKLAB',
                 'deskripsi' => 'Organisasi yang mengembangkan kemampuan bahasa Inggris dan membangun jejaring internasional.',
                 'kategori' => 'Akademik',
