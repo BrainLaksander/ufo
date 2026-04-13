@@ -1,8 +1,8 @@
 *.log
 .DS_Store
 .env
-.env.backup
-.env.production
+.env.*
+!.env.example
 .phpactor.json
 .phpunit.result.cache
 /.fleet
@@ -42,3 +42,8 @@ Thumbs.db
 
 # UML workspace folder
 /uml/
+
+# Local secret material
+/secrets/
+*.pem
+*.key
