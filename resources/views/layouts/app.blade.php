@@ -9,10 +9,10 @@
     <link rel="stylesheet" href="{{ asset('css/app.css') }}">
     @stack('styles')
 </head>
-<body>
+<body class="ufo-app-shell @yield('bodyClass', '')">
     @include('partials.header')
 
-    <main class="container">
+    <main class="@yield('mainClass', 'container')">
         @yield('content')
     </main>
 
