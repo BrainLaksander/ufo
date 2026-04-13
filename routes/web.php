@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\PengumumanController;
 use App\Http\Controllers\OrganisasiController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\IzinKegiatanWorkflowController;
+use App\Http\Controllers\KemahasiswaanWorkflowController;
 use Illuminate\Http\Request;
 
 Route::view('/', 'welcome')->name('home');
@@ -22,9 +24,18 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 | Portal Login Routes
 |--------------------------------------------------------------------------
 */
-Route::get('/portal', [AuthController::class, 'showLogin'])->name('portal.index');
-Route::get('/portal/login', [AuthController::class, 'showLogin'])->name('portal.login');
-Route::view('/portal/internal-login', 'pages.portal.internal-login')->name('portal.internal.login');
+Route::get('/portal', function () {
+    return redirect()->route('login');
+})->name('portal.index');
+
+Route::get('/portal/login', function () {
+    return redirect()->route('login');
+})->name('portal.login');
+
+Route::get('/portal/internal-login', function () {
+    return redirect()->route('login');
+})->name('portal.internal.login');
+
 Route::post('/portal/login', [AuthController::class, 'login'])->name('portal.login.perform');
 
 /*
@@ -49,27 +60,42 @@ Route::prefix('portal/admin')->name('portal.admin.')->group(function () {
 
 Route::prefix('portal/kemahasiswaan')->name('portal.kemahasiswaan.')->group(function () {
     Route::view('/', 'pages.kemahasiswaan.dashboard')->name('dashboard');
-    Route::view('/organisasi', 'pages.portal.kemahasiswaan.organisasi')->name('organisasi');
-    Route::view('/pengajuan', 'pages.portal.kemahasiswaan.pengajuan')->name('pengajuan');
-    Route::view('/pengumuman', 'pages.portal.kemahasiswaan.pengumuman')->name('pengumuman');
+    Route::get('/organisasi', [KemahasiswaanWorkflowController::class, 'organisasiIndex'])->name('organisasi');
+    Route::post('/organisasi/akun', [KemahasiswaanWorkflowController::class, 'storeAkunUKM'])->name('organisasi.akun.store');
+    Route::post('/organisasi/akun/{id}/update', [KemahasiswaanWorkflowController::class, 'updateAkunUKM'])->name('organisasi.akun.update');
+    Route::post('/organisasi/akun/{id}/reset-password', [KemahasiswaanWorkflowController::class, 'resetPasswordAkunUKM'])->name('organisasi.akun.reset-password');
+    Route::post('/organisasi/akun/{id}/deactivate', [KemahasiswaanWorkflowController::class, 'deactivateAkunUKM'])->name('organisasi.akun.deactivate');
+    Route::get('/pengajuan', [IzinKegiatanWorkflowController::class, 'kemahasiswaanIndex'])->name('pengajuan');
+    Route::post('/pengajuan/{id}/review', [IzinKegiatanWorkflowController::class, 'review'])->name('pengajuan.review');
+    Route::post('/laporan/{id}/review', [IzinKegiatanWorkflowController::class, 'reviewLaporan'])->name('laporan.review');
+    Route::post('/jadwal', [IzinKegiatanWorkflowController::class, 'storeJadwal'])->name('jadwal.store');
+    Route::get('/pengumuman', [KemahasiswaanWorkflowController::class, 'pengumumanIndex'])->name('pengumuman');
+    Route::post('/pengumuman', [KemahasiswaanWorkflowController::class, 'storePengumuman'])->name('pengumuman.store');
+    Route::post('/pengumuman/{id}/email-review', [KemahasiswaanWorkflowController::class, 'reviewIzinPengumumanEmail'])->name('pengumuman.email-review');
     Route::view('/notifikasi', 'pages.portal.kemahasiswaan.notifikasi')->name('notifikasi');
 });
 
 Route::prefix('portal/pengurus')->name('portal.pengurus.')->group(function () {
     Route::view('/', 'portal.pengurus.dashboard')->name('dashboard');
     Route::view('/events', 'portal.pengurus.events')->name('events');
-    Route::view('/events/create', 'pages.pengurus.events.form')->name('events.create');
+    Route::get('/events/create', [IzinKegiatanWorkflowController::class, 'eventForm'])->name('events.create');
+    Route::post('/events', [IzinKegiatanWorkflowController::class, 'storeEvent'])->name('events.store');
     Route::view('/events/{id}', 'pages.pengurus.events.detail')->name('events.detail');
 
     Route::view('/announcements', 'portal.pengurus.announcements')->name('announcements');
     Route::view('/announcements/create', 'pages.pengurus.announcements.form')->name('announcements.create');
 
     Route::view('/lostandfound', 'portal.pengurus.lostandfound')->name('lostandfound');
-    Route::view('/proposals', 'portal.pengurus.proposals')->name('proposals');
+    Route::get('/proposals', [IzinKegiatanWorkflowController::class, 'pengurusIndex'])->name('proposals');
+    Route::post('/proposals', [IzinKegiatanWorkflowController::class, 'storePengajuan'])->name('proposals.store');
+    Route::post('/proposals/{id}/submit', [IzinKegiatanWorkflowController::class, 'submit'])->name('proposals.submit');
+    Route::post('/reports', [IzinKegiatanWorkflowController::class, 'storeLaporan'])->name('reports.store');
+    Route::post('/reports/{id}/submit', [IzinKegiatanWorkflowController::class, 'submitLaporan'])->name('reports.submit');
     Route::view('/members', 'portal.pengurus.members')->name('members');
     Route::view('/applications', 'portal.pengurus.applications')->name('applications');
 
-    Route::view('/settings', 'pages.pengurus.settings')->name('settings');
+    Route::get('/settings', [IzinKegiatanWorkflowController::class, 'pengurusSettings'])->name('settings');
+    Route::post('/settings/profile', [IzinKegiatanWorkflowController::class, 'updateProfilUKM'])->name('settings.profile.update');
     Route::view('/reports', 'pages.pengurus.dashboard-detail')->name('reports');
     Route::view('/submissions', 'pages.pengurus.dashboard-advanced')->name('submissions');
 });
@@ -114,9 +140,7 @@ Route::get('/events', function () {
     return redirect()->route('portal.pengurus.events');
 })->name('events.index');
 
-Route::get('/events/create', function () {
-    return view('pages.pengurus.events.form');
-})->name('events.create');
+Route::get('/events/create', [IzinKegiatanWorkflowController::class, 'eventForm'])->name('events.create');
 
 Route::get('/events/{event}', function ($event) {
     return view('pages.pengurus.events.detail');
