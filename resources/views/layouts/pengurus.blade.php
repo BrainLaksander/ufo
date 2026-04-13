@@ -400,36 +400,6 @@
             color: white;
         }
 
-        /* Floating Chatbot Button */
-        .floating-chatbot {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 60px;
-            height: 60px;
-            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
-            transition: all 0.3s;
-            z-index: 1010;
-            color: white;
-            border: none;
-            padding: 0;
-        }
-
-        .floating-chatbot:hover {
-            transform: scale(1.1);
-            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.6);
-        }
-
-        .floating-chatbot i {
-            font-size: 1.5rem;
-        }
-
         /* Badge */
         .badge-custom {
             padding: 8px 12px;
@@ -480,12 +450,6 @@
                 font-size: 1.5rem;
             }
 
-            .floating-chatbot {
-                bottom: 20px;
-                right: 20px;
-                width: 50px;
-                height: 50px;
-            }
         }
 
         /* Scrollbar Styling */
@@ -525,7 +489,6 @@
             .navbar-pengurus,
             .sidebar,
             .notification-panel,
-            .floating-chatbot,
             .sidebar-backdrop {
                 display: none;
             }
@@ -1000,11 +963,6 @@
         @yield('content')
     </main>
 
-    <!-- Floating Chatbot Button -->
-    <button class="floating-chatbot" id="chatbotBtn" title="UFO Bot">
-        <i class="bi bi-robot"></i>
-    </button>
-
     <!-- Bootstrap 5 JS -->
     <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
@@ -1016,7 +974,6 @@
         const sidebar = document.getElementById('sidebar');
         const notificationPanel = document.getElementById('notificationPanel');
         const sidebarBackdrop = document.getElementById('sidebarBackdrop');
-        const chatbotBtn = document.getElementById('chatbotBtn');
 
         // Handle Burger Button (Toggle Sidebar)
         burgerBtn.addEventListener('click', function(e) {
@@ -1049,11 +1006,6 @@
                 sidebar.classList.remove('show');
                 sidebarBackdrop.classList.remove('show');
             });
-        });
-
-        // Chatbot Button Click
-        chatbotBtn.addEventListener('click', function() {
-            alert('UFO Bot: Halo! Ada yang bisa saya bantu?');
         });
 
         // Initialize Tooltips
