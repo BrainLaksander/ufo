@@ -2,540 +2,808 @@
 
 @section('title', 'Dashboard Kemahasiswaan - UFO')
 
-@section('content')
-<div class="page-header">
-  <div class="container-fluid">
-    <h1 class="mb-2">Dashboard</h1>
-    <p class="text-white-50 mb-0">Sistem Administrasi &amp; Kontrol Organisasi Mahasiswa</p>
-  </div>
-</div>
+@php
+    $stats = [
+        [
+            'label' => 'Total Organisasi Aktif',
+            'value' => '22',
+            'icon' => 'bi-buildings',
+            'tone' => 'primary',
+        ],
+        [
+            'label' => 'Total Kegiatan Berjalan',
+            'value' => '12',
+            'icon' => 'bi-card-list',
+            'tone' => 'primary',
+        ],
+        [
+            'label' => 'Total Kegiatan Menunggu Persetujuan',
+            'value' => '8',
+            'icon' => 'bi-clock-history',
+            'tone' => 'warning',
+        ],
+        [
+            'label' => 'Total Laporan Belum Direview',
+            'value' => '5',
+            'icon' => 'bi-clipboard-check',
+            'tone' => 'primary',
+        ],
+    ];
 
-<div class="container-fluid py-4">
-  
-  <!-- ===== STATISTICS CARDS SECTION ===== -->
-  <div class="row mb-4">
-    <!-- Card 1: Total Organisasi Aktif -->
-    <div class="col-md-6 col-lg-3 mb-3">
-      <div class="card stat-card border-0 shadow-sm">
-        <div class="card-body">
-          <div class="d-flex align-items-start justify-content-between">
-            <div class="flex-grow-1">
-              <p class="card-text text-secondary small mb-2">Total Organisasi Aktif</p>
-              <h2 class="stat-number text-primary fw-bold mb-0">24</h2>
-            </div>
-            <div class="stat-icon bg-primary text-white rounded-3">
-              <i class="bi bi-building"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    $monthlyActivity = [
+        ['month' => 'Jan', 'value' => 8],
+        ['month' => 'Feb', 'value' => 12],
+        ['month' => 'Mar', 'value' => 15],
+        ['month' => 'Apr', 'value' => 10],
+        ['month' => 'Mei', 'value' => 18],
+        ['month' => 'Jun', 'value' => 14],
+        ['month' => 'Jul', 'value' => 20],
+        ['month' => 'Agu', 'value' => 16],
+        ['month' => 'Sep', 'value' => 22],
+        ['month' => 'Okt', 'value' => 19],
+        ['month' => 'Nov', 'value' => 17],
+        ['month' => 'Des', 'value' => 13],
+    ];
 
-    <!-- Card 2: Total Kegiatan Berjalan -->
-    <div class="col-md-6 col-lg-3 mb-3">
-      <div class="card stat-card border-0 shadow-sm">
-        <div class="card-body">
-          <div class="d-flex align-items-start justify-content-between">
-            <div class="flex-grow-1">
-              <p class="card-text text-secondary small mb-2">Total Kegiatan Berjalan</p>
-              <h2 class="stat-number text-primary fw-bold mb-0">12</h2>
-            </div>
-            <div class="stat-icon bg-primary text-white rounded-3">
-              <i class="bi bi-calendar-event"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    $upcomingEvents = [
+        [
+            'title' => 'Seminar Nasional HMTI',
+            'date' => '20 Desember 2024',
+            'status' => 'Aktif',
+            'tone' => 'active',
+        ],
+        [
+            'title' => 'Festival Seni UKM',
+            'date' => '22 Desember 2024',
+            'status' => 'Aktif',
+            'tone' => 'active',
+        ],
+        [
+            'title' => 'Rapat Koordinasi BEM',
+            'date' => '25 Desember 2024',
+            'status' => 'Pending',
+            'tone' => 'pending',
+        ],
+    ];
 
-    <!-- Card 3: Total Kegiatan Menunggu Persetujuan -->
-    <div class="col-md-6 col-lg-3 mb-3">
-      <div class="card stat-card border-0 shadow-sm">
-        <div class="card-body">
-          <div class="d-flex align-items-start justify-content-between">
-            <div class="flex-grow-1">
-              <p class="card-text text-secondary small mb-2">Kegiatan Menunggu Persetujuan</p>
-              <h2 class="stat-number text-warning fw-bold mb-0">8</h2>
-            </div>
-            <div class="stat-icon bg-warning text-dark rounded-3">
-              <i class="bi bi-hourglass-split"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
+    $chartMax = 24;
+@endphp
 
-    <!-- Card 4: Total Laporan Belum Direview -->
-    <div class="col-md-6 col-lg-3 mb-3">
-      <div class="card stat-card border-0 shadow-sm">
-        <div class="card-body">
-          <div class="d-flex align-items-start justify-content-between">
-            <div class="flex-grow-1">
-              <p class="card-text text-secondary small mb-2">Laporan Belum Direview</p>
-              <h2 class="stat-number text-primary fw-bold mb-0">5</h2>
-            </div>
-            <div class="stat-icon bg-primary text-white rounded-3">
-              <i class="bi bi-file-earmark-text"></i>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ===== MAIN CONTENT ROW ===== -->
-  <div class="row">
-    
-    <!-- LEFT COLUMN: CHART -->
-    <div class="col-lg-8 mb-4">
-      <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white border-bottom">
-          <h5 class="card-title mb-0">Grafik Kegiatan Bulanan 2024</h5>
-        </div>
-        <div class="card-body" style="min-height: 320px;">
-          <!-- Custom Chart Container -->
-          <div id="chart-container" class="position-relative" style="height: 280px;">
-            <div class="chart-wrapper">
-              <div class="chart-y-axis">
-                <div class="chart-y-label">20</div>
-                <div class="chart-y-label">15</div>
-                <div class="chart-y-label">10</div>
-                <div class="chart-y-label">5</div>
-                <div class="chart-y-label">0</div>
-              </div>
-              <div class="chart-bars">
-                <div class="chart-bar-group">
-                  <div class="chart-bar" style="height: 65%;" data-value="13" data-month="Jan"></div>
-                  <div class="chart-x-label">Jan</div>
-                </div>
-                <div class="chart-bar-group">
-                  <div class="chart-bar" style="height: 80%;" data-value="16" data-month="Feb"></div>
-                  <div class="chart-x-label">Feb</div>
-                </div>
-                <div class="chart-bar-group">
-                  <div class="chart-bar" style="height: 45%;" data-value="9" data-month="Mar"></div>
-                  <div class="chart-x-label">Mar</div>
-                </div>
-                <div class="chart-bar-group">
-                  <div class="chart-bar" style="height: 70%;" data-value="14" data-month="Apr"></div>
-                  <div class="chart-x-label">Apr</div>
-                </div>
-                <div class="chart-bar-group">
-                  <div class="chart-bar" style="height: 55%;" data-value="11" data-month="May"></div>
-                  <div class="chart-x-label">May</div>
-                </div>
-                <div class="chart-bar-group">
-                  <div class="chart-bar" style="height: 75%;" data-value="15" data-month="Jun"></div>
-                  <div class="chart-x-label">Jun</div>
-                </div>
-                <div class="chart-bar-group">
-                  <div class="chart-bar" style="height: 50%;" data-value="10" data-month="Jul"></div>
-                  <div class="chart-x-label">Jul</div>
-                </div>
-                <div class="chart-bar-group">
-                  <div class="chart-bar" style="height: 85%;" data-value="17" data-month="Aug"></div>
-                  <div class="chart-x-label">Aug</div>
-                </div>
-                <div class="chart-bar-group">
-                  <div class="chart-bar" style="height: 60%;" data-value="12" data-month="Sep"></div>
-                  <div class="chart-x-label">Sep</div>
-                </div>
-                <div class="chart-bar-group">
-                  <div class="chart-bar" style="height: 72%;" data-value="14.4" data-month="Oct"></div>
-                  <div class="chart-x-label">Oct</div>
-                </div>
-                <div class="chart-bar-group">
-                  <div class="chart-bar" style="height: 68%;" data-value="13.6" data-month="Nov"></div>
-                  <div class="chart-x-label">Nov</div>
-                </div>
-                <div class="chart-bar-group">
-                  <div class="chart-bar" style="height: 78%;" data-value="15.6" data-month="Dec"></div>
-                  <div class="chart-x-label">Dec</div>
-                </div>
-              </div>
-            </div>
-            <!-- Tooltip -->
-            <div id="chart-tooltip" class="chart-tooltip d-none">
-              <span id="tooltip-month"></span>: <strong id="tooltip-value"></strong>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- RIGHT COLUMN: QUICK ACTIONS & UPCOMING EVENTS -->
-    <div class="col-lg-4 mb-4">
-      
-      <!-- Quick Actions Card -->
-      <div class="card border-0 shadow-sm mb-4">
-        <div class="card-header bg-white border-bottom">
-          <h5 class="card-title mb-0">Aksi Cepat</h5>
-        </div>
-        <div class="card-body">
-          <button class="btn btn-primary w-100 mb-3" onclick="location.href='/portal/kemahasiswaan/pengajuan'">
-            <i class="bi bi-check-circle me-2"></i> Review Kegiatan
-          </button>
-          <button class="btn btn-warning w-100" onclick="location.href='/portal/kemahasiswaan/pengumuman'">
-            <i class="bi bi-megaphone me-2"></i> Buat Pengumuman
-          </button>
-        </div>
-      </div>
-
-      <!-- Upcoming Events Card -->
-      <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white border-bottom">
-          <h5 class="card-title mb-0">Kegiatan Mendatang</h5>
-        </div>
-        <div class="card-body p-0">
-          <div class="list-group list-group-flush">
-            <a href="#" class="list-group-item list-group-item-action border-0 px-3 py-3">
-              <div class="d-flex align-items-start justify-content-between">
-                <div>
-                  <h6 class="mb-1 text-dark fw-500">Seminar Kepemimpinan</h6>
-                  <small class="text-secondary">
-                    <i class="bi bi-calendar3 me-1"></i>
-                    12 Feb 2026
-                  </small>
-                </div>
-                <span class="badge bg-success rounded-pill">Aktif</span>
-              </div>
-            </a>
-            <a href="#" class="list-group-item list-group-item-action border-0 border-top px-3 py-3">
-              <div class="d-flex align-items-start justify-content-between">
-                <div>
-                  <h6 class="mb-1 text-dark fw-500">Workshop Fotografi</h6>
-                  <small class="text-secondary">
-                    <i class="bi bi-calendar3 me-1"></i>
-                    18 Feb 2026
-                  </small>
-                </div>
-                <span class="badge bg-success rounded-pill">Aktif</span>
-              </div>
-            </a>
-            <a href="#" class="list-group-item list-group-item-action border-0 border-top px-3 py-3">
-              <div class="d-flex align-items-start justify-content-between">
-                <div>
-                  <h6 class="mb-1 text-dark fw-500">Gathering Organisasi</h6>
-                  <small class="text-secondary">
-                    <i class="bi bi-calendar3 me-1"></i>
-                    25 Feb 2026
-                  </small>
-                </div>
-                <span class="badge bg-warning text-dark rounded-pill">Pending</span>
-              </div>
-            </a>
-          </div>
-        </div>
-      </div>
-
-    </div>
-
-  </div>
-
-  <!-- ===== ANNOUNCEMENTS TABLE SECTION ===== -->
-  <div class="row mt-3">
-    <div class="col-12">
-      <div class="card border-0 shadow-sm">
-        <div class="card-header bg-white border-bottom d-flex justify-content-between align-items-center">
-          <h5 class="card-title mb-0">Pengumuman Terbaru</h5>
-          <a href="{{ route('portal.kemahasiswaan.pengumuman') }}" class="btn btn-sm btn-outline-primary">Lihat Semua</a>
-        </div>
-        <div class="card-body p-0">
-          <div class="table-responsive">
-            <table class="table table-hover mb-0">
-              <thead class="table-light">
-                <tr>
-                  <th style="width: 50%;" class="border-0">Judul Pengumuman</th>
-                  <th style="width: 25%;" class="border-0">Tanggal</th>
-                  <th style="width: 25%;" class="border-0 text-center">Status</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td class="fw-500">Pengumuman Jadwal Gathering Tahun 2026</td>
-                  <td><small class="text-secondary">8 Feb 2026</small></td>
-                  <td class="text-center">
-                    <span class="badge bg-success">Terpublikasi</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="fw-500">Pembukaan Pendaftaran Organisasi Baru</td>
-                  <td><small class="text-secondary">5 Feb 2026</small></td>
-                  <td class="text-center">
-                    <span class="badge bg-success">Terpublikasi</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="fw-500">Undangan Rapat Koordinasi Pengurus</td>
-                  <td><small class="text-secondary">3 Feb 2026</small></td>
-                  <td class="text-center">
-                    <span class="badge bg-secondary">Draft</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="fw-500">Laporan Evaluasi Kegiatan Semester 1</td>
-                  <td><small class="text-secondary">1 Feb 2026</small></td>
-                  <td class="text-center">
-                    <span class="badge bg-success">Terpublikasi</span>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="fw-500">Pembaruan Panduan Pengajuan Kegiatan</td>
-                  <td><small class="text-secondary">25 Jan 2026</small></td>
-                  <td class="text-center">
-                    <span class="badge bg-secondary">Draft</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div>
-
-<!-- ===== CUSTOM CSS FOR DASHBOARD ===== -->
+@push('styles')
 <style>
-  /* Statistics Cards */
-  .stat-card {
-    transition: all 0.3s ease;
-    border-radius: 12px;
-  }
-  
-  .stat-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12) !important;
-  }
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
 
-  .stat-number {
-    font-size: 2.5rem;
-    line-height: 1;
-  }
-
-  .stat-icon {
-    width: 56px;
-    height: 56px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.75rem;
-    border-radius: 12px;
-    flex-shrink: 0;
-  }
-
-  /* Chart Styling */
-  .chart-wrapper {
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
-    height: 100%;
-    padding: 20px 0;
-  }
-
-  .chart-y-axis {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: flex-end;
-    width: 30px;
-    height: 100%;
-    padding-right: 10px;
-    border-right: 2px solid #e9ecef;
-    font-size: 0.75rem;
-    color: #6c757d;
-  }
-
-  .chart-y-label {
-    font-weight: 500;
-  }
-
-  .chart-bars {
-    display: flex;
-    justify-content: space-around;
-    align-items: flex-end;
-    flex: 1;
-    height: 100%;
-    gap: 4px;
-  }
-
-  .chart-bar-group {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    flex: 1;
-    height: 100%;
-    justify-content: flex-end;
-  }
-
-  .chart-bar {
-    width: 100%;
-    background: linear-gradient(180deg, #5f3a74 0%, #7a5a94 100%);
-    border-radius: 6px 6px 0 0;
-    cursor: pointer;
-    transition: all 0.2s ease;
-    position: relative;
-    min-height: 8px;
-  }
-
-  .chart-bar:hover {
-    background: linear-gradient(180deg, #4a2e5e 0%, #6a4a84 100%);
-    filter: brightness(1.1);
-  }
-
-  .chart-x-label {
-    font-size: 0.75rem;
-    color: #6c757d;
-    margin-top: 8px;
-    font-weight: 500;
-  }
-
-  .chart-tooltip {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: #333;
-    color: white;
-    padding: 6px 12px;
-    border-radius: 6px;
-    font-size: 0.85rem;
-    white-space: nowrap;
-    z-index: 10;
-    pointer-events: none;
-  }
-
-  .chart-tooltip::before {
-    content: '';
-    position: absolute;
-    bottom: -4px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 0;
-    border-left: 4px solid transparent;
-    border-right: 4px solid transparent;
-    border-top: 4px solid #333;
-  }
-
-  /* Table Styling */
-  .table {
-    margin-bottom: 0;
-  }
-
-  .table th {
-    padding: 1rem;
-    font-weight: 600;
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    color: #495057;
-    letter-spacing: 0.5px;
-  }
-
-  .table td {
-    padding: 1rem;
-    vertical-align: middle;
-    border-color: #f0f0f0;
-  }
-
-  .table tbody tr:hover {
-    background-color: #f9f9f9;
-  }
-
-  /* Button Tweaks */
-  .btn-primary {
-    background-color: #5f3a74;
-    border-color: #5f3a74;
-  }
-
-  .btn-primary:hover {
-    background-color: #4a2e5e;
-    border-color: #4a2e5e;
-  }
-
-  .btn-warning {
-    background-color: #ffcc00;
-    color: #333;
-    border-color: #ffcc00;
-  }
-
-  .btn-warning:hover {
-    background-color: #e6b800;
-    border-color: #e6b800;
-    color: #333;
-  }
-
-  /* List Group Tweaks */
-  .list-group-item {
-    padding: 1rem 1.25rem;
-    transition: background-color 0.2s ease;
-  }
-
-  .list-group-item:hover {
-    background-color: #f8f9fa;
-  }
-
-  /* Page Header */
-  .page-header {
-    background: linear-gradient(135deg, #5f3a74 0%, #7a5a94 100%);
-    color: white;
-    padding: 1.5rem 0;
-    margin-bottom: 2rem;
-  }
-
-  .page-header h1 {
-    font-size: 2rem;
-    font-weight: 700;
-  }
-
-  @media (max-width: 768px) {
-    .stat-number {
-      font-size: 2rem;
+    body.kemahasiswaan-layout {
+        background: #ececf1;
     }
 
-    .stat-icon {
-      width: 48px;
-      height: 48px;
-      font-size: 1.5rem;
+    body.kemahasiswaan-layout .kemahasiswaan-header {
+        display: none;
     }
 
-    .chart-bars {
-      gap: 2px;
+    body.kemahasiswaan-layout .kemahasiswaan-sidebar {
+        width: 300px;
+        background: linear-gradient(180deg, #3f1f61 0%, #34154f 100%);
+        color: #f8f6fc;
+        z-index: 96;
+        transform: translateX(0);
     }
-  }
+
+    body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-top {
+        padding: 1.35rem 1.2rem 0;
+    }
+
+    body.kemahasiswaan-layout .kemahasiswaan-sidebar .dept-title h2 {
+        font-size: 2rem;
+        line-height: 1.02;
+        margin-bottom: 0.65rem;
+        letter-spacing: -0.01em;
+    }
+
+    body.kemahasiswaan-layout .kemahasiswaan-sidebar .university {
+        color: #facc15;
+        font-size: 0.86rem;
+    }
+
+    body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-nav {
+        padding: 1rem 1.02rem 1.7rem;
+    }
+
+    body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-nav .nav-link {
+        border-radius: 10px;
+        padding: 0.62rem 0.7rem;
+        gap: 0.65rem;
+        color: rgba(255, 255, 255, 0.92);
+    }
+
+    body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-nav .nav-link:hover {
+        background: rgba(255, 255, 255, 0.09);
+    }
+
+    body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-nav .nav-link.active {
+        background: rgba(255, 255, 255, 0.16);
+        color: #ffffff;
+        box-shadow: none;
+    }
+
+    body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-nav .nav-icon {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 0.55rem;
+        background: rgba(255, 255, 255, 0.08);
+    }
+
+    body.kemahasiswaan-layout .main-content.role-main-content {
+        margin-left: 300px;
+        min-height: 100vh;
+        padding: 6.25rem 1.15rem 1.2rem;
+        background: #ececf1;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .kmh-dashboard-topbar {
+        position: fixed;
+        top: 0;
+        left: 300px;
+        right: 0;
+        z-index: 90;
+        background: #4f256f;
+        color: #ffffff;
+        box-shadow: 0 6px 14px rgba(28, 11, 45, 0.2);
+    }
+
+    .kmh-dashboard-topbar-inner {
+        min-height: 5.35rem;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.8rem;
+        padding: 0.95rem 1.25rem;
+    }
+
+    .kmh-dashboard-menu-btn {
+        width: 2.2rem;
+        height: 2.2rem;
+        border: 0;
+        border-radius: 999px;
+        background: rgba(255, 255, 255, 0.14);
+        color: #ffffff;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.15rem;
+    }
+
+    .kmh-dashboard-title {
+        margin-right: auto;
+    }
+
+    .kmh-dashboard-title h1 {
+        margin: 0;
+        font-size: clamp(1.55rem, 2.4vw, 2rem);
+        line-height: 1.1;
+        font-weight: 700;
+        color: #ffffff;
+    }
+
+    .kmh-dashboard-title p {
+        margin: 0.24rem 0 0;
+        font-size: 0.98rem;
+        color: rgba(255, 255, 255, 0.86);
+    }
+
+    .kmh-dashboard-alert {
+        width: 2.35rem;
+        height: 2.35rem;
+        border: 0;
+        border-radius: 999px;
+        background: transparent;
+        color: #ffffff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+        font-size: 1.16rem;
+    }
+
+    .kmh-dashboard-alert:hover {
+        background: rgba(255, 255, 255, 0.14);
+    }
+
+    .kmh-dashboard-alert-badge {
+        position: absolute;
+        top: 0.08rem;
+        right: 0.13rem;
+        min-width: 1.05rem;
+        height: 1.05rem;
+        padding: 0 0.28rem;
+        border-radius: 999px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.66rem;
+        line-height: 1;
+        font-weight: 700;
+        background: #facc15;
+        color: #442063;
+    }
+
+    .kmh-dashboard-wrap {
+        width: min(100%, 1280px);
+        margin: 0 auto;
+    }
+
+    .kmh-stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 0.9rem;
+        margin-bottom: 0.92rem;
+    }
+
+    .kmh-stat-card {
+        background: #ffffff;
+        border: 1px solid #dfdfeb;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(17, 24, 39, 0.06);
+        padding: 0.95rem 0.95rem;
+        min-height: 122px;
+        display: flex;
+        justify-content: space-between;
+        gap: 0.8rem;
+    }
+
+    .kmh-stat-card p {
+        margin: 0;
+        color: #6b7280;
+        font-size: 0.88rem;
+        line-height: 1.35;
+    }
+
+    .kmh-stat-card strong {
+        display: block;
+        margin-top: 0.38rem;
+        font-size: 2.2rem;
+        line-height: 1;
+        font-weight: 700;
+        color: #111827;
+    }
+
+    .kmh-stat-card .kmh-stat-icon {
+        flex-shrink: 0;
+        width: 2.4rem;
+        height: 2.4rem;
+        border-radius: 0.52rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.12rem;
+        color: #ffffff;
+        background: #4f256f;
+    }
+
+    .kmh-stat-card.tone-warning .kmh-stat-icon {
+        color: #3f2c02;
+        background: #facc15;
+    }
+
+    .kmh-main-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 300px;
+        gap: 0.9rem;
+    }
+
+    .kmh-card {
+        background: #ffffff;
+        border: 1px solid #dfdfeb;
+        border-radius: 10px;
+        box-shadow: 0 2px 8px rgba(17, 24, 39, 0.06);
+        overflow: hidden;
+    }
+
+    .kmh-card-head {
+        padding: 0.8rem 0.9rem;
+        border-bottom: 1px solid #ececf3;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 0.7rem;
+    }
+
+    .kmh-card-head h2 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .kmh-chart-body {
+        padding: 0.7rem 0.85rem 0.95rem;
+    }
+
+    .kmh-chart-shell {
+        display: grid;
+        grid-template-columns: 2.1rem minmax(0, 1fr);
+        gap: 0.35rem;
+        min-height: 306px;
+    }
+
+    .kmh-chart-y {
+        display: grid;
+        grid-template-rows: repeat(5, 1fr);
+        align-items: end;
+        color: #6b7280;
+        font-size: 0.72rem;
+        padding-bottom: 1.65rem;
+    }
+
+    .kmh-chart-plot {
+        position: relative;
+        border-left: 2px solid #d1d5db;
+        border-bottom: 2px solid #d1d5db;
+        padding: 0.3rem 0.35rem 1.65rem;
+    }
+
+    .kmh-chart-gridline {
+        position: absolute;
+        left: 0;
+        right: 0;
+        border-top: 1px dashed #e5e7eb;
+    }
+
+    .kmh-chart-gridline.y24 { top: 0; }
+    .kmh-chart-gridline.y18 { top: 25%; }
+    .kmh-chart-gridline.y12 { top: 50%; }
+    .kmh-chart-gridline.y6 { top: 75%; }
+
+    .kmh-chart-bars {
+        position: relative;
+        z-index: 2;
+        display: grid;
+        grid-template-columns: repeat(12, minmax(0, 1fr));
+        gap: 0.28rem;
+        align-items: end;
+        height: 100%;
+    }
+
+    .kmh-chart-bar-col {
+        display: grid;
+        grid-template-rows: minmax(0, 1fr) 1.4rem;
+        align-items: end;
+        min-width: 0;
+    }
+
+    .kmh-chart-bar-wrap {
+        display: flex;
+        align-items: flex-end;
+        height: 100%;
+    }
+
+    .kmh-chart-bar {
+        width: 100%;
+        border-radius: 0.35rem 0.35rem 0 0;
+        background: linear-gradient(180deg, #55317c 0%, #3f1f61 100%);
+        transition: filter 0.2s ease;
+        cursor: default;
+    }
+
+    .kmh-chart-bar:hover {
+        filter: brightness(1.08);
+    }
+
+    .kmh-chart-month {
+        text-align: center;
+        color: #6b7280;
+        font-size: 0.74rem;
+        line-height: 1.2;
+        align-self: end;
+        white-space: nowrap;
+    }
+
+    .kmh-chart-tooltip {
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        transform: translate(-50%, -110%);
+        background: #111827;
+        color: #ffffff;
+        border-radius: 8px;
+        padding: 0.32rem 0.48rem;
+        font-size: 0.74rem;
+        line-height: 1;
+        pointer-events: none;
+        opacity: 0;
+        transition: opacity 0.14s ease;
+        z-index: 8;
+        white-space: nowrap;
+    }
+
+    .kmh-chart-tooltip.is-visible {
+        opacity: 1;
+    }
+
+    .kmh-side-stack {
+        display: grid;
+        gap: 0.9rem;
+    }
+
+    .kmh-actions-body {
+        padding: 0.9rem;
+    }
+
+    .kmh-action-btn {
+        width: 100%;
+        border: 0;
+        border-radius: 8px;
+        font-size: 1rem;
+        font-weight: 600;
+        padding: 0.68rem 0.75rem;
+        margin-bottom: 0.68rem;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.45rem;
+        text-decoration: none;
+    }
+
+    .kmh-action-btn.primary {
+        background: #4f256f;
+        color: #ffffff;
+    }
+
+    .kmh-action-btn.warning {
+        background: #facc15;
+        color: #442063;
+        margin-bottom: 0;
+    }
+
+    .kmh-event-list {
+        padding: 0.2rem 0;
+    }
+
+    .kmh-event-item {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 0.7rem;
+        padding: 0.8rem 0.9rem;
+        border-top: 1px solid #ececf3;
+    }
+
+    .kmh-event-item:first-child {
+        border-top: 0;
+    }
+
+    .kmh-event-item h3 {
+        margin: 0;
+        font-size: 0.96rem;
+        font-weight: 600;
+        color: #1f2937;
+    }
+
+    .kmh-event-item p {
+        margin: 0.22rem 0 0;
+        font-size: 0.8rem;
+        color: #6b7280;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.32rem;
+    }
+
+    .kmh-pill {
+        border-radius: 999px;
+        padding: 0.22rem 0.58rem;
+        font-size: 0.72rem;
+        line-height: 1;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .kmh-pill.active {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    .kmh-pill.pending {
+        background: #fef9c3;
+        color: #a16207;
+    }
+
+    @media (max-width: 1260px) {
+        .kmh-stat-grid {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .kmh-main-grid {
+            grid-template-columns: minmax(0, 1fr);
+        }
+
+        .kmh-side-stack {
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+    }
+
+    @media (max-width: 1024px) {
+        body.kemahasiswaan-layout .main-content.role-main-content {
+            margin-left: 0;
+            padding-top: 5.15rem;
+        }
+
+        body.kemahasiswaan-layout .kemahasiswaan-sidebar {
+            transform: translateX(-110%);
+            width: min(84vw, 320px);
+            box-shadow: 0 18px 34px rgba(10, 10, 10, 0.34);
+        }
+
+        body.kemahasiswaan-layout .kemahasiswaan-sidebar[aria-hidden="false"] {
+            transform: translateX(0) !important;
+        }
+
+        .kmh-dashboard-topbar {
+            left: 0;
+        }
+
+        .kmh-dashboard-menu-btn {
+            display: inline-flex;
+        }
+
+        .kmh-dashboard-topbar-inner {
+            min-height: 4.45rem;
+            padding: 0.78rem 0.95rem;
+        }
+
+        .kmh-dashboard-title h1 {
+            font-size: 1.52rem;
+        }
+
+        .kmh-dashboard-title p {
+            font-size: 0.86rem;
+        }
+
+        .kmh-side-stack {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    @media (max-width: 640px) {
+        .kmh-stat-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .kmh-chart-shell {
+            min-height: 250px;
+        }
+
+        .kmh-card-head h2 {
+            font-size: 0.95rem;
+        }
+    }
 </style>
+@endpush
 
-<!-- ===== CHART INTERACTION SCRIPT ===== -->
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    const chartBars = document.querySelectorAll('.chart-bar');
-    const tooltip = document.getElementById('chart-tooltip');
-    const tooltipMonth = document.getElementById('tooltip-month');
-    const tooltipValue = document.getElementById('tooltip-value');
+@section('content')
+<header class="kmh-dashboard-topbar" aria-label="Header dashboard kemahasiswaan">
+    <div class="kmh-dashboard-topbar-inner">
+        <button id="kmh-sidebar-toggle" type="button" class="kmh-dashboard-menu-btn" aria-label="Buka navigasi samping">
+            <i class="bi bi-list"></i>
+        </button>
 
-    chartBars.forEach(bar => {
-      bar.addEventListener('mouseenter', function() {
-        const value = this.getAttribute('data-value');
-        const month = this.getAttribute('data-month');
-        
-        tooltipMonth.textContent = month;
-        tooltipValue.textContent = value + ' kegiatan';
-        
-        const rect = this.getBoundingClientRect();
-        const chartContainer = document.getElementById('chart-container');
-        const containerRect = chartContainer.getBoundingClientRect();
-        
-        tooltip.style.left = (rect.left - containerRect.left + rect.width / 2) + 'px';
-        tooltip.style.bottom = (containerRect.bottom - rect.top + 10) + 'px';
-        tooltip.classList.remove('d-none');
-      });
+        <div class="kmh-dashboard-title">
+            <h1>Dashboard</h1>
+            <p>Sistem Administrasi &amp; Kontrol Organisasi Mahasiswa</p>
+        </div>
 
-      bar.addEventListener('mouseleave', function() {
-        tooltip.classList.add('d-none');
-      });
-    });
-  });
-</script>
+        <button type="button" class="kmh-dashboard-alert" aria-label="Notifikasi sistem">
+            <i class="bi bi-bell"></i>
+            <span class="kmh-dashboard-alert-badge">5</span>
+        </button>
+    </div>
+</header>
 
+<div class="kmh-dashboard-wrap">
+    <section class="kmh-stat-grid" aria-label="Ringkasan statistik dashboard">
+        @foreach ($stats as $item)
+            <article class="kmh-stat-card tone-{{ $item['tone'] }}">
+                <div>
+                    <p>{{ $item['label'] }}</p>
+                    <strong>{{ $item['value'] }}</strong>
+                </div>
+                <span class="kmh-stat-icon">
+                    <i class="bi {{ $item['icon'] }}"></i>
+                </span>
+            </article>
+        @endforeach
+    </section>
+
+    <section class="kmh-main-grid" aria-label="Konten utama dashboard">
+        <article class="kmh-card">
+            <header class="kmh-card-head">
+                <h2>Grafik Kegiatan Bulanan 2024</h2>
+            </header>
+
+            <div class="kmh-chart-body">
+                <div class="kmh-chart-shell">
+                    <div class="kmh-chart-y" aria-hidden="true">
+                        <span>24</span>
+                        <span>18</span>
+                        <span>12</span>
+                        <span>6</span>
+                        <span>0</span>
+                    </div>
+
+                    <div class="kmh-chart-plot" id="kmh-chart-plot">
+                        <span class="kmh-chart-gridline y24" aria-hidden="true"></span>
+                        <span class="kmh-chart-gridline y18" aria-hidden="true"></span>
+                        <span class="kmh-chart-gridline y12" aria-hidden="true"></span>
+                        <span class="kmh-chart-gridline y6" aria-hidden="true"></span>
+
+                        <div class="kmh-chart-bars">
+                            @foreach ($monthlyActivity as $bar)
+                                @php
+                                    $height = max(6, min(100, round(($bar['value'] / $chartMax) * 100)));
+                                @endphp
+                                <div class="kmh-chart-bar-col">
+                                    <div class="kmh-chart-bar-wrap">
+                                        <span
+                                            class="kmh-chart-bar"
+                                            data-month="{{ $bar['month'] }}"
+                                            data-value="{{ $bar['value'] }}"
+                                            style="height: {{ $height }}%;"
+                                        ></span>
+                                    </div>
+                                    <span class="kmh-chart-month">{{ $bar['month'] }}</span>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        <span id="kmh-chart-tooltip" class="kmh-chart-tooltip"></span>
+                    </div>
+                </div>
+            </div>
+        </article>
+
+        <div class="kmh-side-stack">
+            <section class="kmh-card">
+                <header class="kmh-card-head">
+                    <h2>Quick Actions</h2>
+                </header>
+
+                <div class="kmh-actions-body">
+                    <a href="{{ route('portal.kemahasiswaan.pengajuan') }}" class="kmh-action-btn primary">
+                        <i class="bi bi-check-circle"></i>
+                        Review Kegiatan
+                    </a>
+                    <a href="{{ route('portal.kemahasiswaan.pengumuman') }}" class="kmh-action-btn warning">
+                        <i class="bi bi-megaphone"></i>
+                        Buat Pengumuman
+                    </a>
+                </div>
+            </section>
+
+            <section class="kmh-card">
+                <header class="kmh-card-head">
+                    <h2>Kegiatan Mendatang</h2>
+                </header>
+
+                <div class="kmh-event-list">
+                    @foreach ($upcomingEvents as $event)
+                        <article class="kmh-event-item">
+                            <div>
+                                <h3>{{ $event['title'] }}</h3>
+                                <p>
+                                    <i class="bi bi-calendar3"></i>
+                                    {{ $event['date'] }}
+                                </p>
+                            </div>
+                            <span class="kmh-pill {{ $event['tone'] }}">{{ $event['status'] }}</span>
+                        </article>
+                    @endforeach
+                </div>
+            </section>
+        </div>
+    </section>
+</div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    const toggleBtn = document.getElementById('kmh-sidebar-toggle');
+    const chartBars = Array.from(document.querySelectorAll('.kmh-chart-bar'));
+    const chartPlot = document.getElementById('kmh-chart-plot');
+    const tooltip = document.getElementById('kmh-chart-tooltip');
+
+    function setSidebarState(open) {
+        if (!sidebar || !overlay) {
+            return;
+        }
+
+        sidebar.setAttribute('aria-hidden', open ? 'false' : 'true');
+        overlay.classList.toggle('hidden', !open);
+    }
+
+    function syncSidebarByViewport() {
+        if (!sidebar || !overlay) {
+            return;
+        }
+
+        if (window.matchMedia('(max-width: 1024px)').matches) {
+            setSidebarState(false);
+        } else {
+            sidebar.setAttribute('aria-hidden', 'false');
+            overlay.classList.add('hidden');
+        }
+    }
+
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', function () {
+            if (!sidebar) {
+                return;
+            }
+
+            const shouldOpen = sidebar.getAttribute('aria-hidden') !== 'false';
+            setSidebarState(shouldOpen);
+        });
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', function () {
+            setSidebarState(false);
+        });
+    }
+
+    if (sidebar) {
+        sidebar.querySelectorAll('[data-close]').forEach(function (link) {
+            link.addEventListener('click', function () {
+                if (window.matchMedia('(max-width: 1024px)').matches) {
+                    setSidebarState(false);
+                }
+            });
+        });
+    }
+
+    window.addEventListener('resize', syncSidebarByViewport);
+    syncSidebarByViewport();
+
+    function showTooltip(bar) {
+        if (!tooltip || !chartPlot || !bar) {
+            return;
+        }
+
+        const month = bar.dataset.month || '';
+        const value = bar.dataset.value || '0';
+        tooltip.textContent = month + ': ' + value + ' kegiatan';
+
+        const barRect = bar.getBoundingClientRect();
+        const plotRect = chartPlot.getBoundingClientRect();
+        const centerX = barRect.left - plotRect.left + (barRect.width / 2);
+        const topY = plotRect.bottom - barRect.top;
+
+        tooltip.style.left = centerX + 'px';
+        tooltip.style.bottom = topY + 'px';
+        tooltip.classList.add('is-visible');
+    }
+
+    function hideTooltip() {
+        if (tooltip) {
+            tooltip.classList.remove('is-visible');
+        }
+    }
+
+    chartBars.forEach(function (bar) {
+        bar.addEventListener('mouseenter', function () {
+            showTooltip(bar);
+        });
+
+        bar.addEventListener('mouseleave', hideTooltip);
+
+        bar.addEventListener('focus', function () {
+            showTooltip(bar);
+        });
+
+        bar.addEventListener('blur', hideTooltip);
+    });
+});
+</script>
+@endpush
