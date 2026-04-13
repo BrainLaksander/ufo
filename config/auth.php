@@ -112,4 +112,24 @@ return [
 
     'password_timeout' => env('AUTH_PASSWORD_TIMEOUT', 10800),
 
+    // Demo login is only permitted in local environment when this flag is enabled.
+    'demo_mode' => (bool) env('AUTH_DEMO_MODE', false),
+
+    'demo_accounts' => [
+        'kemahasiswaan' => [
+            'name' => env('AUTH_DEMO_KEMAHASISWAAN_NAME', 'Departemen Kemahasiswaan'),
+            'email' => env('AUTH_DEMO_KEMAHASISWAAN_EMAIL', ''),
+            'password_hash' => env('AUTH_DEMO_KEMAHASISWAAN_PASSWORD_HASH', ''),
+        ],
+        'pengurus' => [
+            'name' => env('AUTH_DEMO_PENGURUS_NAME', 'Pengurus UKM/BEM'),
+            'email' => env('AUTH_DEMO_PENGURUS_EMAIL', ''),
+            'password_hash' => env('AUTH_DEMO_PENGURUS_PASSWORD_HASH', ''),
+        ],
+    ],
+
+    // Optional defaults for local utilities.
+    'factory_default_password' => env('USER_FACTORY_PASSWORD', ''),
+    'default_ukm_password' => env('AUTH_DEFAULT_UKM_PASSWORD', ''),
+
 ];
