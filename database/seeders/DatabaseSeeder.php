@@ -5,6 +5,8 @@ namespace Database\Seeders;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,33 +17,67 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Create sample users for testing each role
-        User::factory()->create([
-            'name' => 'Admin Sistem',
-            'email' => 'admin@example.com',
-            'password' => bcrypt('password'),
-            'role' => 'admin',
-        ]);
+        if (!app()->environment('local') || !config('auth.demo_mode')) {
+            return;
+        }
 
-        User::factory()->create([
-            'name' => 'Kemahasiswaan',
-            'email' => 'kemahasiswaan@example.com',
-            'password' => bcrypt('password'),
-            'role' => 'kemahasiswaan',
-        ]);
+        $demoAccounts = (array) config('auth.demo_accounts', []);
+        $userRoleMap = ['kemahasiswaan'];
 
-        User::factory()->create([
-            'name' => 'Pengurus Organisasi',
-            'email' => 'pengurus@example.com',
-            'password' => bcrypt('password'),
-            'role' => 'pengurus',
-        ]);
+        foreach ($userRoleMap as $role) {
+            $account = $demoAccounts[$role] ?? null;
+            if (!is_array($account)) {
+                continue;
+            }
 
-        User::factory()->create([
-            'name' => 'Mahasiswa',
-            'email' => 'mahasiswa@example.com',
-            'password' => bcrypt('password'),
-            'role' => 'mahasiswa',
-        ]);
+            $email = strtolower((string) ($account['email'] ?? ''));
+            $passwordHash = (string) ($account['password_hash'] ?? '');
+            $name = (string) ($account['name'] ?? ucfirst($role));
+
+            if ($email === '' || $passwordHash === '') {
+                continue;
+            }
+
+            User::query()->updateOrCreate(
+                ['email' => $email],
+                [
+                    'name' => $name,
+                    'password' => $passwordHash,
+                    'role' => $role,
+                ]
+            );
+        }
+
+        if (!Schema::hasTable('kemahasiswaan_ukm_accounts')) {
+            return;
+        }
+
+        $pengurusAccount = $demoAccounts['pengurus'] ?? null;
+        if (!is_array($pengurusAccount)) {
+            return;
+        }
+
+        $pengurusEmail = strtolower((string) ($pengurusAccount['email'] ?? ''));
+        $pengurusName = (string) ($pengurusAccount['name'] ?? 'Pengurus UKM/BEM');
+        $pengurusPasswordHash = (string) ($pengurusAccount['password_hash'] ?? '');
+
+        if ($pengurusEmail === '') {
+            return;
+        }
+
+        $record = [
+            'name' => $pengurusName,
+            'status' => 'active',
+            'updated_at' => now(),
+        ];
+
+        if (Schema::hasColumn('kemahasiswaan_ukm_accounts', 'password_hash') && $pengurusPasswordHash !== '') {
+            $record['password_hash'] = $pengurusPasswordHash;
+        }
+
+        DB::table('kemahasiswaan_ukm_accounts')->updateOrInsert(
+            ['email' => $pengurusEmail],
+            $record + ['created_at' => now()]
+        );
     }
 }
