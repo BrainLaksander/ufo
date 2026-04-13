@@ -1,18 +1,20 @@
-<header style="padding:1rem; background:#f5f5f5; border-bottom:1px solid #ddd;">
-    <div class="container">
-        <h1 style="margin:0; font-size:1.2rem;">UFO - Sistem Informasi Organisasi Mahasiswa UNKLAB</h1>
-        <nav style="margin-top:0.5rem;">
-            <a href="{{ route('home') }}">Beranda</a> |
-            <a href="{{ route('organisasi.index') }}">Organisasi</a> |
-            <a href="{{ route('kegiatan.index') }}">Kegiatan</a> |
+<header class="ufo-shell-header">
+    <div class="container ufo-shell-header__inner">
+        <a href="{{ route('home') }}" class="ufo-shell-brand" aria-label="UFO Home">
+            <span class="ufo-shell-brand__mark">UFO</span>
+            <span class="ufo-shell-brand__name">Universitas Klabat</span>
+        </a>
+
+        <div class="ufo-shell-auth">
             @if(session()->has('user'))
-                <form action="{{ route('logout') }}" method="POST" style="display:inline">@csrf
-                    <button type="submit">Logout</button>
+                <span class="ufo-shell-chip">{{ session('user.name') }}</span>
+                <form action="{{ route('logout') }}" method="POST" class="ufo-shell-inline-form">
+                    @csrf
+                    <button type="submit" class="ufo-shell-btn">Logout</button>
                 </form>
-                <span style="margin-left:0.5rem;">Hi, {{ session('user.name') }}</span>
             @else
-                <a href="{{ route('login') }}">Login</a>
+                <a href="{{ route('login') }}" class="ufo-shell-btn">Login</a>
             @endif
-        </nav>
+        </div>
     </div>
 </header>
