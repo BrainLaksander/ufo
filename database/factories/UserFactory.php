@@ -23,11 +23,17 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $factoryPassword = (string) config('auth.factory_default_password', '');
+
+        if ($factoryPassword === '') {
+            $factoryPassword = Str::random(24);
+        }
+
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
+            'password' => static::$password ??= Hash::make($factoryPassword),
             'remember_token' => Str::random(10),
         ];
     }
