@@ -1,6 +1,9 @@
-CREATE DATABASE IF NOT EXISTS ufo_db CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS 'ufo_user'@'127.0.0.1' IDENTIFIED BY 'k8X2aP4mQ9sV7nT3uR1yC6hL';
-CREATE USER IF NOT EXISTS 'ufo_user'@'localhost' IDENTIFIED BY 'k8X2aP4mQ9sV7nT3uR1yC6hL';
-GRANT ALL PRIVILEGES ON ufo_db.* TO 'ufo_user'@'127.0.0.1';
-GRANT ALL PRIVILEGES ON ufo_db.* TO 'ufo_user'@'localhost';
+-- Runtime template only.
+-- Render with deploy/mysql-init-ufounk.sh so credentials come from environment variables,
+-- not from plaintext values committed to git.
+CREATE DATABASE IF NOT EXISTS `__UFO_DB_NAME__` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER IF NOT EXISTS '__UFO_DB_USER__'@'127.0.0.1' IDENTIFIED BY '__UFO_DB_PASSWORD__';
+CREATE USER IF NOT EXISTS '__UFO_DB_USER__'@'localhost' IDENTIFIED BY '__UFO_DB_PASSWORD__';
+GRANT ALL PRIVILEGES ON `__UFO_DB_NAME__`.* TO '__UFO_DB_USER__'@'127.0.0.1';
+GRANT ALL PRIVILEGES ON `__UFO_DB_NAME__`.* TO '__UFO_DB_USER__'@'localhost';
 FLUSH PRIVILEGES;
