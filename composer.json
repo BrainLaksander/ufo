@@ -42,6 +42,16 @@
             "Composer\\Config::disableProcessTimeout",
             "@php artisan serve"
         ],
+        "security:scan": [
+            "bash scripts/security/secret-scan.sh"
+        ],
+        "security:scan:all": [
+            "bash scripts/security/secret-scan.sh --all"
+        ],
+        "hooks:install": [
+            "git config core.hooksPath .githooks",
+            "chmod +x .githooks/pre-commit scripts/security/secret-scan.sh deploy/mysql-init-ufounk.sh"
+        ],
         "test": [
             "@php artisan config:clear --ansi",
             "@php artisan test"
