@@ -1,0 +1,13 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(git rev-parse --show-toplevel)"
+cd "${ROOT_DIR}"
+
+if [[ ! -x "scripts/security/secret-scan.sh" ]]; then
+  echo "Missing executable scanner: scripts/security/secret-scan.sh" >&2
+  echo "Run: chmod +x scripts/security/secret-scan.sh" >&2
+  exit 1
+fi
+
+scripts/security/secret-scan.sh staged
