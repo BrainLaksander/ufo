@@ -1,5 +1,7 @@
-<footer style="padding:1rem; background:#fafafa; border-top:1px solid #eee; margin-top:2rem;">
-    <div class="container">
-        <small>&copy; {{ date('Y') }} Universitas Klabat - UFO System</small>
+<footer class="ufo-shell-footer">
+    <div class="container ufo-shell-footer__inner">
+        <div class="ufo-shell-footer__right">
+            <small>&copy; {{ date('Y') }} Universitas Klabat</small>
+        </div>
     </div>
 </footer>
