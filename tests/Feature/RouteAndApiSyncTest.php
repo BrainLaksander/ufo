@@ -11,7 +11,7 @@ class RouteAndApiSyncTest extends TestCase
         $routes = [
             'home' => 200,
             'login' => 200,
-            'portal.login' => 200,
+            'portal.login' => 302,
             'portal.admin.dashboard' => 200,
             'portal.kemahasiswaan.dashboard' => 200,
             'portal.kemahasiswaan.organisasi' => 200,
