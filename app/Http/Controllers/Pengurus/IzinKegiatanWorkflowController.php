@@ -1,0 +1,1795 @@
+<?php
+
+namespace App\Http\Controllers\Pengurus;
+
+use App\Http\Controllers\Controller;
+use Carbon\Carbon;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
+use Illuminate\View\View;
+
+class IzinKegiatanWorkflowController extends Controller
+{
+    private array $referenceCache = [];
+
+    public function pengurusIndex(Request $request): View
+    {
+        $context = $this->resolvePengurusContext($request);
+        $organizationId = $context['organization_id'];
+
+        return view('portal.pengurus.proposals', [
+            'workflowPengajuan' => $organizationId ? $this->getPengajuan($organizationId) : [],
+            'workflowLaporan' => $organizationId ? $this->getLaporan($organizationId) : [],
+            'jadwalKegiatan' => $this->getJadwal(),
+            'kontakPengurus' => $this->getKontakPengurus(),
+            'eventOptions' => $organizationId ? $this->getEventOptions($organizationId) : [],
+            'hasPengurusContext' => $context['organization_id'] !== null && $context['member_id'] !== null,
+            'pengurusOrganizationName' => $context['organization_name'],
+            ...$this->buildPengurusPlaceholderData($context['organization_name']),
+            ...$this->buildPengurusShellData($organizationId),
+        ]);
+    }
+
+    public function pengurusAnnouncementForm(Request $request): View
+    {
+        $context = $this->resolvePengurusContext($request);
+
+        return view('portal.pengurus.announcements.form', [
+            ...$this->buildPengurusPlaceholderData($context['organization_name']),
+            ...$this->buildPengurusShellData($context['organization_id']),
+        ]);
+    }
+
+    public function pengurusSettings(Request $request): View
+    {
+        $context = $this->resolvePengurusContext($request);
+
+        $org = null;
+        if ($context['organization_id']) {
+            $org = DB::table('organizations')->where('id', $context['organization_id'])->first();
+        }
+
+        return view('portal.pengurus.settings', [
+            'hasOrganizationContext' => $org !== null,
+            'orgData' => [
+                'id' => $org->id ?? null,
+                'name' => $org->name ?? '',
+                'shortname' => $org->shortname ?? '',
+                'description' => $org->description ?? '',
+                'vision' => $org->vision ?? '',
+                'mission' => $org->mission ?? '',
+                'email' => $org->email ?? '',
+                'phone' => $org->phone ?? '',
+                'instagram' => $org->instagram ?? '',
+                'line' => $org->line ?? '',
+            ],
+            ...$this->buildPengurusShellData($context['organization_id']),
+        ]);
+    }
+
+    public function updateProfilUKM(Request $request): RedirectResponse
+    {
+        $context = $this->resolvePengurusContext($request);
+
+        if (!$context['organization_id']) {
+            return back()->with('error', $this->refLabel('flash_message', 'org_context_missing'));
+        }
+
+        $validated = $request->validate([
+            'description' => 'nullable|string|max:4000',
+            'vision' => 'nullable|string|max:2000',
+            'mission' => 'nullable|string|max:4000',
+            'email' => 'nullable|email|max:120',
+            'phone' => 'nullable|string|max:40',
+            'instagram' => 'nullable|string|max:120',
+            'line' => 'nullable|string|max:120',
+        ]);
+
+        DB::table('organizations')
+            ->where('id', $context['organization_id'])
+            ->update([
+                'description' => $validated['description'] ?? null,
+                'vision' => $validated['vision'] ?? null,
+                'mission' => $validated['mission'] ?? null,
+                'email' => $validated['email'] ?? null,
+                'phone' => $validated['phone'] ?? null,
+                'instagram' => $validated['instagram'] ?? null,
+                'line' => $validated['line'] ?? null,
+                'updated_at' => now(),
+            ]);
+
+        return back()->with('success', $this->refLabel('flash_message', 'profile_updated'));
+    }
+
+    public function kemahasiswaanIndex(): View
+    {
+        $workflowPengajuan = $this->getPengajuan();
+        $workflowLaporan = $this->getLaporan();
+
+        return view('portal.kemahasiswaan.pengajuan', [
+            'workflowPengajuan' => $workflowPengajuan,
+            'workflowLaporan' => $workflowLaporan,
+            'jadwalKegiatan' => $this->getJadwal(),
+            'organizations' => $this->getOrganizations(),
+            'headerNotificationCount' => $this->countKemahasiswaanPendingNotifications($workflowPengajuan, $workflowLaporan),
+        ]);
+    }
+
+    public function pengurusDashboard(Request $request): View
+    {
+        $context = $this->resolvePengurusContext($request);
+        $organizationId = $context['organization_id'];
+
+        $month = now()->startOfMonth();
+        $start = $month->copy()->startOfMonth()->startOfWeek(Carbon::SUNDAY);
+        $end = $month->copy()->endOfMonth()->endOfWeek(Carbon::SATURDAY);
+
+        $activities = $this->getDashboardActivities($organizationId, $start, $end);
+
+        return view('portal.pengurus.dashboard', [
+            'activities' => $activities,
+            'summaryCards' => $this->buildDashboardSummaryCards($activities, $organizationId),
+            'legendItems' => $this->buildDashboardLegend($activities),
+            'calendarDays' => $this->buildCalendarDays($activities, $month, $start, $end, now()),
+            'pendingTasks' => $this->getPendingTasks($organizationId),
+            'monthLabel' => $month->translatedFormat('F Y'),
+            ...$this->buildPengurusShellData($organizationId),
+        ]);
+    }
+
+    public function pengurusEvents(Request $request): View
+    {
+        $context = $this->resolvePengurusContext($request);
+        $organizationId = $context['organization_id'];
+
+        $rows = collect();
+        if (Schema::hasTable('events')) {
+            $query = DB::table('events as evt')
+                ->leftJoin('organizations as org', 'org.id', '=', 'evt.organization_id')
+                ->select([
+                    'evt.id',
+                    'evt.name',
+                    'evt.start_date',
+                    'evt.end_date',
+                    'evt.location',
+                    'evt.current_participants',
+                    'evt.quota',
+                    'evt.status',
+                    'org.name as organization_name',
+                ])
+                ->orderByDesc('evt.start_date')
+                ->limit(200);
+
+            if ($organizationId) {
+                $query->where('evt.organization_id', $organizationId);
+            }
+
+            $rows = $query->get();
+        }
+
+        $announcementTitles = collect();
+        if (Schema::hasTable('kemahasiswaan_announcements')) {
+            $announcementQuery = DB::table('kemahasiswaan_announcements as ann')
+                ->select('ann.title')
+                ->where('ann.publish_status', 'published')
+                ->limit(300);
+
+            if ($organizationId && Schema::hasTable('kemahasiswaan_ukm_accounts')) {
+                $announcementQuery
+                    ->leftJoin('kemahasiswaan_ukm_accounts as akun', 'akun.id', '=', 'ann.ukm_account_id')
+                    ->where('akun.organization_id', $organizationId);
+            }
+
+            $announcementTitles = $announcementQuery
+                ->pluck('title')
+                ->filter()
+                ->map(fn ($title) => Str::lower((string) $title));
+        }
+
+        $mapped = $rows->map(function ($row) use ($announcementTitles) {
+            $startDate = $row->start_date ? Carbon::parse($row->start_date) : null;
+            $endDate = $row->end_date ? Carbon::parse($row->end_date) : $startDate;
+            [$statusLabel, $pill] = $this->mapEventStatusToPortal((string) $row->status, $startDate, $endDate);
+
+            $hasNews = $announcementTitles->contains(function ($title) use ($row) {
+                $needle = Str::lower((string) $row->name);
+                return $needle !== '' && Str::contains((string) $title, $needle);
+            });
+
+            return [
+                'id' => (int) $row->id,
+                'title' => (string) $row->name,
+                'date' => $startDate ? $startDate->translatedFormat('d F Y') : '',
+                'time' => $startDate
+                    ? $startDate->format('H:i') . ' - ' . ($endDate ? $endDate->format('H:i') : $startDate->format('H:i'))
+                    : '',
+                'location' => (string) ($row->location ?? ''),
+                'registrants' => (int) ($row->current_participants ?? 0),
+                'participants' => (int) ($row->current_participants ?? 0),
+                'status' => $statusLabel,
+                'pill' => $pill,
+                'has_news' => $hasNews,
+            ];
+        });
+
+        $completedLabels = array_filter([
+            $this->mapEventStatusToPortal('completed', null, null)[0],
+            $this->mapEventStatusToPortal('cancelled', null, null)[0],
+        ]);
+
+        $activeEvents = $mapped->filter(function ($event) use ($completedLabels) {
+            return !in_array($event['status'], $completedLabels, true);
+        })->values()->all();
+
+        $completedEvents = $mapped->filter(function ($event) use ($completedLabels) {
+            return in_array($event['status'], $completedLabels, true);
+        })->values()->all();
+
+        return view('portal.pengurus.events', [
+            'activeEvents' => $activeEvents,
+            'completedEvents' => $completedEvents,
+            ...$this->buildPengurusPlaceholderData($context['organization_name']),
+            ...$this->buildPengurusShellData($organizationId),
+        ]);
+    }
+
+    public function pengurusAnnouncements(Request $request): View
+    {
+        $context = $this->resolvePengurusContext($request);
+        $organizationId = $context['organization_id'];
+
+        $rows = collect();
+        if (Schema::hasTable('kemahasiswaan_announcements')) {
+            $query = DB::table('kemahasiswaan_announcements as ann');
+
+            if (Schema::hasTable('kemahasiswaan_ukm_accounts')) {
+                $query->leftJoin('kemahasiswaan_ukm_accounts as akun', 'akun.id', '=', 'ann.ukm_account_id');
+            }
+
+            if ($organizationId && Schema::hasTable('kemahasiswaan_ukm_accounts')) {
+                $query->where('akun.organization_id', $organizationId);
+            }
+
+            $rows = $query
+                ->select([
+                    'ann.id',
+                    'ann.title',
+                    'ann.summary',
+                    'ann.content',
+                    'ann.publish_at',
+                    'ann.created_at',
+                    'ann.publish_status',
+                ])
+                ->orderByDesc('ann.publish_at')
+                ->orderByDesc('ann.created_at')
+                ->limit(250)
+                ->get();
+        }
+
+        $allAnnouncements = $rows->map(function ($row) {
+            $start = $row->publish_at ? Carbon::parse($row->publish_at) : Carbon::parse($row->created_at);
+            [$statusLabel, $pill] = $this->mapAnnouncementStatus((string) $row->publish_status);
+
+            return [
+                'id' => (int) $row->id,
+                'title' => (string) $row->title,
+                'description' => (string) ($row->summary ?: Str::limit(strip_tags((string) $row->content), 180)),
+                'start_date' => $start->translatedFormat('d M Y'),
+                'end_date' => $start->copy()->addDays(7)->translatedFormat('d M Y'),
+                'status' => $statusLabel,
+                'pill' => $pill,
+            ];
+        })->values()->all();
+
+        $activeAnnouncements = collect($allAnnouncements)
+            ->filter(fn ($item) => ($item['status'] ?? '') === 'Aktif')
+            ->values()
+            ->all();
+
+        $eventOptions = [];
+        if ($organizationId) {
+            $eventOptions = $this->getEventOptions($organizationId);
+        } elseif (Schema::hasTable('events')) {
+            $eventOptions = DB::table('events')
+                ->select(['id', 'name'])
+                ->orderByDesc('id')
+                ->limit(200)
+                ->get()
+                ->map(fn ($row) => [
+                    'id' => (int) $row->id,
+                    'name' => (string) $row->name,
+                ])
+                ->all();
+        }
+
+        return view('portal.pengurus.announcements', [
+            'activeAnnouncements' => $activeAnnouncements,
+            'allAnnouncements' => $allAnnouncements,
+            'eventOptions' => $eventOptions,
+            ...$this->buildPengurusPlaceholderData($context['organization_name']),
+            ...$this->buildPengurusShellData($organizationId),
+        ]);
+    }
+
+    public function pengurusLostAndFound(Request $request): View
+    {
+        $context = $this->resolvePengurusContext($request);
+        $organizationId = $context['organization_id'];
+
+        $organization = null;
+        if ($organizationId && Schema::hasTable('organizations')) {
+            $organization = DB::table('organizations')
+                ->select(['id', 'name', 'shortname'])
+                ->where('id', $organizationId)
+                ->first();
+        }
+
+        $sessionRole = Str::lower((string) data_get($request->session()->get('user'), 'role', ''));
+        $isBem = Str::contains($sessionRole, 'bem')
+            || Str::contains(Str::lower((string) ($organization->shortname ?? '')), 'bem')
+            || Str::contains(Str::lower((string) ($organization->name ?? '')), 'bem');
+
+        $rows = collect();
+        if (Schema::hasTable('lost_found_items')) {
+            $query = DB::table('lost_found_items as lf');
+
+            if (Schema::hasTable('users')) {
+                $query->leftJoin('users as reporter', 'reporter.id', '=', 'lf.reported_by');
+            }
+
+            if ($organizationId) {
+                $query->where('lf.organization_id', $organizationId);
+            }
+
+            $query->select([
+                'lf.id',
+                'lf.type',
+                'lf.item_name',
+                'lf.description',
+                'lf.location_found',
+                'lf.status',
+                'lf.created_at',
+                'lf.claimed_at',
+                'lf.resolved_at',
+            ]);
+
+            if (Schema::hasTable('users')) {
+                $query->addSelect('reporter.name as reporter_name');
+                $query->addSelect('reporter.email as reporter_email');
+            } else {
+                $query->selectRaw('NULL as reporter_name');
+                $query->selectRaw('NULL as reporter_email');
+            }
+
+            $rows = $query
+                ->orderByDesc('lf.created_at')
+                ->limit(200)
+                ->get();
+        }
+
+        $items = $rows->map(function ($row) {
+            [$status, $itemStatus] = $this->mapLostFoundModerationStatus((string) $row->status);
+            $createdAt = $row->created_at ? Carbon::parse($row->created_at) : now();
+
+            return [
+                'id' => (int) $row->id,
+                'type' => (string) ($row->type ?? ''),
+                'title' => (string) ($row->item_name ?? ''),
+                'description' => (string) ($row->description ?? ''),
+                'location' => (string) ($row->location_found ?? ''),
+                'date' => $createdAt->toDateString(),
+                'reporter' => (string) ($row->reporter_name ?? ''),
+                'contact' => (string) ($row->reporter_email ?? ''),
+                'status' => $status,
+                'item_status' => $itemStatus,
+                'priority' => ((string) $row->type === 'lost') && ((string) $row->status === 'active') && $createdAt->lte(now()->subDays(2)),
+                'notes' => '',
+            ];
+        })->values();
+
+        $priorityItems = $items
+            ->filter(fn ($item) => ($item['priority'] ?? false) && ($item['status'] ?? '') === 'approved' && ($item['item_status'] ?? '') === 'belum_ditemukan')
+            ->values()
+            ->all();
+
+        return view('portal.pengurus.lostandfound', [
+            'isBem' => $isBem,
+            'items' => $items->all(),
+            'priorityItems' => $priorityItems,
+            'statusLabel' => collect($this->getReferenceMap('lostfound_review_status'))
+                ->mapWithKeys(fn ($entry, $code) => [$code => (string) ($entry['label'] ?? '')])
+                ->all(),
+            'statusPill' => collect($this->getReferenceMap('lostfound_review_status'))
+                ->mapWithKeys(fn ($entry, $code) => [$code => (string) ($entry['payload']['pill'] ?? '')])
+                ->all(),
+            ...$this->buildPengurusShellData($organizationId),
+        ]);
+    }
+
+    public function pengurusMembers(Request $request): View
+    {
+        $context = $this->resolvePengurusContext($request);
+        $organizationId = $context['organization_id'];
+
+        $organization = null;
+        if ($organizationId && Schema::hasTable('organizations')) {
+            $organization = DB::table('organizations')
+                ->where('id', $organizationId)
+                ->first();
+        }
+
+        $members = collect();
+        if ($organizationId && Schema::hasTable('members')) {
+            $members = DB::table('members')
+                ->where('organization_id', $organizationId)
+                ->where('status', 'aktif')
+                ->orderByRaw("CASE position WHEN 'ketua' THEN 1 WHEN 'sekretaris' THEN 2 WHEN 'bendahara' THEN 3 ELSE 4 END")
+                ->orderBy('name')
+                ->get();
+        }
+
+        $programKegiatan = [];
+        if ($organizationId && Schema::hasTable('events')) {
+            $programKegiatan = DB::table('events')
+                ->where('organization_id', $organizationId)
+                ->whereIn('status', ['approved', 'ongoing', 'completed'])
+                ->orderByDesc('start_date')
+                ->limit(8)
+                ->get()
+                ->map(function ($row) {
+                    $start = $row->start_date ? Carbon::parse($row->start_date) : null;
+                    $end = $row->end_date ? Carbon::parse($row->end_date) : $start;
+
+                    return [
+                        'nama' => (string) $row->name,
+                        'periode' => $start
+                            ? $start->translatedFormat('d M Y') . ($end ? ' - ' . $end->translatedFormat('d M Y') : '')
+                            : '',
+                        'tujuan' => Str::limit((string) $row->description, 160),
+                        'kegiatan' => (string) ($row->location ?? ''),
+                        'output' => (string) ($row->quota ?? ''),
+                    ];
+                })
+                ->all();
+        }
+
+        $struktur = $members->map(fn ($row) => [
+            'jabatan' => Str::title((string) $row->position),
+            'nama' => (string) $row->name,
+        ])->values()->all();
+
+        $kontakPengurus = $members
+            ->filter(fn ($row) => !empty($row->phone))
+            ->take(10)
+            ->map(fn ($row) => [
+                'nama' => (string) $row->name,
+                'jabatan' => Str::title((string) $row->position),
+                'whatsapp' => (string) $row->phone,
+            ])
+            ->values()
+            ->all();
+
+        $socialMedia = [];
+        if ($organization) {
+            if (!empty($organization->instagram)) {
+                $socialMedia[] = ['platform' => 'Instagram', 'value' => (string) $organization->instagram];
+            }
+
+            if (!empty($organization->line)) {
+                $socialMedia[] = ['platform' => 'LINE', 'value' => (string) $organization->line];
+            }
+
+            if (!empty($organization->email)) {
+                $socialMedia[] = ['platform' => 'Email', 'value' => (string) $organization->email];
+            }
+
+            if (!empty($organization->phone)) {
+                $socialMedia[] = ['platform' => 'Telepon', 'value' => (string) $organization->phone];
+            }
+        }
+
+        $kategoriOptions = [];
+        if (Schema::hasTable('organizations')) {
+            $kategoriOptions = collect($kategoriOptions)
+                ->merge(
+                    DB::table('organizations')
+                        ->select('shortname')
+                        ->whereNotNull('shortname')
+                        ->orderBy('shortname')
+                        ->limit(40)
+                        ->pluck('shortname')
+                        ->map(fn ($name) => (string) $name)
+                )
+                ->filter(fn ($value) => $value !== '')
+                ->unique()
+                ->values()
+                ->all();
+        }
+
+            if ($organization && !empty($organization->shortname)) {
+                $kategoriOptions = collect($kategoriOptions)
+                ->prepend((string) $organization->shortname)
+                ->filter(fn ($value) => $value !== '')
+                ->unique()
+                ->values()
+                ->all();
+            }
+
+        $filled = 0;
+        $total = 8;
+        if ($organization) {
+            foreach (['description', 'vision', 'mission', 'email', 'phone', 'instagram', 'line', 'logo'] as $field) {
+                if (!empty($organization->{$field})) {
+                    $filled++;
+                }
+            }
+        }
+        $profileCompletion = $organization ? (int) round(($filled / $total) * 100) : 0;
+
+        return view('portal.pengurus.members', [
+            'kategoriOptions' => $kategoriOptions,
+            'activeKategori' => $this->inferOrganizationCategory($organization),
+            'programKegiatan' => $programKegiatan,
+            'struktur' => $struktur,
+            'kontakPengurus' => $kontakPengurus,
+            'socialMedia' => $socialMedia,
+            'values' => $this->missionToValues($organization?->mission),
+            'profileCompletion' => $profileCompletion,
+            'visionText' => (string) ($organization?->vision ?? ''),
+            'missionText' => (string) ($organization?->mission ?? ''),
+            'cultureText' => (string) ($organization?->description ?? ''),
+            ...$this->buildPengurusShellData($organizationId),
+        ]);
+    }
+
+    public function pengurusApplications(Request $request): View
+    {
+        $context = $this->resolvePengurusContext($request);
+        $organizationId = $context['organization_id'];
+
+        $contacts = collect();
+        if (Schema::hasTable('members')) {
+            $query = DB::table('members as mem')
+                ->leftJoin('organizations as org', 'org.id', '=', 'mem.organization_id')
+                ->select([
+                    'mem.name',
+                    'mem.position',
+                    'mem.phone',
+                    'mem.email',
+                    'org.name as organization_name',
+                ])
+                ->where('mem.status', 'aktif')
+                ->orderByRaw("CASE mem.position WHEN 'ketua' THEN 1 WHEN 'sekretaris' THEN 2 WHEN 'bendahara' THEN 3 ELSE 4 END")
+                ->orderBy('mem.name')
+                ->limit(24);
+
+            if ($organizationId) {
+                $query->where('mem.organization_id', $organizationId);
+            }
+
+            $contacts = $query->get();
+        }
+
+        $mappedContacts = $contacts->map(function ($row) {
+            $phone = (string) ($row->phone ?? '');
+
+            return [
+                'name' => (string) $row->name,
+                'role' => Str::title((string) $row->position) . (!empty($row->organization_name) ? ' - ' . (string) $row->organization_name : ''),
+                'phone' => $phone,
+                'email' => (string) ($row->email ?? ''),
+                'whatsapp' => $this->formatWhatsappLink($phone),
+            ];
+        })->values()->all();
+
+        return view('portal.pengurus.applications', [
+            'contacts' => $mappedContacts,
+            ...$this->buildPengurusShellData($organizationId),
+        ]);
+    }
+
+    public function pengurusEventDetail(Request $request, int $id): View
+    {
+        $context = $this->resolvePengurusContext($request);
+        $organizationId = $context['organization_id'];
+
+        abort_unless(Schema::hasTable('events'), 404);
+
+        $query = DB::table('events')->where('id', $id);
+        if ($organizationId) {
+            $query->where('organization_id', $organizationId);
+        }
+
+        $row = $query->first();
+        abort_unless($row, 404);
+
+        $startDate = $row->start_date ? Carbon::parse($row->start_date) : null;
+        $endDate = $row->end_date ? Carbon::parse($row->end_date) : $startDate;
+        [$statusLabel] = $this->mapEventStatusToPortal((string) $row->status, $startDate, $endDate);
+
+        $participants = [];
+        if (Schema::hasTable('members')) {
+            $participants = DB::table('members')
+                ->where('organization_id', $row->organization_id)
+                ->where('status', 'aktif')
+                ->orderBy('name')
+                ->limit(max((int) ($row->current_participants ?? 0), 20))
+                ->get()
+                ->map(fn ($member) => [
+                    'name' => (string) $member->name,
+                    'nim' => (string) $member->nim,
+                    'status' => (string) ($member->status ?? ''),
+                ])
+                ->all();
+        }
+
+        return view('portal.pengurus.events.detail', [
+            'event' => [
+                'id' => (int) $row->id,
+                'name' => (string) $row->name,
+                'date' => $startDate ? $startDate->toDateString() : '',
+                'time' => $startDate ? $startDate->format('H:i') : '',
+                'location' => (string) ($row->location ?? ''),
+                'quota' => (int) ($row->quota ?? 0),
+                'description' => (string) ($row->description ?? ''),
+                'status' => $statusLabel,
+                'participants' => $participants,
+            ],
+            ...$this->buildPengurusShellData($organizationId),
+        ]);
+    }
+
+    public function eventForm(Request $request): View
+    {
+        $context = $this->resolvePengurusContext($request);
+        $organizationId = $context['organization_id'];
+
+        $hasApprovedIzin = false;
+        if ($organizationId) {
+            $hasApprovedIzin = DB::table('submissions')
+                ->where('organization_id', $organizationId)
+                ->where('status', 'approved')
+                ->exists();
+        }
+
+        return view('portal.pengurus.events.form', [
+            'hasApprovedIzin' => $hasApprovedIzin,
+            'hasPengurusContext' => $context['organization_id'] !== null && $context['member_id'] !== null,
+            'pengurusOrganizationName' => $context['organization_name'],
+            ...$this->buildPengurusPlaceholderData($context['organization_name']),
+            ...$this->buildPengurusShellData($organizationId),
+        ]);
+    }
+
+    public function storeEvent(Request $request): RedirectResponse
+    {
+        $context = $this->resolvePengurusContext($request);
+
+        if (!$context['organization_id'] || !$context['member_id']) {
+            return back()->with('error', $this->refLabel('flash_message', 'pengurus_data_incomplete'));
+        }
+
+        $hasApprovedIzin = DB::table('submissions')
+            ->where('organization_id', $context['organization_id'])
+            ->where('status', 'approved')
+            ->exists();
+
+        if (!$hasApprovedIzin) {
+            return back()->with('error', $this->refLabel('flash_message', 'event_requires_approved_submission'));
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:150',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'location' => 'required|string|max:160',
+            'quota' => 'required|integer|min:1',
+            'description' => 'required|string|max:3000',
+            'status' => 'required|in:draft,approved',
+        ]);
+
+        DB::table('events')->insert([
+            'organization_id' => $context['organization_id'],
+            'created_by' => $context['member_id'],
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'start_date' => Carbon::parse($validated['start_date']),
+            'end_date' => !empty($validated['end_date']) ? Carbon::parse($validated['end_date']) : Carbon::parse($validated['start_date']),
+            'location' => $validated['location'],
+            'quota' => (int) $validated['quota'],
+            'current_participants' => 0,
+            'banner' => null,
+            'status' => $validated['status'],
+            'internal_notes' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return back()->with('success', $this->refLabel('flash_message', 'event_created'));
+    }
+
+    public function storePengajuan(Request $request): RedirectResponse
+    {
+        $context = $this->resolvePengurusContext($request);
+
+        if (!$context['organization_id'] || !$context['member_id']) {
+            return back()->with('error', $this->refLabel('flash_message', 'pengurus_data_incomplete'));
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:180',
+            'description' => 'required|string|max:3000',
+            'type' => 'required|in:proposal,budget,activity_plan',
+        ]);
+
+        DB::table('submissions')->insert([
+            'organization_id' => $context['organization_id'],
+            'member_id' => $context['member_id'],
+            'reviewed_by_department_user_id' => null,
+            'title' => $validated['title'],
+            'description' => $validated['description'],
+            'type' => $validated['type'],
+            'status' => 'submitted',
+            'feedback' => null,
+            'department_review_note' => null,
+            'revision_count' => 0,
+            'submitted_date' => now()->toDateString(),
+            'approved_date' => null,
+            'reviewed_at' => null,
+            'file_path' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return back()->with('success', $this->refLabel('flash_message', 'proposal_created'));
+    }
+
+    public function storeLaporan(Request $request): RedirectResponse
+    {
+        $context = $this->resolvePengurusContext($request);
+
+        if (!$context['organization_id'] || !$context['member_id']) {
+            return back()->with('error', $this->refLabel('flash_message', 'pengurus_data_incomplete'));
+        }
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:180',
+            'content' => 'required|string|max:5000',
+            'participants' => 'required|integer|min:0',
+            'report_type' => 'required|in:activity,financial,semester',
+            'event_id' => 'nullable|integer|exists:events,id',
+        ]);
+
+        if (!empty($validated['event_id'])) {
+            $event = DB::table('events')
+                ->where('id', $validated['event_id'])
+                ->where('organization_id', $context['organization_id'])
+                ->first();
+
+            if (!$event) {
+                return back()->with('error', $this->refLabel('flash_message', 'report_event_invalid'));
+            }
+        }
+
+        DB::table('reports')->insert([
+            'organization_id' => $context['organization_id'],
+            'event_id' => $validated['event_id'] ?? null,
+            'member_id' => $context['member_id'],
+            'reviewed_by_department_user_id' => null,
+            'title' => $validated['title'],
+            'content' => $validated['content'],
+            'participants' => (int) $validated['participants'],
+            'report_type' => $validated['report_type'],
+            'status' => 'draft',
+            'reviewer_notes' => null,
+            'department_review_note' => null,
+            'submitted_date' => null,
+            'approved_date' => null,
+            'reviewed_at' => null,
+            'attachment' => null,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return back()->with('success', $this->refLabel('flash_message', 'report_draft_created'));
+    }
+
+    public function submit(Request $request, int $id): RedirectResponse
+    {
+        $submission = DB::table('submissions')->where('id', $id)->first();
+        if (!$submission) {
+            return back()->with('error', $this->refLabel('flash_message', 'submission_not_found'));
+        }
+
+        $context = $this->resolvePengurusContext($request);
+        if ($context['organization_id'] && (int) $submission->organization_id !== $context['organization_id']) {
+            return back()->with('error', $this->refLabel('flash_message', 'submission_not_owned'));
+        }
+
+        if (!in_array((string) $submission->status, ['draft', 'revised'], true)) {
+            return back()->with('error', $this->refLabel('flash_message', 'submission_status_invalid_for_submit'));
+        }
+
+        DB::table('submissions')
+            ->where('id', $id)
+            ->update([
+                'status' => 'submitted',
+                'submitted_date' => now()->toDateString(),
+                'department_review_note' => null,
+                'reviewed_at' => null,
+                'updated_at' => now(),
+            ]);
+
+        return back()->with('success', $this->refLabel('flash_message', 'submission_submitted'));
+    }
+
+    public function submitLaporan(Request $request, int $id): RedirectResponse
+    {
+        $report = DB::table('reports')->where('id', $id)->first();
+        if (!$report) {
+            return back()->with('error', $this->refLabel('flash_message', 'report_not_found'));
+        }
+
+        $context = $this->resolvePengurusContext($request);
+        if ($context['organization_id'] && (int) $report->organization_id !== $context['organization_id']) {
+            return back()->with('error', $this->refLabel('flash_message', 'report_not_owned'));
+        }
+
+        if (!in_array((string) $report->status, ['draft', 'revision_needed'], true)) {
+            return back()->with('error', $this->refLabel('flash_message', 'report_status_invalid_for_submit'));
+        }
+
+        DB::table('reports')
+            ->where('id', $id)
+            ->update([
+                'status' => 'submitted',
+                'submitted_date' => now()->toDateString(),
+                'department_review_note' => null,
+                'reviewed_at' => null,
+                'updated_at' => now(),
+            ]);
+
+        return back()->with('success', $this->refLabel('flash_message', 'report_submitted'));
+    }
+
+    public function review(Request $request, int $id): RedirectResponse
+    {
+        $decisionOptions = array_keys($this->getReferenceMap('review_submission_decision_map'));
+
+        $validated = $request->validate([
+            'decision' => 'required|in:' . implode(',', $decisionOptions),
+            'catatan' => 'nullable|string|max:200',
+        ]);
+
+        $decisionConfig = $this->getReferencePayload('review_submission_decision_map', (string) $validated['decision']);
+        if (($decisionConfig['requires_note'] ?? false) && empty(trim((string) ($validated['catatan'] ?? '')))) {
+            return back()->with('error', $this->refLabel('flash_message', 'review_note_required_submission'));
+        }
+
+        $submission = DB::table('submissions')->where('id', $id)->first();
+        if (!$submission) {
+            return back()->with('error', $this->refLabel('flash_message', 'submission_not_found'));
+        }
+
+        if ((string) $submission->status === 'draft') {
+            return back()->with('error', $this->refLabel('flash_message', 'submission_still_draft'));
+        }
+
+        $statusMap = collect($this->getReferenceMap('review_submission_decision_map'))
+            ->mapWithKeys(fn ($entry, $code) => [$code => (string) ($entry['payload']['value'] ?? '')])
+            ->all();
+
+        $nextStatus = $statusMap[$validated['decision']] ?? '';
+        if ($nextStatus === '') {
+            return back()->with('error', $this->refLabel('flash_message', 'submission_review_config_missing'));
+        }
+
+        DB::table('submissions')
+            ->where('id', $id)
+            ->update([
+                'status' => $nextStatus,
+                'department_review_note' => trim((string) ($validated['catatan'] ?? '')) ?: null,
+                'reviewed_by_department_user_id' => $this->resolveSessionUserId($request),
+                'reviewed_at' => now(),
+                'approved_date' => ($decisionConfig['approved'] ?? false) ? now()->toDateString() : null,
+                'updated_at' => now(),
+            ]);
+
+        return back()->with('success', $this->refLabel('flash_message', 'submission_review_saved'));
+    }
+
+    public function reviewLaporan(Request $request, int $id): RedirectResponse
+    {
+        $decisionOptions = array_keys($this->getReferenceMap('review_report_decision_map'));
+
+        $validated = $request->validate([
+            'decision' => 'required|in:' . implode(',', $decisionOptions),
+            'catatan' => 'nullable|string|max:200',
+        ]);
+
+        $decisionConfig = $this->getReferencePayload('review_report_decision_map', (string) $validated['decision']);
+        if (($decisionConfig['requires_note'] ?? false) && empty(trim((string) ($validated['catatan'] ?? '')))) {
+            return back()->with('error', $this->refLabel('flash_message', 'review_note_required_report'));
+        }
+
+        $report = DB::table('reports')->where('id', $id)->first();
+        if (!$report) {
+            return back()->with('error', $this->refLabel('flash_message', 'report_not_found'));
+        }
+
+        if ((string) $report->status === 'draft') {
+            return back()->with('error', $this->refLabel('flash_message', 'report_still_draft'));
+        }
+
+        $statusMap = collect($this->getReferenceMap('review_report_decision_map'))
+            ->mapWithKeys(fn ($entry, $code) => [$code => (string) ($entry['payload']['value'] ?? '')])
+            ->all();
+
+        $nextStatus = $statusMap[$validated['decision']] ?? '';
+        if ($nextStatus === '') {
+            return back()->with('error', $this->refLabel('flash_message', 'report_review_config_missing'));
+        }
+
+        $note = trim((string) ($validated['catatan'] ?? '')) ?: null;
+
+        DB::table('reports')
+            ->where('id', $id)
+            ->update([
+                'status' => $nextStatus,
+                'reviewer_notes' => $note,
+                'department_review_note' => $note,
+                'reviewed_by_department_user_id' => $this->resolveSessionUserId($request),
+                'reviewed_at' => now(),
+                'approved_date' => ($decisionConfig['approved'] ?? false) ? now()->toDateString() : null,
+                'updated_at' => now(),
+            ]);
+
+        return back()->with('success', $this->refLabel('flash_message', 'report_review_saved'));
+    }
+
+    public function storeJadwal(Request $request): RedirectResponse
+    {
+        $validated = $request->validate([
+            'judul' => 'required|string|max:120',
+            'organization_id' => 'required|integer|exists:organizations,id',
+            'tanggal' => 'required|date',
+            'lokasi' => 'required|string|max:120',
+        ]);
+
+        DB::table('kemahasiswaan_schedules')->insert([
+            'organization_id' => (int) $validated['organization_id'],
+            'title' => $validated['judul'],
+            'start_at' => Carbon::parse($validated['tanggal'])->startOfDay(),
+            'end_at' => null,
+            'location' => $validated['lokasi'],
+            'status' => 'planned',
+            'created_by' => $this->resolveSessionUserId($request),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return back()->with('success', $this->refLabel('flash_message', 'schedule_created'));
+    }
+
+    private function buildPengurusShellData(?int $organizationId): array
+    {
+        $notifications = [];
+
+        if (Schema::hasTable('kemahasiswaan_activity_logs')) {
+            $query = DB::table('kemahasiswaan_activity_logs as log')
+                ->select([
+                    'log.action',
+                    'log.description',
+                    'log.created_at',
+                ])
+                ->orderByDesc('log.created_at')
+                ->limit(10);
+
+            if ($organizationId) {
+                $query->where('log.organization_id', $organizationId);
+            }
+
+            $notifications = $query->get()->map(function ($row) {
+                $action = Str::lower((string) $row->action);
+
+                $rules = $this->getReferenceMap('notification_action_rule');
+                $defaultRule = $rules['default']['payload'] ?? [];
+                $icon = (string) ($defaultRule['icon'] ?? '');
+                $tone = (string) ($defaultRule['tone'] ?? '');
+
+                foreach ($rules as $code => $rule) {
+                    if ($code === 'default') {
+                        continue;
+                    }
+
+                    $keywords = $rule['payload']['keywords'] ?? [];
+                    if (!is_array($keywords) || empty($keywords)) {
+                        continue;
+                    }
+
+                    if (Str::contains($action, $keywords)) {
+                        $icon = (string) ($rule['payload']['icon'] ?? $icon);
+                        $tone = (string) ($rule['payload']['tone'] ?? $tone);
+                        break;
+                    }
+                }
+
+                return [
+                    'title' => Str::title(str_replace('_', ' ', (string) $row->action)),
+                    'description' => (string) ($row->description ?: $this->refLabel('ui_text', 'activity_default_description')),
+                    'timestamp' => $row->created_at ? Carbon::parse($row->created_at)->diffForHumans() : '',
+                    'icon' => $icon,
+                    'tone' => $tone,
+                ];
+            })->take(5)->values()->all();
+        }
+
+        if (empty($notifications) && Schema::hasTable('activity_logs')) {
+            $query = DB::table('activity_logs as log')
+                ->select([
+                    'log.activity_type as action',
+                    'log.description',
+                    'log.created_at',
+                ])
+                ->orderByDesc('log.created_at')
+                ->limit(10);
+
+            if ($organizationId) {
+                $query->where('log.organization_id', $organizationId);
+            }
+
+            $notifications = $query->get()->map(function ($row) {
+                $action = (string) $row->action;
+                $defaultRule = $this->getReferencePayload('notification_action_rule', 'default');
+
+                return [
+                    'title' => Str::title(str_replace('_', ' ', $action)),
+                    'description' => (string) ($row->description ?: $this->refLabel('ui_text', 'activity_default_description')),
+                    'timestamp' => $row->created_at ? Carbon::parse($row->created_at)->diffForHumans() : '',
+                    'icon' => (string) ($defaultRule['icon'] ?? ''),
+                    'tone' => (string) ($defaultRule['tone'] ?? ''),
+                ];
+            })->take(5)->values()->all();
+        }
+
+        return [
+            'notifications' => $notifications,
+        ];
+    }
+
+    private function buildPengurusPlaceholderData(?string $organizationName): array
+    {
+        $organization = trim((string) $organizationName);
+        $organizationSuffix = $organization !== '' ? ' untuk ' . $organization : '';
+
+        return [
+            'eventNamePlaceholder' => $organization !== '' ? 'Workshop ' . $organization : 'Workshop AI & Machine Learning',
+            'eventLocationPlaceholder' => 'Aula Gedung A atau Zoom Meeting',
+            'eventDescriptionPlaceholder' => 'Jelaskan tujuan, agenda, dan manfaat event' . $organizationSuffix . '.',
+            'proposalTitlePlaceholder' => $organization !== '' ? 'Proposal ' . $organization : 'Proposal Kegiatan Organisasi',
+            'proposalDescriptionPlaceholder' => 'Jelaskan detail kegiatan yang akan diajukan' . $organizationSuffix . '.',
+            'reportTitlePlaceholder' => $organization !== '' ? 'Laporan ' . $organization : 'Laporan Kegiatan Organisasi',
+            'reportContentPlaceholder' => 'Ceritakan hasil kegiatan, evaluasi, dan dampak program' . $organizationSuffix . '.',
+            'announcementTitlePlaceholder' => $organization !== '' ? 'Pengumuman ' . $organization : 'Pengumuman Organisasi',
+            'announcementDescriptionPlaceholder' => 'Jelaskan isi pengumuman di sini' . $organizationSuffix . '.',
+            'eventNewsTitlePlaceholder' => $organization !== '' ? 'Berita ' . $organization : 'Berita Event Organisasi',
+            'eventNewsDescriptionPlaceholder' => 'Ceritakan bagaimana event berlangsung dan apa highlight-nya' . $organizationSuffix . '.',
+            'eventNewsHighlightPlaceholder' => 'Sorot momen utama, capaian, atau hasil paling penting.',
+        ];
+    }
+
+    private function getDashboardActivities(?int $organizationId, Carbon $start, Carbon $end): array
+    {
+        $activities = [];
+
+        if (Schema::hasTable('events')) {
+            $query = DB::table('events as evt')
+                ->leftJoin('organizations as org', 'org.id', '=', 'evt.organization_id')
+                ->select([
+                    'evt.name',
+                    'evt.start_date',
+                    'evt.end_date',
+                    'evt.status',
+                    'org.name as organizer',
+                ])
+                ->whereDate('evt.start_date', '<=', $end->toDateString())
+                ->whereDate('evt.end_date', '>=', $start->toDateString())
+                ->orderBy('evt.start_date')
+                ->limit(300);
+
+            if ($organizationId) {
+                $query->where('evt.organization_id', $organizationId);
+            }
+
+            $eventActivities = $query->get()->map(function ($row) {
+                $status = Str::lower((string) $row->status);
+
+                $category = trim($this->refLabel('event_status_category_map', $status));
+                if ($category === '') {
+                    $category = trim($this->refLabel('event_status_category_map', 'default'));
+                }
+
+                return [
+                    'name' => (string) $row->name,
+                    'category' => $category,
+                    'emoji' => $this->dashboardEmojiForCategory($category),
+                    'start' => Carbon::parse($row->start_date)->toDateString(),
+                    'end' => Carbon::parse($row->end_date ?: $row->start_date)->toDateString(),
+                    'organizer' => (string) ($row->organizer ?? ''),
+                ];
+            })->all();
+
+            $activities = array_merge($activities, $eventActivities);
+        }
+
+        if (Schema::hasTable('kemahasiswaan_schedules')) {
+            $query = DB::table('kemahasiswaan_schedules as sch')
+                ->leftJoin('organizations as org', 'org.id', '=', 'sch.organization_id')
+                ->select([
+                    'sch.title',
+                    'sch.start_at',
+                    'sch.end_at',
+                    'sch.status',
+                    'org.name as organizer',
+                ])
+                ->whereDate('sch.start_at', '<=', $end->toDateString())
+                ->whereDate(DB::raw('COALESCE(sch.end_at, sch.start_at)'), '>=', $start->toDateString())
+                ->orderBy('sch.start_at')
+                ->limit(300);
+
+            if ($organizationId) {
+                $query->where('sch.organization_id', $organizationId);
+            }
+
+            $scheduleActivities = $query->get()->map(function ($row) {
+                $status = Str::lower((string) $row->status);
+
+                $category = trim($this->refLabel('schedule_status_category_map', $status));
+                if ($category === '') {
+                    $category = trim($this->refLabel('schedule_status_category_map', 'default'));
+                }
+
+                return [
+                    'name' => (string) $row->title,
+                    'category' => $category,
+                    'emoji' => $this->dashboardEmojiForCategory($category),
+                    'start' => Carbon::parse($row->start_at)->toDateString(),
+                    'end' => Carbon::parse($row->end_at ?: $row->start_at)->toDateString(),
+                    'organizer' => (string) ($row->organizer ?? ''),
+                ];
+            })->all();
+
+            $activities = array_merge($activities, $scheduleActivities);
+        }
+
+        usort($activities, function ($left, $right) {
+            return strcmp((string) ($left['start'] ?? ''), (string) ($right['start'] ?? ''));
+        });
+
+        return $activities;
+    }
+
+    private function dashboardEmojiForCategory(string $category): string
+    {
+        $legend = $this->getReferencePayload('dashboard_legend', $category);
+        $emoji = trim((string) ($legend['emoji'] ?? ''));
+
+        if ($emoji !== '') {
+            return $emoji;
+        }
+
+        $fallback = $this->getReferencePayload('dashboard_setting', 'default_event');
+
+        return trim((string) ($fallback['emoji'] ?? ''));
+    }
+
+    private function buildDashboardSummaryCards(array $activities, ?int $organizationId): array
+    {
+        $collection = collect($activities);
+        $currentMonth = now()->format('Y-m');
+
+        $totalEvents = count($activities);
+        if (Schema::hasTable('events')) {
+            $eventQuery = DB::table('events');
+            if ($organizationId) {
+                $eventQuery->where('organization_id', $organizationId);
+            }
+
+            $totalEvents = (int) $eventQuery->count();
+        }
+
+        return [
+            [
+                'label' => $this->refLabel('dashboard_summary_label', 'academic'),
+                'value' => $collection->where('category', 'acad')->count(),
+                'tone' => 'blue',
+            ],
+            [
+                'label' => $this->refLabel('dashboard_summary_label', 'organization'),
+                'value' => $collection->where('category', 'org')->count(),
+                'tone' => 'green',
+            ],
+            [
+                'label' => $this->refLabel('dashboard_summary_label', 'month'),
+                'value' => $collection->filter(function ($item) use ($currentMonth) {
+                    return str_starts_with((string) ($item['start'] ?? ''), $currentMonth)
+                        || str_starts_with((string) ($item['end'] ?? ''), $currentMonth);
+                })->count(),
+                'tone' => 'purple',
+            ],
+            [
+                'label' => $this->refLabel('dashboard_summary_label', 'total'),
+                'value' => $totalEvents,
+                'tone' => 'orange',
+            ],
+        ];
+    }
+
+    private function buildDashboardLegend(array $activities): array
+    {
+        $legendMap = $this->getReferenceMap('dashboard_legend');
+
+        $categories = collect($activities)
+            ->pluck('category')
+            ->filter()
+            ->unique()
+            ->values()
+            ->all();
+
+        if (empty($categories)) {
+            $defaultCategory = trim($this->refLabel('dashboard_setting', 'default_category'));
+            $categories = $defaultCategory !== '' ? [$defaultCategory] : [];
+        }
+
+        return collect($categories)
+            ->map(function ($category) use ($legendMap) {
+                $entry = $legendMap[$category] ?? null;
+
+                if (is_array($entry)) {
+                    return [
+                        'emoji' => (string) ($entry['payload']['emoji'] ?? ''),
+                        'label' => (string) ($entry['label'] ?? ''),
+                    ];
+                }
+
+                $fallback = $this->getReferencePayload('dashboard_setting', 'default_event');
+
+                return [
+                    'emoji' => (string) ($fallback['emoji'] ?? ''),
+                    'label' => Str::title((string) $category),
+                ];
+            })
+            ->values()
+            ->all();
+    }
+
+    private function buildCalendarDays(array $activities, Carbon $month, Carbon $start, Carbon $end, Carbon $today): array
+    {
+        $calendarDays = [];
+
+        for ($cursor = $start->copy(); $cursor->lte($end); $cursor->addDay()) {
+            $matches = [];
+
+            foreach ($activities as $activity) {
+                $activityStart = Carbon::parse((string) $activity['start']);
+                $activityEnd = Carbon::parse((string) ($activity['end'] ?: $activity['start']));
+
+                if ($cursor->greaterThanOrEqualTo($activityStart) && $cursor->lessThanOrEqualTo($activityEnd)) {
+                    $defaultCategory = trim($this->refLabel('dashboard_setting', 'default_category'));
+                    $defaultEvent = $this->getReferencePayload('dashboard_setting', 'default_event');
+
+                    $matches[] = [
+                        'name' => (string) $activity['name'],
+                        'badge' => (string) ($activity['category'] ?? $defaultCategory),
+                        'emoji' => (string) ($activity['emoji'] ?? ($defaultEvent['emoji'] ?? '')),
+                    ];
+                }
+            }
+
+            $calendarDays[] = [
+                'day' => $cursor->day,
+                'muted' => !$cursor->isSameMonth($month),
+                'is_today' => $cursor->isSameDay($today),
+                'events' => array_slice($matches, 0, 3),
+                'overflow' => max(count($matches) - 3, 0),
+            ];
+        }
+
+        return $calendarDays;
+    }
+
+    private function getPendingTasks(?int $organizationId): array
+    {
+        if (!Schema::hasTable('tasks')) {
+            return [];
+        }
+
+        $query = DB::table('tasks')
+            ->whereIn('status', ['pending', 'overdue'])
+            ->orderByRaw("CASE priority WHEN 'urgent' THEN 1 WHEN 'normal' THEN 2 ELSE 3 END")
+            ->orderBy('deadline')
+            ->limit(8);
+
+        if ($organizationId) {
+            $query->where('organization_id', $organizationId);
+        }
+
+        return $query->get()->map(function ($row) {
+            $deadline = $row->deadline ? Carbon::parse($row->deadline) : null;
+
+            if (!$deadline) {
+                $deadlineLabel = $this->refLabel('ui_text', 'task_deadline_none');
+            } elseif ($deadline->isPast()) {
+                $deadlineLabel = $this->refLabel('ui_text', 'task_deadline_overdue_prefix') . $deadline->diffForHumans();
+            } else {
+                $deadlineLabel = $deadline->diffForHumans();
+            }
+
+            return [
+                'task' => (string) ($row->title ?? ''),
+                'priority' => in_array($row->priority, ['urgent', 'normal', 'low'], true) ? (string) $row->priority : 'normal',
+                'deadline' => $deadlineLabel,
+            ];
+        })->values()->all();
+    }
+
+    private function mapEventStatusToPortal(string $status, ?Carbon $startDate, ?Carbon $endDate): array
+    {
+        $normalized = Str::lower($status);
+
+        if ($normalized === 'cancelled') {
+            return $this->refStatusPair('event_status_map', 'cancelled');
+        }
+
+        if ($normalized === 'completed') {
+            return $this->refStatusPair('event_status_map', 'completed');
+        }
+
+        if ($normalized === 'draft') {
+            return $this->refStatusPair('event_status_map', 'draft');
+        }
+
+        if ($startDate && $startDate->isFuture()) {
+            return $this->refStatusPair('event_status_map', 'future');
+        }
+
+        if ($startDate && $endDate && $startDate->lte(now()) && $endDate->gte(now())) {
+            return $this->refStatusPair('event_status_map', 'ongoing');
+        }
+
+        return $this->refStatusPair('event_status_map', 'default');
+    }
+
+    private function mapAnnouncementStatus(string $status): array
+    {
+        return match (Str::lower($status)) {
+            'published' => $this->refStatusPair('announcement_status_map', 'published'),
+            'scheduled' => $this->refStatusPair('announcement_status_map', 'scheduled'),
+            'archived' => $this->refStatusPair('announcement_status_map', 'archived'),
+            default => $this->refStatusPair('announcement_status_map', 'default'),
+        };
+    }
+
+    private function mapLostFoundModerationStatus(string $status): array
+    {
+        return match (Str::lower($status)) {
+            'active' => $this->refStatusPair('lostfound_moderation_map', 'active'),
+            'claimed' => $this->refStatusPair('lostfound_moderation_map', 'claimed'),
+            'closed' => $this->refStatusPair('lostfound_moderation_map', 'closed'),
+            default => $this->refStatusPair('lostfound_moderation_map', 'default'),
+        };
+    }
+
+    private function inferOrganizationCategory(?object $organization): string
+    {
+        if (!$organization) {
+            return '';
+        }
+
+        $shortname = trim((string) ($organization->shortname ?? ''));
+        if ($shortname !== '') {
+            return $shortname;
+        }
+
+        return trim((string) ($organization->name ?? ''));
+    }
+
+    private function missionToValues(?string $mission): array
+    {
+        $text = trim((string) $mission);
+        if ($text === '') {
+            return [];
+        }
+
+        $parts = preg_split('/\r\n|\r|\n|\./', $text) ?: [];
+        $parts = collect($parts)
+            ->map(fn ($part) => trim((string) $part))
+            ->filter()
+            ->take(6)
+            ->values();
+
+        return $parts->map(function ($part, $index) {
+            return [
+                'name' => Str::limit($part, 48, ''),
+                'desc' => $part,
+            ];
+        })->all();
+    }
+
+    private function formatWhatsappLink(string $phone): string
+    {
+        $digits = preg_replace('/[^0-9]/', '', $phone) ?: '';
+        if ($digits === '') {
+            return '';
+        }
+
+        if (str_starts_with($digits, '0')) {
+            $digits = '62' . substr($digits, 1);
+        }
+
+        return 'https://wa.me/' . $digits;
+    }
+
+    private function getPengajuan(?int $organizationId = null): array
+    {
+        $query = DB::table('submissions as sub')
+            ->leftJoin('organizations as org', 'org.id', '=', 'sub.organization_id')
+            ->select([
+                'sub.id',
+                'sub.title',
+                'sub.status',
+                'sub.submitted_date',
+                'sub.created_at',
+                'sub.department_review_note',
+                'sub.feedback',
+                'org.name as organization_name',
+            ])
+            ->orderByDesc('sub.id');
+
+        if ($organizationId) {
+            $query->where('sub.organization_id', $organizationId);
+        }
+
+        $rows = $query->get();
+
+        return $rows->map(function ($row) {
+            return [
+                'id' => (int) $row->id,
+                'judul' => $row->title,
+                'organisasi' => (string) ($row->organization_name ?? ''),
+                'tanggal_kegiatan' => $this->normalizeDateField($row->submitted_date, $row->created_at),
+                'status' => $this->mapSubmissionStatus((string) $row->status),
+                'catatan_departemen' => $row->department_review_note ?: $row->feedback,
+            ];
+        })->all();
+    }
+
+    private function getLaporan(?int $organizationId = null): array
+    {
+        $query = DB::table('reports as rep')
+            ->leftJoin('organizations as org', 'org.id', '=', 'rep.organization_id')
+            ->select([
+                'rep.id',
+                'rep.title',
+                'rep.status',
+                'rep.submitted_date',
+                'rep.created_at',
+                'rep.department_review_note',
+                'rep.reviewer_notes',
+                'org.name as organization_name',
+            ])
+            ->orderByDesc('rep.id');
+
+        if ($organizationId) {
+            $query->where('rep.organization_id', $organizationId);
+        }
+
+        $rows = $query->get();
+
+        return $rows->map(function ($row) {
+            return [
+                'id' => (int) $row->id,
+                'judul' => $row->title,
+                'organisasi' => (string) ($row->organization_name ?? ''),
+                'tanggal_laporan' => $this->normalizeDateField($row->submitted_date, $row->created_at),
+                'status' => $this->mapReportStatus((string) $row->status),
+                'catatan_departemen' => $row->department_review_note ?: $row->reviewer_notes,
+            ];
+        })->all();
+    }
+
+    private function getJadwal(): array
+    {
+        $rows = DB::table('kemahasiswaan_schedules as jadwal')
+            ->leftJoin('organizations as org', 'org.id', '=', 'jadwal.organization_id')
+            ->select([
+                'jadwal.id',
+                'jadwal.title',
+                'jadwal.start_at',
+                'jadwal.location',
+                'org.name as organization_name',
+            ])
+            ->orderBy('jadwal.start_at')
+            ->get();
+
+        return $rows->map(function ($row) {
+            return [
+                'id' => (int) $row->id,
+                'judul' => $row->title,
+                'organisasi' => (string) ($row->organization_name ?? ''),
+                'tanggal' => $this->normalizeDateField($row->start_at, $row->start_at),
+                'lokasi' => $row->location,
+            ];
+        })->all();
+    }
+
+    private function getKontakPengurus(): array
+    {
+        $rows = DB::table('members as mem')
+            ->leftJoin('organizations as org', 'org.id', '=', 'mem.organization_id')
+            ->select([
+                'mem.name',
+                'mem.email',
+                'mem.phone',
+                'mem.position',
+                'org.name as organization_name',
+            ])
+            ->where('mem.status', 'aktif')
+            ->orderBy('org.name')
+            ->orderBy('mem.name')
+            ->limit(200)
+            ->get();
+
+        return $rows->map(function ($row) {
+            return [
+                'nama' => $row->name,
+                'organisasi' => (string) ($row->organization_name ?? ''),
+                'jabatan' => Str::title((string) $row->position),
+                'kontak' => (string) ($row->phone ?? ''),
+                'email' => (string) ($row->email ?? ''),
+            ];
+        })->all();
+    }
+
+    private function getEventOptions(int $organizationId): array
+    {
+        return DB::table('events')
+            ->select(['id', 'name'])
+            ->where('organization_id', $organizationId)
+            ->orderByDesc('id')
+            ->limit(200)
+            ->get()
+            ->map(fn ($row) => [
+                'id' => (int) $row->id,
+                'name' => $row->name,
+            ])
+            ->all();
+    }
+
+    private function getOrganizations(): array
+    {
+        return DB::table('organizations')
+            ->select(['id', 'name'])
+            ->orderBy('name')
+            ->get()
+            ->map(fn ($row) => [
+                'id' => (int) $row->id,
+                'name' => $row->name,
+            ])
+            ->all();
+    }
+
+    private function countKemahasiswaanPendingNotifications(array $workflowPengajuan, array $workflowLaporan): int
+    {
+        $pendingSubmissionCodes = array_keys($this->getReferenceMap('pending_submission_status'));
+        $pendingSubmissionStatuses = collect($pendingSubmissionCodes)
+            ->map(fn ($code) => $this->mapSubmissionStatus((string) $code))
+            ->filter(fn ($value) => $value !== '')
+            ->values()
+            ->all();
+
+        $pendingReportCodes = array_keys($this->getReferenceMap('pending_report_status'));
+        $pendingReportStatuses = collect($pendingReportCodes)
+            ->map(fn ($code) => $this->mapReportStatus((string) $code))
+            ->filter(fn ($value) => $value !== '')
+            ->values()
+            ->all();
+
+        if (empty($pendingReportStatuses)) {
+            $pendingReportStatuses = $pendingSubmissionStatuses;
+        }
+
+        $count = collect($workflowPengajuan)
+            ->whereIn('status', $pendingSubmissionStatuses)
+            ->count();
+
+        $count += collect($workflowLaporan)
+            ->whereIn('status', $pendingReportStatuses)
+            ->count();
+
+        if (Schema::hasTable('kemahasiswaan_announcements')) {
+            $pendingEmailReviewStatuses = array_keys($this->getReferenceMap('pending_email_review_status'));
+
+            $count += (int) DB::table('kemahasiswaan_announcements')
+                ->whereIn('email_review_status', $pendingEmailReviewStatuses)
+                ->count();
+        }
+
+        return $count;
+    }
+
+    private function mapSubmissionStatus(string $status): string
+    {
+        $label = $this->refLabel('submission_status_map', $status);
+
+        return $label !== '' ? $label : Str::title(str_replace('_', ' ', $status));
+    }
+
+    private function mapReportStatus(string $status): string
+    {
+        $label = $this->refLabel('report_status_map', $status);
+
+        return $label !== '' ? $label : Str::title(str_replace('_', ' ', $status));
+    }
+
+    private function refStatusPair(string $domain, string $code, string $fallbackLabel = '', string $fallbackValue = ''): array
+    {
+        $label = $this->refLabel($domain, $code);
+        $payload = $this->getReferencePayload($domain, $code);
+        $value = trim((string) ($payload['value'] ?? ''));
+
+        return [
+            $label !== '' ? $label : $fallbackLabel,
+            $value !== '' ? $value : $fallbackValue,
+        ];
+    }
+
+    private function refLabel(string $domain, string $code): string
+    {
+        $map = $this->getReferenceMap($domain);
+
+        return (string) (($map[$code]['label'] ?? ''));
+    }
+
+    private function getReferencePayload(string $domain, string $code): array
+    {
+        $map = $this->getReferenceMap($domain);
+        $payload = $map[$code]['payload'] ?? [];
+
+        return is_array($payload) ? $payload : [];
+    }
+
+    private function getReferenceMap(string $domain): array
+    {
+        if (array_key_exists($domain, $this->referenceCache)) {
+            return $this->referenceCache[$domain];
+        }
+
+        if (!Schema::hasTable('workflow_reference_values')) {
+            $this->referenceCache[$domain] = [];
+            return [];
+        }
+
+        $rows = DB::table('workflow_reference_values')
+            ->select(['code', 'label', 'payload'])
+            ->where('domain', $domain)
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get();
+
+        $map = [];
+        foreach ($rows as $row) {
+            $payload = [];
+            if (!empty($row->payload)) {
+                $decoded = json_decode((string) $row->payload, true);
+                if (is_array($decoded)) {
+                    $payload = $decoded;
+                }
+            }
+
+            $map[(string) $row->code] = [
+                'label' => (string) ($row->label ?? ''),
+                'payload' => $payload,
+            ];
+        }
+
+        $this->referenceCache[$domain] = $map;
+
+        return $map;
+    }
+
+    private function normalizeDateField(mixed $primary, mixed $fallback): string
+    {
+        $value = $primary ?: $fallback;
+
+        if (!$value) {
+            return now()->toDateString();
+        }
+
+        return Carbon::parse((string) $value)->toDateString();
+    }
+
+    private function resolveSessionUserId(Request $request): ?int
+    {
+        $email = (string) data_get($request->session()->get('user'), 'email', '');
+        if ($email === '') {
+            return null;
+        }
+
+        $user = DB::table('users')->select('id')->where('email', $email)->first();
+
+        return $user ? (int) $user->id : null;
+    }
+
+    private function resolvePengurusContext(Request $request): array
+    {
+        $email = (string) data_get($request->session()->get('user'), 'email', '');
+
+        $organizationId = null;
+        $memberId = null;
+
+        if ($email !== '') {
+            $user = DB::table('users')
+                ->select(['id', 'organization_id'])
+                ->where('email', $email)
+                ->first();
+
+            if ($user && $user->organization_id) {
+                $organizationId = (int) $user->organization_id;
+            }
+
+            if (!$organizationId) {
+                $ukmAccount = DB::table('kemahasiswaan_ukm_accounts')
+                    ->select(['organization_id'])
+                    ->where('email', $email)
+                    ->first();
+
+                if ($ukmAccount && $ukmAccount->organization_id) {
+                    $organizationId = (int) $ukmAccount->organization_id;
+                }
+            }
+        }
+
+        $organizationName = null;
+        if ($organizationId) {
+            $organization = DB::table('organizations')->select(['id', 'name'])->where('id', $organizationId)->first();
+            $organizationName = $organization->name ?? null;
+
+            if ($email !== '') {
+                $member = DB::table('members')
+                    ->select('id')
+                    ->where('organization_id', $organizationId)
+                    ->where('email', $email)
+                    ->first();
+
+                if ($member) {
+                    $memberId = (int) $member->id;
+                }
+            }
+
+            if (!$memberId) {
+                $fallbackMember = DB::table('members')
+                    ->select('id')
+                    ->where('organization_id', $organizationId)
+                    ->where('status', 'aktif')
+                    ->orderByRaw("CASE WHEN position = 'ketua' THEN 0 ELSE 1 END")
+                    ->orderBy('id')
+                    ->first();
+
+                if ($fallbackMember) {
+                    $memberId = (int) $fallbackMember->id;
+                }
+            }
+        }
+
+        return [
+            'organization_id' => $organizationId,
+            'organization_name' => $organizationName,
+            'member_id' => $memberId,
+        ];
+    }
+}

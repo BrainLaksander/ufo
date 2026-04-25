@@ -1,183 +1,134 @@
-@extends('layouts.pengurus')
+@extends('layouts.portal.pengurus')
 
-@section('title', 'Pengumuman')
+@section('title', 'Pengumuman Organisasi')
+
+@php
+    $activeAnnouncements = $activeAnnouncements ?? [];
+    $allAnnouncements = $allAnnouncements ?? [];
+    $eventOptions = $eventOptions ?? [];
+@endphp
 
 @section('content')
-<!-- Page Header -->
-<div class="page-header">
-    <h1>Pengumuman</h1>
-    <p>Kelola dan publikasikan pengumuman untuk semua anggota</p>
-</div>
-
-<!-- Page Actions -->
-<div class="row mb-4">
-    <div class="col-12">
-        <button class="btn btn-primary-custom" data-bs-toggle="modal" data-bs-target="#announcementModal">
-            <i class="bi bi-plus-circle-fill"></i> Buat Pengumuman Baru
-        </button>
-    </div>
-</div>
-
-<!-- Filter and Search -->
-<div class="row mb-4">
-    <div class="col-md-6">
-        <input type="text" class="form-control" placeholder="Cari pengumuman...">
-    </div>
-    <div class="col-md-6">
-        <select class="form-select">
-            <option>Semua Status</option>
-            <option>Dipublikasikan</option>
-            <option>Draft</option>
-        </select>
-    </div>
-</div>
-
-<!-- Announcements List -->
-<div class="row">
-    <div class="col-lg-8 mb-4">
-        <div class="card card-dashboard">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                        <h5 class="card-title">Jadwal Rapat Rutin Bulan Maret</h5>
-                        <small class="text-muted">
-                            <i class="bi bi-calendar-date-fill"></i> Dipublikasikan 28 Feb 2026
-                        </small>
-                    </div>
-                    <span class="badge bg-success">Dipublikasikan</span>
-                </div>
-                <p class="text-muted mb-3">Informasi jadwal rapat rutin semua anggota pengurus UFO untuk bulan Maret. Rapat akan membahas program kerja tahunan dan evaluasi kegiatan bulan Februari.</p>
-                <small class="text-muted"><i class="bi bi-tag-fill"></i> Kategori: Jadwal</small>
-                <div class="mt-3">
-                    <button class="btn btn-sm btn-info me-2"><i class="bi bi-eye-fill"></i> Lihat</button>
-                    <button class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</button>
-                    <button class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i> Hapus</button>
-                </div>
+<div class="ufo-kboard-page">
+    <section class="ufo-kboard-section">
+        <div class="ufo-kboard-item-head">
+            <div>
+                <h1 class="ufo-kboard-heading">Pengumuman Organisasi</h1>
+                <p class="ufo-kboard-lead">Kelola pengumuman event organisasi Anda dengan mudah.</p>
             </div>
+
+            <button class="ufo-kboard-btn primary" data-bs-toggle="collapse" data-bs-target="#announcementCreateForm" type="button">
+                <i class="bi bi-plus-lg"></i>
+                Buat Pengumuman
+            </button>
         </div>
-    </div>
+    </section>
 
-    <div class="col-lg-8 mb-4">
-        <div class="card card-dashboard">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                        <h5 class="card-title">Pembukaan Pendaftaran Anggota Baru 2026</h5>
-                        <small class="text-muted">
-                            <i class="bi bi-calendar-date-fill"></i> Dipublikasikan 25 Feb 2026
-                        </small>
-                    </div>
-                    <span class="badge bg-success">Dipublikasikan</span>
-                </div>
-                <p class="text-muted mb-3">Pendaftaran anggota baru UFO telah resmi dibuka! Jika Anda tertarik bergabung dengan organisasi kami, silakan daftar melalui portal ini sebelum 10 Maret 2026.</p>
-                <small class="text-muted"><i class="bi bi-tag-fill"></i> Kategori: Pendaftaran</small>
-                <div class="mt-3">
-                    <button class="btn btn-sm btn-info me-2"><i class="bi bi-eye-fill"></i> Lihat</button>
-                    <button class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</button>
-                    <button class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i> Hapus</button>
-                </div>
-            </div>
+    <section class="ufo-kboard-section collapse" id="announcementCreateForm">
+        <h3 class="ufo-kboard-item-title mb-3">Buat Pengumuman Baru</h3>
+
+        <div class="ufo-kboard-row two">
+            <label class="ufo-kboard-span-full">
+                <span class="ufo-kboard-item-meta">Judul Pengumuman</span>
+                <input type="text" class="ufo-kboard-field" placeholder="{{ $announcementTitlePlaceholder ?? 'Pengumuman Organisasi' }}">
+            </label>
+
+            <label class="ufo-kboard-span-full">
+                <span class="ufo-kboard-item-meta">Deskripsi</span>
+                <textarea class="ufo-kboard-textarea" placeholder="{{ $announcementDescriptionPlaceholder ?? 'Jelaskan isi pengumuman di sini.' }}"></textarea>
+            </label>
+
+            <label>
+                <span class="ufo-kboard-item-meta">Tanggal Mulai</span>
+                <input type="date" class="ufo-kboard-field">
+            </label>
+
+            <label>
+                <span class="ufo-kboard-item-meta">Tanggal Berakhir</span>
+                <input type="date" class="ufo-kboard-field">
+            </label>
+
+            <label class="ufo-kboard-span-full">
+                <span class="ufo-kboard-item-meta">Pilih Event</span>
+                <select class="ufo-kboard-select">
+                    @forelse($eventOptions as $event)
+                        <option value="{{ $event['id'] }}">{{ $event['name'] }}</option>
+                    @empty
+                        <option>Tidak ada event tersedia</option>
+                    @endforelse
+                </select>
+            </label>
         </div>
-    </div>
 
-    <div class="col-lg-8 mb-4">
-        <div class="card card-dashboard">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                        <h5 class="card-title">Workshop Python for Beginners - Minggu Depan</h5>
-                        <small class="text-muted">
-                            <i class="bi bi-calendar-date-fill"></i> Dipublikasikan 23 Feb 2026
-                        </small>
-                    </div>
-                    <span class="badge bg-success">Dipublikasikan</span>
-                </div>
-                <p class="text-muted mb-3">Reminder: Workshop Python for Beginners akan dilaksanakan minggu depan. Jangan lupa untuk mendaftar dan hadir tepat waktu. Tempat terbatas hanya 100 peserta.</p>
-                <small class="text-muted"><i class="bi bi-tag-fill"></i> Kategori: Event</small>
-                <div class="mt-3">
-                    <button class="btn btn-sm btn-info me-2"><i class="bi bi-eye-fill"></i> Lihat</button>
-                    <button class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</button>
-                    <button class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i> Hapus</button>
-                </div>
-            </div>
+        <div class="ufo-kboard-item-actions mt-3">
+            <button class="ufo-kboard-btn primary" type="button">Publikasikan</button>
+            <button class="ufo-kboard-btn ghost" type="button" data-bs-toggle="collapse" data-bs-target="#announcementCreateForm">Batal</button>
         </div>
-    </div>
+    </section>
 
-    <div class="col-lg-8 mb-4">
-        <div class="card card-dashboard">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                        <h5 class="card-title">Draft: Pengumuman Rapat Darurat</h5>
-                        <small class="text-muted">
-                            <i class="bi bi-calendar-date-fill"></i> Dibuat 20 Feb 2026
-                        </small>
-                    </div>
-                    <span class="badge bg-warning text-dark">Draft</span>
-                </div>
-                <p class="text-muted mb-3">Pengumuman tentang rapat darurat untuk membahas situasi khusus. Masih dalam tahap draft dan belum dipublikasikan.</p>
-                <small class="text-muted"><i class="bi bi-tag-fill"></i> Kategori: Pengumuman</small>
-                <div class="mt-3">
-                    <button class="btn btn-sm btn-info me-2"><i class="bi bi-eye-fill"></i> Lihat</button>
-                    <button class="btn btn-sm btn-warning"><i class="bi bi-pencil-square"></i> Edit</button>
-                    <button class="btn btn-sm btn-danger"><i class="bi bi-trash-fill"></i> Hapus</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+    <section class="ufo-kboard-section">
+        <ul class="nav nav-pills mb-3" id="announcementTabs" role="tablist">
+            <li class="nav-item" role="presentation">
+                <button class="nav-link active" id="announcement-active-tab" data-bs-toggle="pill" data-bs-target="#announcement-active-pane" type="button" role="tab" aria-controls="announcement-active-pane" aria-selected="true">
+                    Pengumuman Aktif ({{ count($activeAnnouncements) }})
+                </button>
+            </li>
+            <li class="nav-item" role="presentation">
+                <button class="nav-link" id="announcement-all-tab" data-bs-toggle="pill" data-bs-target="#announcement-all-pane" type="button" role="tab" aria-controls="announcement-all-pane" aria-selected="false">
+                    Semua Pengumuman ({{ count($allAnnouncements) }})
+                </button>
+            </li>
+        </ul>
 
-<!-- Announcement Modal -->
-<div class="modal fade" id="announcementModal" tabindex="-1">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Buat Pengumuman Baru</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-            </div>
-            <div class="modal-body">
-                <form>
-                    <div class="mb-3">
-                        <label class="form-label">Judul Pengumuman</label>
-                        <input type="text" class="form-control" placeholder="Judul pengumuman">
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Kategori</label>
-                        <select class="form-select">
-                            <option>Pilih kategori</option>
-                            <option>Pengumuman</option>
-                            <option>Jadwal</option>
-                            <option>Pendaftaran</option>
-                            <option>Event</option>
-                            <option>Update</option>
-                            <option>Lainnya</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Isi Pengumuman</label>
-                        <textarea class="form-control" rows="6" placeholder="Tulis isi pengumuman..."></textarea>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Status Publikasi</label>
-                        <div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="status" value="draft" id="draft" checked>
-                                <label class="form-check-label" for="draft">Draft (Belum dipublikasikan)</label>
+        <div class="tab-content" id="announcementTabsContent">
+            <div class="tab-pane fade show active" id="announcement-active-pane" role="tabpanel" aria-labelledby="announcement-active-tab" tabindex="0">
+                <div class="ufo-kboard-list">
+                    @foreach($activeAnnouncements as $item)
+                        <article class="ufo-kboard-item">
+                            <div class="ufo-kboard-item-head">
+                                <div>
+                                    <h3 class="ufo-kboard-item-title">{{ $item['title'] }}</h3>
+                                    <p class="ufo-kboard-item-meta">{{ $item['start_date'] }} - {{ $item['end_date'] }}</p>
+                                </div>
+                                <span class="ufo-kboard-pill {{ $item['pill'] }}">{{ $item['status'] }}</span>
                             </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="radio" name="status" value="published" id="published">
-                                <label class="form-check-label" for="published">Publikasikan sekarang</label>
+
+                            <p class="ufo-kboard-item-text">{{ $item['description'] }}</p>
+
+                            <div class="ufo-kboard-item-actions">
+                                <button class="ufo-kboard-btn primary" type="button">Edit</button>
+                                <button class="ufo-kboard-btn ghost" type="button">Lihat</button>
                             </div>
-                        </div>
-                    </div>
-                </form>
+                        </article>
+                    @endforeach
+                </div>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-primary-custom">Simpan Pengumuman</button>
+
+            <div class="tab-pane fade" id="announcement-all-pane" role="tabpanel" aria-labelledby="announcement-all-tab" tabindex="0">
+                <div class="ufo-kboard-list">
+                    @foreach($allAnnouncements as $item)
+                        <article class="ufo-kboard-item">
+                            <div class="ufo-kboard-item-head">
+                                <div>
+                                    <h3 class="ufo-kboard-item-title">{{ $item['title'] }}</h3>
+                                    <p class="ufo-kboard-item-meta">{{ $item['start_date'] }} - {{ $item['end_date'] }}</p>
+                                </div>
+                                <span class="ufo-kboard-pill {{ $item['pill'] }}">{{ $item['status'] }}</span>
+                            </div>
+
+                            <p class="ufo-kboard-item-text">{{ $item['description'] }}</p>
+
+                            <div class="ufo-kboard-item-actions">
+                                <button class="ufo-kboard-btn ghost" type="button">Lihat</button>
+                                @if($item['status'] === 'Aktif')
+                                    <button class="ufo-kboard-btn primary" type="button">Edit</button>
+                                @endif
+                            </div>
+                        </article>
+                    @endforeach
+                </div>
             </div>
         </div>
-    </div>
+    </section>
 </div>
-
 @endsection
