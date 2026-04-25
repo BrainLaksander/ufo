@@ -1,0 +1,18 @@
+.ufo-badge-accent {
+    background-color: var(--ufo-color-accent);
+    color: var(--ufo-color-foreground);
+}
+
+.ufo-card-accent-left {
+    border-left-color: var(--ufo-color-primary) !important;
+}
+
+.ufo-empty-icon {
+    font-size: 3rem;
+    color: rgba(var(--ufo-primary-rgb), 0.35);
+}
+
+.ufo-modal-header-primary {
+    background: var(--ufo-color-primary);
+    color: #ffffff;
+}

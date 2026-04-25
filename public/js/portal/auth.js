@@ -8,7 +8,7 @@
             var role = this.getAttribute("data-role");
             if (role) {
                 localStorage.setItem("portal_role", role);
-                window.location.href = "/portal/" + role;
+                window.location.href = "/" + role;
             }
         });
     });

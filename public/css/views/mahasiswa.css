@@ -1,0 +1,64 @@
+body.figma-ufo-body {
+    --figma-primary: var(--ufo-color-primary);
+    --figma-primary-strong: var(--ufo-color-primary-strong);
+    --figma-accent: var(--ufo-color-accent);
+    --figma-bg: var(--ufo-color-bg);
+    --figma-surface: var(--ufo-color-surface);
+    --figma-border: var(--ufo-color-border);
+    --figma-text: var(--ufo-color-foreground);
+    --figma-text-soft: var(--ufo-color-muted);
+    --primary: var(--ufo-color-primary);
+    --primary-strong: var(--ufo-color-primary-strong);
+    --accent: var(--ufo-color-accent);
+    --bg-light: var(--ufo-color-bg);
+    --text-primary: var(--ufo-color-foreground);
+    --text-secondary: var(--ufo-color-muted);
+    --border-color: var(--ufo-color-border);
+    background: var(--ufo-color-bg);
+    color: var(--ufo-color-foreground);
+}
+
+body.figma-ufo-body .figma-ufo-header,
+body.figma-ufo-body .mahasiswa-header {
+    background: linear-gradient(135deg, var(--ufo-color-primary) 0%, var(--ufo-color-primary-strong) 100%);
+}
+
+body.figma-ufo-body .burger-mahasiswa {
+    background: var(--ufo-color-accent);
+    color: var(--ufo-color-foreground);
+}
+
+body.figma-ufo-body .burger-mahasiswa .organisasi-link {
+    background: var(--ufo-color-primary);
+}
+
+body.figma-ufo-body .burger-mahasiswa .organisasi-link:hover {
+    background: var(--ufo-color-primary-strong);
+}
+
+body.figma-ufo-body .student-burger-header,
+body.figma-ufo-body .student-burger-footer {
+    border-color: rgba(var(--ufo-primary-rgb), 0.2);
+    background: rgba(var(--ufo-primary-rgb), 0.08);
+}
+
+body.figma-ufo-body .student-burger-title,
+body.figma-ufo-body .student-burger-close,
+body.figma-ufo-body .student-burger-footer-title,
+body.figma-ufo-body .student-burger-footer-version {
+    color: var(--ufo-color-primary);
+}
+
+body.figma-ufo-body .student-burger-link:hover,
+body.figma-ufo-body .student-burger-link:active {
+    background: rgba(var(--ufo-primary-rgb), 0.1);
+    border-left-color: var(--ufo-color-primary);
+}
+
+body.figma-ufo-body .student-burger-link--active {
+    background: var(--ufo-color-primary);
+}
+
+body.figma-ufo-body .ufo-modal-header-primary .btn-close {
+    filter: invert(1) grayscale(100%) brightness(200%);
+}

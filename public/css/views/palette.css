@@ -1,0 +1,56 @@
+:root {
+    --ufo-color-primary: #5c3b78;
+    --ufo-color-primary-strong: #4c2f66;
+    --ufo-color-primary-soft: #7a5d97;
+    --ufo-color-accent: #ffcc00;
+    --ufo-color-accent-soft: #ffd54f;
+    --ufo-color-bg: #f4f6f8;
+    --ufo-color-surface: #ffffff;
+    --ufo-color-foreground: #000000;
+    --ufo-color-muted: #666666;
+    --ufo-color-border: rgba(0, 0, 0, 0.1);
+    --ufo-color-danger: #d4183d;
+    --ufo-color-success: #198754;
+    --ufo-color-warning: #ffcc00;
+    --ufo-color-info: #1d4ed8;
+
+    --ufo-primary-rgb: 92, 59, 120;
+    --ufo-accent-rgb: 255, 204, 0;
+
+    --ufo-shadow-sm: 0 2px 6px rgba(15, 23, 42, 0.08);
+    --ufo-shadow-md: 0 10px 24px rgba(15, 23, 42, 0.12);
+    --ufo-shadow-lg: 0 18px 36px rgba(15, 23, 42, 0.14);
+
+    --primary: var(--ufo-color-primary);
+    --primary-strong: var(--ufo-color-primary-strong);
+    --accent: var(--ufo-color-accent);
+    --danger: var(--ufo-color-danger);
+    --success: var(--ufo-color-success);
+    --warning: var(--ufo-color-warning);
+    --text-primary: var(--ufo-color-foreground);
+    --text-secondary: var(--ufo-color-muted);
+    --bg-light: var(--ufo-color-bg);
+    --border-color: var(--ufo-color-border);
+
+    --figma-primary: var(--ufo-color-primary);
+    --figma-primary-strong: var(--ufo-color-primary-strong);
+    --figma-accent: var(--ufo-color-accent);
+    --figma-bg: var(--ufo-color-bg);
+    --figma-surface: var(--ufo-color-surface);
+    --figma-text: var(--ufo-color-foreground);
+    --figma-text-soft: var(--ufo-color-muted);
+    --figma-border: var(--ufo-color-border);
+
+    --ufo-purple-900: var(--ufo-color-primary);
+    --ufo-purple-800: var(--ufo-color-primary-strong);
+    --ufo-purple-700: var(--ufo-color-primary);
+    --ufo-purple-100: #ede7f6;
+    --ufo-gold-500: var(--ufo-color-accent);
+    --ufo-gold-300: var(--ufo-color-accent-soft);
+    --ufo-gray-900: #14151a;
+    --ufo-gray-700: #4f5563;
+    --ufo-gray-500: #8e95a3;
+    --ufo-gray-200: #d9deea;
+    --ufo-gray-100: #eef1f6;
+    --ufo-surface: var(--ufo-color-surface);
+}

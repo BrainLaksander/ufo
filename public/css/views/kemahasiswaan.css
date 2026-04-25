@@ -1,0 +1,22 @@
+body.kemahasiswaan-layout {
+    --km-bg: var(--ufo-color-bg);
+    --km-card: var(--ufo-color-surface);
+    --km-border: var(--ufo-color-border);
+    --km-primary: var(--ufo-color-primary);
+    --km-primary-strong: var(--ufo-color-primary-strong);
+    --km-accent: var(--ufo-color-accent);
+    --km-yellow: var(--ufo-color-accent-soft);
+    --km-text: var(--ufo-color-foreground);
+    --km-muted-text: var(--ufo-color-muted);
+}
+
+body.kemahasiswaan-layout .kmh-page .btn-primary {
+    border-color: var(--km-primary);
+    background: var(--km-primary);
+}
+
+body.kemahasiswaan-layout .kmh-page .btn-primary:hover,
+body.kemahasiswaan-layout .kmh-page .btn-primary:focus {
+    border-color: var(--km-primary-strong);
+    background: var(--km-primary-strong);
+}

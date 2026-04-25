@@ -1,0 +1,29 @@
+body.ufo-pengurus-shell {
+    --ufo-purple-900: var(--ufo-color-primary);
+    --ufo-purple-800: var(--ufo-color-primary-strong);
+    --ufo-purple-700: var(--ufo-color-primary);
+    --ufo-purple-100: #ede7f6;
+    --ufo-gold-500: var(--ufo-color-accent);
+    --ufo-gold-300: var(--ufo-color-accent-soft);
+    --ufo-danger: var(--ufo-color-danger);
+    --ufo-success: var(--ufo-color-success);
+    background: radial-gradient(circle at 8% 0%, #f4effb 0%, #eff3fb 38%, var(--ufo-color-bg) 100%);
+}
+
+body.ufo-pengurus-shell .ufo-pengurus-header {
+    background: linear-gradient(110deg, var(--ufo-purple-800), var(--ufo-purple-700));
+}
+
+body.ufo-pengurus-shell .ufo-pengurus-burger {
+    background: linear-gradient(165deg, var(--ufo-gold-500) 0%, var(--ufo-gold-300) 75%);
+}
+
+body.ufo-pengurus-shell .ufo-kboard-btn.primary,
+body.ufo-pengurus-shell .ufo-kboard-menu-item.is-active {
+    background: var(--ufo-purple-700);
+    border-color: var(--ufo-purple-700);
+}
+
+body.ufo-pengurus-shell .ufo-kboard-btn.gold {
+    background: var(--ufo-gold-500);
+}
