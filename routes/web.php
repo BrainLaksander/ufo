@@ -1,14 +1,17 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PengumumanController;
-use App\Http\Controllers\OrganisasiController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\IzinKegiatanWorkflowController;
-use App\Http\Controllers\KemahasiswaanWorkflowController;
+use App\Http\Controllers\Mahasiswa\MahasiswaController;
+use App\Http\Controllers\Auth\AuthController;
+use App\Http\Controllers\Pengurus\IzinKegiatanWorkflowController;
+use App\Http\Controllers\Kemahasiswaan\KemahasiswaanWorkflowController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Str;
 
-Route::view('/', 'welcome')->name('home');
+Route::get('/', [MahasiswaController::class, 'organisasiIndex'])->name('home');
 
 /*
 |--------------------------------------------------------------------------
@@ -21,46 +24,52 @@ Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 /*
 |--------------------------------------------------------------------------
-| Portal Login Routes
+| Internal Login Alias Routes (No /portal Prefix)
 |--------------------------------------------------------------------------
 */
-Route::get('/portal', function () {
-    return redirect()->route('login');
+Route::get('/internal', function (Request $request) {
+    return redirect()->route('login', $request->only('role'));
 })->name('portal.index');
 
-Route::get('/portal/login', function () {
-    return redirect()->route('login');
+Route::get('/internal-login', function (Request $request) {
+    return redirect()->route('login', $request->only('role'));
 })->name('portal.login');
 
-Route::get('/portal/internal-login', function () {
-    return redirect()->route('login');
+Route::get('/internal/auth-login', function (Request $request) {
+    return redirect()->route('login', $request->only('role'));
 })->name('portal.internal.login');
 
-Route::post('/portal/login', [AuthController::class, 'login'])->name('portal.login.perform');
+Route::post('/internal-login', [AuthController::class, 'login'])->name('portal.login.perform');
 
 /*
 |--------------------------------------------------------------------------
 | Dashboard Routes (Named Targets)
 |--------------------------------------------------------------------------
 */
-Route::view('/dashboard', 'portal.pengurus.dashboard')->name('dashboard');
-Route::view('/dashboard/admin', 'pages.admin.dashboard')->name('dashboard.admin');
-Route::view('/dashboard/kemahasiswaan', 'pages.kemahasiswaan.dashboard')->name('dashboard.kemahasiswaan');
-Route::view('/dashboard/pengurus', 'portal.pengurus.dashboard')->name('dashboard.pengurus');
-Route::view('/dashboard/mahasiswa', 'mahasiswa.beranda')->name('dashboard.mahasiswa');
+Route::get('/dashboard', [IzinKegiatanWorkflowController::class, 'pengurusDashboard'])
+    ->middleware(['auth', 'role:pengurus'])
+    ->name('dashboard');
+Route::get('/dashboard/kemahasiswaan', [KemahasiswaanWorkflowController::class, 'dashboard'])
+    ->middleware(['auth', 'role:kemahasiswaan'])
+    ->name('dashboard.kemahasiswaan');
+Route::get('/dashboard/pengurus', [IzinKegiatanWorkflowController::class, 'pengurusDashboard'])
+    ->middleware(['auth', 'role:pengurus'])
+    ->name('dashboard.pengurus');
+Route::get('/dashboard/mahasiswa', [MahasiswaController::class, 'beranda'])->name('dashboard.mahasiswa');
 
 /*
 |--------------------------------------------------------------------------
 | Portal Internal Routes
 |--------------------------------------------------------------------------
 */
-Route::prefix('portal/admin')->name('portal.admin.')->group(function () {
-    Route::view('/', 'pages.admin.dashboard')->name('dashboard');
-});
-
-Route::prefix('portal/kemahasiswaan')->name('portal.kemahasiswaan.')->group(function () {
-    Route::view('/', 'pages.kemahasiswaan.dashboard')->name('dashboard');
+Route::prefix('kemahasiswaan')->name('portal.kemahasiswaan.')->middleware(['auth', 'role:kemahasiswaan'])->group(function () {
+    Route::get('/', [KemahasiswaanWorkflowController::class, 'dashboard'])->name('dashboard');
     Route::get('/organisasi', [KemahasiswaanWorkflowController::class, 'organisasiIndex'])->name('organisasi');
+    Route::post('/organisasi', [KemahasiswaanWorkflowController::class, 'storeOrganisasi'])->name('organisasi.store');
+    Route::post('/organisasi/{id}/update', [KemahasiswaanWorkflowController::class, 'updateOrganisasi'])->name('organisasi.update');
+    Route::delete('/organisasi/{id}', [KemahasiswaanWorkflowController::class, 'deactivateOrganisasi'])->name('organisasi.destroy');
+    Route::get('/kontak', [KemahasiswaanWorkflowController::class, 'kontakPengurusIndex'])->name('kontak');
+    Route::get('/kalender', [KemahasiswaanWorkflowController::class, 'kalenderKegiatanIndex'])->name('kalender');
     Route::post('/organisasi/akun', [KemahasiswaanWorkflowController::class, 'storeAkunUKM'])->name('organisasi.akun.store');
     Route::post('/organisasi/akun/{id}/update', [KemahasiswaanWorkflowController::class, 'updateAkunUKM'])->name('organisasi.akun.update');
     Route::post('/organisasi/akun/{id}/reset-password', [KemahasiswaanWorkflowController::class, 'resetPasswordAkunUKM'])->name('organisasi.akun.reset-password');
@@ -72,32 +81,39 @@ Route::prefix('portal/kemahasiswaan')->name('portal.kemahasiswaan.')->group(func
     Route::get('/pengumuman', [KemahasiswaanWorkflowController::class, 'pengumumanIndex'])->name('pengumuman');
     Route::post('/pengumuman', [KemahasiswaanWorkflowController::class, 'storePengumuman'])->name('pengumuman.store');
     Route::post('/pengumuman/{id}/email-review', [KemahasiswaanWorkflowController::class, 'reviewIzinPengumumanEmail'])->name('pengumuman.email-review');
-    Route::view('/notifikasi', 'pages.portal.kemahasiswaan.notifikasi')->name('notifikasi');
+    Route::get('/notifikasi', [KemahasiswaanWorkflowController::class, 'notifikasiIndex'])->name('notifikasi');
 });
 
-Route::prefix('portal/pengurus')->name('portal.pengurus.')->group(function () {
-    Route::view('/', 'portal.pengurus.dashboard')->name('dashboard');
-    Route::view('/events', 'portal.pengurus.events')->name('events');
+Route::prefix('pengurus')->name('portal.pengurus.')->middleware(['auth', 'role:pengurus'])->group(function () {
+    Route::get('/', [IzinKegiatanWorkflowController::class, 'pengurusDashboard'])->name('dashboard');
+    Route::redirect('/profil', '/pengurus/members')->name('profil');
+    Route::redirect('/event', '/pengurus/events')->name('event');
+    Route::redirect('/pengumuman', '/pengurus/announcements')->name('pengumuman');
+    Route::redirect('/pengajuan-laporan', '/pengurus/proposals')->name('pengajuan-laporan');
+    Route::redirect('/kontak', '/pengurus/applications')->name('kontak');
+    Route::redirect('/lost-found', '/pengurus/lostandfound')->name('lost-found');
+
+    Route::get('/events', [IzinKegiatanWorkflowController::class, 'pengurusEvents'])->name('events');
     Route::get('/events/create', [IzinKegiatanWorkflowController::class, 'eventForm'])->name('events.create');
     Route::post('/events', [IzinKegiatanWorkflowController::class, 'storeEvent'])->name('events.store');
-    Route::view('/events/{id}', 'pages.pengurus.events.detail')->name('events.detail');
+    Route::get('/events/{id}', [IzinKegiatanWorkflowController::class, 'pengurusEventDetail'])->name('events.detail');
 
-    Route::view('/announcements', 'portal.pengurus.announcements')->name('announcements');
-    Route::view('/announcements/create', 'pages.pengurus.announcements.form')->name('announcements.create');
+    Route::get('/announcements', [IzinKegiatanWorkflowController::class, 'pengurusAnnouncements'])->name('announcements');
+    Route::get('/announcements/create', [IzinKegiatanWorkflowController::class, 'pengurusAnnouncementForm'])->name('announcements.create');
 
-    Route::view('/lostandfound', 'portal.pengurus.lostandfound')->name('lostandfound');
+    Route::get('/lostandfound', [IzinKegiatanWorkflowController::class, 'pengurusLostAndFound'])->name('lostandfound');
     Route::get('/proposals', [IzinKegiatanWorkflowController::class, 'pengurusIndex'])->name('proposals');
     Route::post('/proposals', [IzinKegiatanWorkflowController::class, 'storePengajuan'])->name('proposals.store');
     Route::post('/proposals/{id}/submit', [IzinKegiatanWorkflowController::class, 'submit'])->name('proposals.submit');
     Route::post('/reports', [IzinKegiatanWorkflowController::class, 'storeLaporan'])->name('reports.store');
     Route::post('/reports/{id}/submit', [IzinKegiatanWorkflowController::class, 'submitLaporan'])->name('reports.submit');
-    Route::view('/members', 'portal.pengurus.members')->name('members');
-    Route::view('/applications', 'portal.pengurus.applications')->name('applications');
+    Route::get('/members', [IzinKegiatanWorkflowController::class, 'pengurusMembers'])->name('members');
+    Route::get('/applications', [IzinKegiatanWorkflowController::class, 'pengurusApplications'])->name('applications');
 
     Route::get('/settings', [IzinKegiatanWorkflowController::class, 'pengurusSettings'])->name('settings');
     Route::post('/settings/profile', [IzinKegiatanWorkflowController::class, 'updateProfilUKM'])->name('settings.profile.update');
-    Route::view('/reports', 'pages.pengurus.dashboard-detail')->name('reports');
-    Route::view('/submissions', 'pages.pengurus.dashboard-advanced')->name('submissions');
+    Route::redirect('/reports', '/pengurus/proposals')->name('reports');
+    Route::redirect('/submissions', '/pengurus/proposals')->name('submissions');
 });
 
 /*
@@ -105,27 +121,26 @@ Route::prefix('portal/pengurus')->name('portal.pengurus.')->group(function () {
 | Blade Frontend Routes (Mahasiswa)
 |--------------------------------------------------------------------------
 */
-Route::prefix('mahasiswa')->name('mahasiswa.')->group(function () {
-    Route::view('/', 'mahasiswa.beranda')->name('beranda');
-    Route::get('/organisasi', [OrganisasiController::class, 'index'])->name('organisasi');
-    Route::get('/organisasi', [OrganisasiController::class, 'index'])->name('organisasi.index');
-    Route::get('/organisasi/{id}', [OrganisasiController::class, 'show'])->name('organisasi.show');
-    Route::view('/event', 'mahasiswa.event')->name('event');
-    Route::get('/pengumuman', [PengumumanController::class, 'index'])->name('pengumuman');
-    Route::view('/tentang', 'mahasiswa.tentang')->name('tentang');
-});
+Route::permanentRedirect('/mahasiswa', '/');
+Route::get('/mahasiswa/organisasi', [MahasiswaController::class, 'organisasiIndex'])->name('mahasiswa.organisasi.redirect');
 
-Route::view('/lost-found', 'lost-found.index')->name('mahasiswa.lost-found');
+Route::get('/organisasi', [MahasiswaController::class, 'organisasiIndex'])->name('mahasiswa.organisasi.index');
+Route::get('/organisasi/{id}', [MahasiswaController::class, 'organisasiShow'])->name('mahasiswa.organisasi.show');
+Route::get('/organisasi/{id}/daftar', [MahasiswaController::class, 'organisasiDaftar'])->name('mahasiswa.organisasi.daftar');
+Route::get('/organisasi/{orgId}/event/{eventId}', [MahasiswaController::class, 'organisasiEventShow'])->name('mahasiswa.organisasi.event.detail');
 
-/*
-|--------------------------------------------------------------------------
-| Legacy Blade Route Compatibility
-|--------------------------------------------------------------------------
-*/
-Route::get('/organisasi', [OrganisasiController::class, 'index'])->name('organisasi.index');
-Route::get('/organisasi/{id}', [OrganisasiController::class, 'show'])->name('organisasi.show');
-Route::get('/pengumuman', [PengumumanController::class, 'index'])->name('pengumuman.index');
-Route::view('/kegiatan', 'mahasiswa.event')->name('kegiatan.index');
+Route::get('/event', [MahasiswaController::class, 'eventIndex'])->name('mahasiswa.event');
+Route::get('/event/{id}', [MahasiswaController::class, 'eventShow'])->name('mahasiswa.event.show');
+
+Route::get('/lost-found', [MahasiswaController::class, 'lostFoundIndex'])->name('mahasiswa.lost-found');
+Route::post('/lost-found/report', [MahasiswaController::class, 'reportLostFound'])->name('mahasiswa.lost-found.report');
+
+Route::get('/pengumuman', [MahasiswaController::class, 'pengumumanIndex'])->name('mahasiswa.pengumuman');
+Route::get('/pengumuman/{id}', [MahasiswaController::class, 'pengumumanShow'])->name('mahasiswa.pengumuman.show');
+
+Route::get('/tentang', [MahasiswaController::class, 'tentang'])->name('mahasiswa.tentang');
+
+Route::get('/kegiatan', [MahasiswaController::class, 'eventIndex'])->name('kegiatan.index');
 
 /*
 |--------------------------------------------------------------------------
@@ -133,7 +148,7 @@ Route::view('/kegiatan', 'mahasiswa.event')->name('kegiatan.index');
 |--------------------------------------------------------------------------
 */
 Route::get('/profil', function () {
-    return view('pages.pengurus.profil-organisasi');
+    return redirect()->route('portal.pengurus.members');
 })->name('profil.show');
 
 Route::get('/events', function () {
@@ -143,11 +158,11 @@ Route::get('/events', function () {
 Route::get('/events/create', [IzinKegiatanWorkflowController::class, 'eventForm'])->name('events.create');
 
 Route::get('/events/{event}', function ($event) {
-    return view('pages.pengurus.events.detail');
+    return redirect()->route('portal.pengurus.events.detail', ['id' => $event]);
 })->name('events.show');
 
 Route::get('/events/{event}/edit', function ($event) {
-    return view('pages.pengurus.events.form');
+    return redirect()->route('portal.pengurus.events.create');
 })->name('events.edit');
 
 Route::get('/announcements', function () {
@@ -155,15 +170,15 @@ Route::get('/announcements', function () {
 })->name('announcements.index');
 
 Route::get('/announcements/create', function () {
-    return view('pages.pengurus.announcements.form');
+    return app(IzinKegiatanWorkflowController::class)->pengurusAnnouncementForm(request());
 })->name('announcements.create');
 
 Route::get('/announcements/{announcement}', function ($announcement) {
-    return view('portal.pengurus.announcements');
+    return redirect()->route('portal.pengurus.announcements');
 })->name('announcements.show');
 
 Route::get('/announcements/{announcement}/edit', function ($announcement) {
-    return view('pages.pengurus.announcements.form');
+    return app(IzinKegiatanWorkflowController::class)->pengurusAnnouncementForm(request());
 })->name('announcements.edit');
 
 Route::get('/proposals', function () {
@@ -171,11 +186,11 @@ Route::get('/proposals', function () {
 })->name('proposals.index');
 
 Route::get('/proposals/{proposal}', function ($proposal) {
-    return view('portal.pengurus.proposals');
+    return redirect()->route('portal.pengurus.proposals');
 })->name('proposals.show');
 
 Route::get('/proposals/{proposal}/edit', function ($proposal) {
-    return view('portal.pengurus.proposals');
+    return redirect()->route('portal.pengurus.proposals');
 })->name('proposals.edit');
 
 Route::post('/proposals/{proposal}/submit', function (Request $request, $proposal) {
@@ -191,7 +206,7 @@ Route::post('/proposals/{proposal}/reject', function (Request $request, $proposa
 })->name('proposals.reject');
 
 Route::get('/messages', function () {
-    return view('portal.pengurus.applications');
+    return redirect()->route('portal.pengurus.applications');
 })->name('messages.index');
 
 Route::get('/lostfound', function () {
@@ -204,36 +219,158 @@ Route::get('/lostfound', function () {
 |--------------------------------------------------------------------------
 */
 Route::prefix('api')->group(function () {
-    Route::get('/pengumuman', function () {
-        $items = [
-            ['id' => 1, 'judul' => 'Info Semester Baru', 'kategori' => 'Akademik', 'author' => 'Rektorat', 'date' => '2026-03-01'],
-            ['id' => 2, 'judul' => 'Open Recruitment Organisasi', 'kategori' => 'Organisasi', 'author' => 'Kemahasiswaan', 'date' => '2026-03-05'],
-            ['id' => 3, 'judul' => 'Jadwal Event Kampus', 'kategori' => 'Event', 'author' => 'BEM', 'date' => '2026-03-10'],
+    $hasTable = static fn (string $table): bool => Schema::hasTable($table);
+
+    $buildAnnouncementQuery = static function (array $baseColumns) use ($hasTable) {
+        $query = DB::table('kemahasiswaan_announcements as ann');
+        $hasAccounts = $hasTable('kemahasiswaan_ukm_accounts');
+        $hasOrganizations = $hasTable('organizations');
+
+        if ($hasAccounts) {
+            $query->leftJoin('kemahasiswaan_ukm_accounts as akun', 'akun.id', '=', 'ann.ukm_account_id');
+        }
+
+        if ($hasAccounts && $hasOrganizations) {
+            $query->leftJoin('organizations as org', 'org.id', '=', 'akun.organization_id');
+        }
+
+        $query->select($baseColumns);
+        $query->selectRaw($hasAccounts ? 'akun.name as account_name' : 'NULL as account_name');
+        $query->selectRaw($hasAccounts && $hasOrganizations ? 'org.name as organization_name' : 'NULL as organization_name');
+
+        return $query;
+    };
+
+    $extractAnnouncementMeta = static function ($item): array {
+        $author = $item->organization_name ?: ($item->account_name ?: 'Kemahasiswaan');
+        $dateValue = $item->publish_at ?: $item->created_at;
+
+        return [
+            'author' => $author,
+            'date' => $dateValue ? Carbon::parse((string) $dateValue)->toDateString() : null,
         ];
+    };
+
+    $resolveLostFoundColumns = static function (): array {
+        $columns = Schema::getColumnListing('lost_found_items');
+        $hasColumn = static fn (string $column): bool => in_array($column, $columns, true);
+
+        return [
+            'title' => $hasColumn('item_name') ? 'item_name' : ($hasColumn('title') ? 'title' : ($hasColumn('name') ? 'name' : null)),
+            'description' => $hasColumn('description') ? 'description' : null,
+            'type' => $hasColumn('type') ? 'type' : null,
+            'status' => $hasColumn('status') ? 'status' : null,
+            'location' => $hasColumn('location_found') ? 'location_found' : ($hasColumn('location') ? 'location' : null),
+        ];
+    };
+
+    $buildLostFoundQuery = static function (array $columns, bool $withDescription = false) {
+        $query = DB::table('lost_found_items as lf')->select('lf.id');
+
+        $query->selectRaw($columns['title'] ? 'lf.' . $columns['title'] . ' as title' : 'NULL as title');
+        $query->selectRaw($columns['type'] ? 'lf.' . $columns['type'] . ' as type' : "'lost' as type");
+        $query->selectRaw($columns['status'] ? 'lf.' . $columns['status'] . ' as status' : "'active' as status");
+        $query->selectRaw($columns['location'] ? 'lf.' . $columns['location'] . ' as location' : 'NULL as location');
+
+        if ($withDescription) {
+            $query->selectRaw($columns['description'] ? 'lf.' . $columns['description'] . ' as description' : 'NULL as description');
+        }
+
+        return $query;
+    };
+
+    $normalizeLostFoundType = static fn ($type): string => in_array((string) $type, ['lost', 'found'], true) ? (string) $type : 'lost';
+
+    Route::get('/pengumuman', function () use ($hasTable, $buildAnnouncementQuery, $extractAnnouncementMeta) {
+        if (!$hasTable('kemahasiswaan_announcements')) {
+            return response()->json([]);
+        }
+
+        $items = $buildAnnouncementQuery([
+            'ann.id',
+            'ann.title',
+            'ann.category',
+            'ann.publish_at',
+            'ann.created_at',
+        ])
+            ->whereIn('ann.publish_status', ['published', 'scheduled', 'archived'])
+            ->orderByDesc(DB::raw('COALESCE(ann.publish_at, ann.created_at)'))
+            ->limit(300)
+            ->get()
+            ->map(function ($item) use ($extractAnnouncementMeta) {
+                $meta = $extractAnnouncementMeta($item);
+
+                return [
+                    'id' => (int) $item->id,
+                    'judul' => $item->title,
+                    'kategori' => $item->category ?: 'Umum',
+                    'author' => $meta['author'],
+                    'date' => $meta['date'],
+                ];
+            })
+            ->values();
 
         return response()->json($items);
     })->name('api.pengumuman.index');
 
-    Route::get('/pengumuman/{id}', function ($id) {
-        $items = [
-            1 => ['id' => 1, 'judul' => 'Info Semester Baru', 'konten' => 'Perkuliahan semester baru dimulai sesuai kalender akademik.', 'kategori' => 'Akademik', 'author' => 'Rektorat', 'date' => '2026-03-01'],
-            2 => ['id' => 2, 'judul' => 'Open Recruitment Organisasi', 'konten' => 'Pendaftaran anggota organisasi dibuka hingga akhir bulan.', 'kategori' => 'Organisasi', 'author' => 'Kemahasiswaan', 'date' => '2026-03-05'],
-            3 => ['id' => 3, 'judul' => 'Jadwal Event Kampus', 'konten' => 'Rangkaian event kampus diumumkan untuk seluruh mahasiswa.', 'kategori' => 'Event', 'author' => 'BEM', 'date' => '2026-03-10'],
-        ];
+    Route::get('/pengumuman/{id}', function ($id) use ($hasTable, $buildAnnouncementQuery, $extractAnnouncementMeta) {
+        if (!$hasTable('kemahasiswaan_announcements')) {
+            abort(404);
+        }
 
-        abort_unless(isset($items[(int) $id]), 404);
+        $item = $buildAnnouncementQuery([
+            'ann.id',
+            'ann.title',
+            'ann.category',
+            'ann.summary',
+            'ann.content',
+            'ann.publish_at',
+            'ann.created_at',
+        ])->where('ann.id', (int) $id)->first();
 
-        return response()->json($items[(int) $id]);
+        abort_if(!$item, 404);
+
+        $meta = $extractAnnouncementMeta($item);
+        $content = trim((string) ($item->content ?: ''));
+
+        return response()->json([
+            'id' => (int) $item->id,
+            'judul' => $item->title,
+            'konten' => $content !== '' ? $content : (string) ($item->summary ?: ''),
+            'kategori' => $item->category ?: 'Umum',
+            'author' => $meta['author'],
+            'date' => $meta['date'],
+        ]);
     })->name('api.pengumuman.detail');
 
     Route::get('/organisasi', function () {
-        $organizations = collect(require resource_path('data/organizationData.php'))
-            ->map(function ($item) {
+        if (!Schema::hasTable('organizations')) {
+            return response()->json([]);
+        }
+
+        $activeMembers = [];
+
+        if (Schema::hasTable('members')) {
+            $activeMembers = DB::table('members')
+                ->selectRaw('organization_id, COUNT(*) as total')
+                ->where('status', 'aktif')
+                ->groupBy('organization_id')
+                ->pluck('total', 'organization_id')
+                ->map(fn ($total) => (int) $total)
+                ->all();
+        }
+
+        $organizations = DB::table('organizations')
+            ->select(['id', 'name', 'description'])
+            ->where('status', 'active')
+            ->orderBy('name')
+            ->get()
+            ->map(function ($item) use ($activeMembers) {
                 return [
-                    'id' => $item['id'],
-                    'name' => $item['name'],
-                    'tagline' => $item['tagline'] ?? null,
-                    'activeMembers' => $item['activeMembers'] ?? 0,
+                    'id' => (int) $item->id,
+                    'name' => $item->name,
+                    'tagline' => $item->description ? Str::limit((string) $item->description, 100, '...') : null,
+                    'activeMembers' => (int) ($activeMembers[(int) $item->id] ?? 0),
                 ];
             })
             ->values();
@@ -242,30 +379,96 @@ Route::prefix('api')->group(function () {
     })->name('api.organisasi.index');
 
     Route::get('/organisasi/{id}', function ($id) {
-        $organizations = collect(require resource_path('data/organizationData.php'));
-        $item = $organizations->firstWhere('id', (int) $id);
+        if (!Schema::hasTable('organizations')) {
+            abort(404);
+        }
+
+        $item = DB::table('organizations')
+            ->select([
+                'id',
+                'name',
+                'shortname',
+                'description',
+                'vision',
+                'mission',
+                'email',
+                'phone',
+                'banner',
+                'instagram',
+                'line',
+                'status',
+            ])
+            ->where('id', (int) $id)
+            ->where('status', 'active')
+            ->first();
 
         abort_if(!$item, 404);
 
-        return response()->json($item);
+        $activeMembers = 0;
+
+        if (Schema::hasTable('members')) {
+            $activeMembers = (int) DB::table('members')
+                ->where('organization_id', (int) $item->id)
+                ->where('status', 'aktif')
+                ->count();
+        }
+
+        return response()->json([
+            'id' => (int) $item->id,
+            'name' => $item->name,
+            'shortname' => $item->shortname,
+            'tagline' => $item->description ? Str::limit((string) $item->description, 100, '...') : null,
+            'description' => $item->description,
+            'vision' => $item->vision,
+            'mission' => $item->mission,
+            'email' => $item->email,
+            'phone' => $item->phone,
+            'banner' => $item->banner,
+            'instagram' => $item->instagram,
+            'line' => $item->line,
+            'activeMembers' => $activeMembers,
+        ]);
     })->name('api.organisasi.show');
 
-    Route::get('/lost-found', function () {
-        return response()->json([
-            ['id' => 1, 'title' => 'Dompet Kulit Hitam', 'type' => 'lost', 'status' => 'active', 'location' => 'Aula Utama'],
-            ['id' => 2, 'title' => 'Kunci Motor', 'type' => 'found', 'status' => 'active', 'location' => 'Parkiran Timur'],
-        ]);
+    Route::get('/lost-found', function () use ($hasTable, $resolveLostFoundColumns, $buildLostFoundQuery, $normalizeLostFoundType) {
+        if (!$hasTable('lost_found_items')) {
+            return response()->json([]);
+        }
+
+        $items = $buildLostFoundQuery($resolveLostFoundColumns())
+            ->orderByDesc('lf.id')
+            ->limit(200)
+            ->get()
+            ->map(fn ($item) => [
+                'id' => (int) $item->id,
+                'title' => $item->title ?: 'Barang Tidak Dikenal',
+                'type' => $normalizeLostFoundType($item->type),
+                'status' => $item->status ?: 'active',
+                'location' => $item->location ?: '-',
+            ])->values();
+
+        return response()->json($items);
     })->name('api.lost-found.index');
 
-    Route::get('/lost-found/{id}', function ($id) {
-        $items = [
-            1 => ['id' => 1, 'title' => 'Dompet Kulit Hitam', 'description' => 'Dompet kulit hitam berisi kartu identitas.', 'type' => 'lost', 'status' => 'active', 'location' => 'Aula Utama'],
-            2 => ['id' => 2, 'title' => 'Kunci Motor', 'description' => 'Satu set kunci motor dengan gantungan biru.', 'type' => 'found', 'status' => 'active', 'location' => 'Parkiran Timur'],
-        ];
+    Route::get('/lost-found/{id}', function ($id) use ($hasTable, $resolveLostFoundColumns, $buildLostFoundQuery, $normalizeLostFoundType) {
+        if (!$hasTable('lost_found_items')) {
+            abort(404);
+        }
 
-        abort_unless(isset($items[(int) $id]), 404);
+        $item = $buildLostFoundQuery($resolveLostFoundColumns(), true)
+            ->where('lf.id', (int) $id)
+            ->first();
 
-        return response()->json($items[(int) $id]);
+        abort_if(!$item, 404);
+
+        return response()->json([
+            'id' => (int) $item->id,
+            'title' => $item->title ?: 'Barang Tidak Dikenal',
+            'description' => (string) ($item->description ?: ''),
+            'type' => $normalizeLostFoundType($item->type),
+            'status' => $item->status ?: 'active',
+            'location' => $item->location ?: '-',
+        ]);
     })->name('api.lost-found.detail');
 });
 
@@ -275,5 +478,5 @@ Route::prefix('api')->group(function () {
 |--------------------------------------------------------------------------
 */
 Route::fallback(function () {
-    return view('welcome');
+    return redirect()->route('home');
 });

@@ -1,18 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Workflow;
 
+use App\Models\Core\Organization;
+use App\Models\Core\User;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-/**
- * Proposal Model
- * Mewakili pengajuan/proposal dari organisasi (dana, acara, fasilitas, dll)
- * 
- * Workflow: draft → submitted → under_review → approved/rejected
- * Admin bisa memberikan review notes
- */
 class Proposal extends Model
 {
     use SoftDeletes;
@@ -38,8 +33,6 @@ class Proposal extends Model
         'updated_at' => 'datetime',
     ];
 
-    // ========== RELATIONSHIPS ==========
-
     public function organization(): BelongsTo
     {
         return $this->belongsTo(Organization::class);
@@ -54,8 +47,6 @@ class Proposal extends Model
     {
         return $this->belongsTo(User::class, 'reviewed_by');
     }
-
-    // ========== SCOPES ==========
 
     public function scopePending($query)
     {
@@ -77,11 +68,9 @@ class Proposal extends Model
         return $query->where('type', $type);
     }
 
-    // ========== HELPER METHODS ==========
-
     public function getStatusBadgeClass(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'draft' => 'secondary',
             'submitted' => 'info',
             'under_review' => 'warning',
@@ -93,7 +82,7 @@ class Proposal extends Model
 
     public function getTypeLabel(): string
     {
-        return match($this->type) {
+        return match ($this->type) {
             'dana' => ' Pengajuan Dana',
             'acara' => ' Pengajuan Acara',
             'fasilitas' => ' Pengajuan Fasilitas',
@@ -114,7 +103,6 @@ class Proposal extends Model
             'submitted_at' => now(),
         ]);
 
-        // Trigger notification ke admin
         event(new \App\Events\ProposalSubmitted($this));
     }
 
@@ -127,7 +115,6 @@ class Proposal extends Model
             'reviewed_at' => now(),
         ]);
 
-        // Trigger notification ke submitter
         event(new \App\Events\ProposalApproved($this));
     }
 
@@ -140,7 +127,6 @@ class Proposal extends Model
             'reviewed_at' => now(),
         ]);
 
-        // Trigger notification ke submitter
         event(new \App\Events\ProposalRejected($this));
     }
 }

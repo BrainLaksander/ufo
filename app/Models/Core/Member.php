@@ -1,11 +1,16 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Core;
 
+use App\Models\Engagement\ActivityLog;
+use App\Models\Engagement\Event;
+use App\Models\Workflow\Report;
+use App\Models\Workflow\Submission;
+use App\Models\Workflow\Task;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Member extends Model
 {
@@ -14,7 +19,7 @@ class Member extends Model
     protected $fillable = [
         'organization_id', 'name', 'nim', 'email', 'phone',
         'division', 'faculty', 'major', 'position', 'status',
-        'join_type', 'join_date', 'notes'
+        'join_type', 'join_date', 'notes',
     ];
 
     protected $casts = [

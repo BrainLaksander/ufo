@@ -1,18 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Engagement;
 
+use App\Models\Core\Organization;
+use App\Models\Core\User;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-/**
- * Announcement Model
- * Mewakili pengumuman organisasi dengan workflow approval
- * 
- * Status: draft → pending → approved/rejected
- * Bisa dijadwalkan untuk publikasi di waktu tertentu
- */
 class Announcement extends Model
 {
     use SoftDeletes;
@@ -36,8 +31,6 @@ class Announcement extends Model
         'updated_at' => 'datetime',
     ];
 
-    // ========== RELATIONSHIPS ==========
-
     public function organization(): BelongsTo
     {
         return $this->belongsTo(Organization::class);
@@ -53,8 +46,6 @@ class Announcement extends Model
         return $this->belongsTo(User::class, 'approved_by');
     }
 
-    // ========== SCOPES ==========
-
     public function scopePublished($query)
     {
         return $query->where('status', 'published')
@@ -69,11 +60,9 @@ class Announcement extends Model
         return $query->where('status', 'pending');
     }
 
-    // ========== HELPER METHODS ==========
-
     public function getStatusBadgeClass(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'draft' => 'secondary',
             'pending' => 'warning',
             'approved' => 'success',
@@ -85,7 +74,7 @@ class Announcement extends Model
 
     public function canBePublished(): bool
     {
-        return in_array($this->status, ['draft', 'approved'])
+        return in_array($this->status, ['draft', 'approved'], true)
             && auth()->user()->can('approveAnnouncement', $this);
     }
 

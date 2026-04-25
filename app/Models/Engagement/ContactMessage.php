@@ -1,18 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Engagement;
 
+use App\Models\Core\Organization;
+use App\Models\Core\User;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-/**
- * ContactMessage Model
- * Mewakili pesan dari form kontak
- * 
- * Admin perlu review dan bisa reply ke pesan
- * Status: new, read, replied
- */
 class ContactMessage extends Model
 {
     use SoftDeletes;
@@ -35,8 +30,6 @@ class ContactMessage extends Model
         'updated_at' => 'datetime',
     ];
 
-    // ========== RELATIONSHIPS ==========
-
     public function organization(): BelongsTo
     {
         return $this->belongsTo(Organization::class);
@@ -46,8 +39,6 @@ class ContactMessage extends Model
     {
         return $this->belongsTo(User::class, 'replied_by');
     }
-
-    // ========== SCOPES ==========
 
     public function scopeNew($query)
     {
@@ -59,11 +50,9 @@ class ContactMessage extends Model
         return $query->whereIn('status', ['new', 'read']);
     }
 
-    // ========== HELPER METHODS ==========
-
     public function getStatusBadgeClass(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'new' => 'danger',
             'read' => 'warning',
             'replied' => 'success',
@@ -87,7 +76,6 @@ class ContactMessage extends Model
             'replied_at' => now(),
         ]);
 
-        // Kirim email reply ke sender
         \Mail::to($this->sender_email)
             ->send(new \App\Mail\ContactMessageReply($this));
     }
@@ -96,9 +84,11 @@ class ContactMessage extends Model
     {
         $names = explode(' ', $this->sender_name);
         $initials = '';
+
         foreach (array_slice($names, 0, 2) as $name) {
             $initials .= strtoupper(substr($name, 0, 1));
         }
+
         return $initials;
     }
 }
