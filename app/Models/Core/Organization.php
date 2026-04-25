@@ -1,23 +1,19 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Core;
 
+use App\Models\Engagement\Announcement;
+use App\Models\Engagement\ContactMessage;
+use App\Models\Engagement\Event;
+use App\Models\Engagement\LostFoundItem;
+use App\Models\Workflow\Proposal;
+use App\Models\Workflow\Report;
+use App\Models\Workflow\Submission;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-/**
- * Organization Model
- * Mewakili organisasi/divisi kampus
- * 
- * Relationship:
- * - Memiliki banyak event
- * - Memiliki banyak announcement
- * - Memiliki banyak proposal
- * - Memiliki banyak lost & found items
- * - Dipimpin oleh leader (user)
- */
 class Organization extends Model
 {
     use SoftDeletes;
@@ -41,19 +37,11 @@ class Organization extends Model
         'updated_at' => 'datetime',
     ];
 
-    // ========== RELATIONSHIPS ==========
-
-    /**
-     * Ketua/Leader organisasi
-     */
     public function leader(): BelongsTo
     {
         return $this->belongsTo(User::class, 'leader_id');
     }
 
-    /**
-     * Anggota organisasi
-     */
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
@@ -61,50 +49,43 @@ class Organization extends Model
 
     public function members(): HasMany
     {
-        return $this->hasMany(User::class);
+        return $this->hasMany(Member::class);
     }
 
-    /**
-     * Event organisasi
-     */
     public function events(): HasMany
     {
         return $this->hasMany(Event::class);
     }
 
-    /**
-     * Pengumuman organisasi
-     */
     public function announcements(): HasMany
     {
         return $this->hasMany(Announcement::class);
     }
 
-    /**
-     * Pengajuan/Proposal organisasi
-     */
     public function proposals(): HasMany
     {
         return $this->hasMany(Proposal::class);
     }
 
-    /**
-     * Lost & Found items
-     */
+    public function submissions(): HasMany
+    {
+        return $this->hasMany(Submission::class);
+    }
+
+    public function reports(): HasMany
+    {
+        return $this->hasMany(Report::class);
+    }
+
     public function lostFoundItems(): HasMany
     {
         return $this->hasMany(LostFoundItem::class);
     }
 
-    /**
-     * Contact messages
-     */
     public function contactMessages(): HasMany
     {
         return $this->hasMany(ContactMessage::class);
     }
-
-    // ========== SCOPES ==========
 
     public function scopeActive($query)
     {
@@ -116,8 +97,6 @@ class Organization extends Model
         return $query->where('slug', $slug);
     }
 
-    // ========== HELPER METHODS ==========
-
     public function getActiveMembers()
     {
         return $this->users()->count();
@@ -125,9 +104,7 @@ class Organization extends Model
 
     public function getActiveEvents()
     {
-        return $this->events()
-            ->whereIn('status', ['published', 'ongoing'])
-            ->count();
+        return $this->events()->whereIn('status', ['published', 'ongoing'])->count();
     }
 
     public function getUpcomingEvents()
@@ -155,34 +132,51 @@ class Organization extends Model
             ->whereIn('status', ['submitted', 'under_review'])
             ->count();
     }
-}
-        return $this->events()->whereIn('status', ['approved', 'berjalan'])->count();
-    }
 
-    public function getCompletedEvents() {
+    public function getCompletedEvents()
+    {
         return $this->events()->where('status', 'selesai')->count();
     }
 
-    public function getApprovedSubmissions() {
+    public function getApprovedSubmissions()
+    {
         return $this->submissions()->where('status', 'approved')->count();
     }
 
-    public function getSubmittedReports() {
+    public function getSubmittedReports()
+    {
         return $this->reports()->whereIn('status', ['submitted', 'pending_review', 'accepted'])->count();
     }
 
-    public function calculateProfileCompletion() {
+    public function calculateProfileCompletion()
+    {
         $score = 0;
         $total = 8;
 
-        if ($this->logo) $score++;
-        if ($this->banner) $score++;
-        if ($this->description) $score++;
-        if ($this->vision) $score++;
-        if ($this->mission) $score++;
-        if ($this->email) $score++;
-        if ($this->phone) $score++;
-        if ($this->members()->count() >= 3) $score++;
+        if ($this->logo) {
+            $score++;
+        }
+        if ($this->banner) {
+            $score++;
+        }
+        if ($this->description) {
+            $score++;
+        }
+        if ($this->vision) {
+            $score++;
+        }
+        if ($this->mission) {
+            $score++;
+        }
+        if ($this->email) {
+            $score++;
+        }
+        if ($this->phone) {
+            $score++;
+        }
+        if ($this->members()->count() >= 3) {
+            $score++;
+        }
 
         $percentage = ($score / $total) * 100;
         $this->profile_completion_percentage = $percentage;
@@ -192,7 +186,6 @@ class Organization extends Model
         return $percentage;
     }
 
-    // Helper: apakah profil dianggap lengkap
     public function isProfileComplete(): bool
     {
         return !empty($this->logo) && !empty($this->description)
@@ -200,13 +193,11 @@ class Organization extends Model
             && !empty($this->email) && !empty($this->phone);
     }
 
-    // Helper: Count anggota aktif
     public function activeMembers(): int
     {
         return $this->members()->where('status', 'aktif')->count();
     }
 
-    // Helper: Count event aktif
     public function activeEvents(): int
     {
         return $this->events()
@@ -214,5 +205,4 @@ class Organization extends Model
             ->where('end_date', '>', now())
             ->count();
     }
-
 }

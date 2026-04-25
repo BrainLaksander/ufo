@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Engagement;
 
+use App\Models\Core\Member;
+use App\Models\Core\Organization;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -9,11 +11,10 @@ class ActivityLog extends Model
 {
     protected $table = 'activity_logs';
 
-    // Support both controller field names used across the codebase
     protected $fillable = [
         'organization_id', 'member_id', 'action', 'activity_type',
         'description', 'model_type', 'model_id', 'related_model', 'related_id',
-        'changes', 'metadata'
+        'changes', 'metadata',
     ];
 
     protected $casts = [
@@ -31,18 +32,16 @@ class ActivityLog extends Model
         return $this->belongsTo(Member::class);
     }
 
-    // Helper: Tampilkan waktu relatif (e.g., "2 jam lalu")
     public function getRelativeTime(): string
     {
         return $this->created_at?->diffForHumans() ?? '';
     }
 
-    // Helper: Icon untuk tipe aktivitas (fallback to 'action' or 'activity_type')
     public function getActivityIcon(): string
     {
         $type = $this->activity_type ?? $this->action ?? null;
 
-        return match($type) {
+        return match ($type) {
             'event_published' => 'bi-calendar-event-fill',
             'member_joined' => 'bi-person-plus-fill',
             'submission_approved' => 'bi-check-circle-fill',
@@ -51,7 +50,7 @@ class ActivityLog extends Model
             'profile_updated' => 'bi-pencil-square',
             'task_created' => 'bi-list-check',
             'task_completed' => 'bi-check2-square',
-            default => 'bi-activity'
+            default => 'bi-activity',
         };
     }
 
@@ -59,7 +58,7 @@ class ActivityLog extends Model
     {
         $type = $this->activity_type ?? $this->action ?? null;
 
-        return match($type) {
+        return match ($type) {
             'event_published' => 'Event Dipublikasikan',
             'member_joined' => 'Anggota Baru Bergabung',
             'submission_approved' => 'Pengajuan Disetujui',
@@ -68,7 +67,7 @@ class ActivityLog extends Model
             'profile_updated' => 'Profil Diperbarui',
             'task_created' => 'Tugas Baru Dibuat',
             'task_completed' => 'Tugas Diselesaikan',
-            default => ucfirst(str_replace('_', ' ', (string) $type))
+            default => ucfirst(str_replace('_', ' ', (string) $type)),
         };
     }
 }

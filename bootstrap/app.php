@@ -14,6 +14,11 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->trustProxies(at: '*');
+
+        $middleware->alias([
+            'auth' => \App\Http\Middleware\Auth\Authenticate::class,
+            'role' => \App\Http\Middleware\Authorization\RoleMiddleware::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //

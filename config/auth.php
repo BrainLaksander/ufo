@@ -62,7 +62,7 @@ return [
     'providers' => [
         'users' => [
             'driver' => 'eloquent',
-            'model' => env('AUTH_MODEL', App\Models\User::class),
+            'model' => env('AUTH_MODEL', App\Models\Core\User::class),
         ],
 
         // 'users' => [
@@ -117,14 +117,15 @@ return [
 
     'demo_accounts' => [
         'kemahasiswaan' => [
-            'name' => env('AUTH_DEMO_KEMAHASISWAAN_NAME', 'Departemen Kemahasiswaan'),
+            'name' => env('AUTH_DEMO_KEMAHASISWAAN_NAME', ''),
             'email' => env('AUTH_DEMO_KEMAHASISWAAN_EMAIL', ''),
             'password_hash' => env('AUTH_DEMO_KEMAHASISWAAN_PASSWORD_HASH', ''),
         ],
         'pengurus' => [
-            'name' => env('AUTH_DEMO_PENGURUS_NAME', 'Pengurus UKM/BEM'),
+            'name' => env('AUTH_DEMO_PENGURUS_NAME', ''),
             'email' => env('AUTH_DEMO_PENGURUS_EMAIL', ''),
             'password_hash' => env('AUTH_DEMO_PENGURUS_PASSWORD_HASH', ''),
+            'status' => env('AUTH_DEMO_PENGURUS_STATUS', ''),
         ],
     ],
 

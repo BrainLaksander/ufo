@@ -1,18 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Engagement;
 
+use App\Models\Core\Organization;
+use App\Models\Core\User;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-/**
- * Event Model
- * Mewakili event/kegiatan organisasi
- * 
- * Categories: rapat, event, akademik, sosial
- * Status: draft, published, ongoing, completed, cancelled
- */
 class Event extends Model
 {
     use SoftDeletes;
@@ -37,8 +32,6 @@ class Event extends Model
         'updated_at' => 'datetime',
     ];
 
-    // ========== RELATIONSHIPS ==========
-
     public function organization(): BelongsTo
     {
         return $this->belongsTo(Organization::class);
@@ -48,8 +41,6 @@ class Event extends Model
     {
         return $this->belongsTo(User::class, 'created_by');
     }
-
-    // ========== SCOPES ==========
 
     public function scopePublished($query)
     {
@@ -66,14 +57,9 @@ class Event extends Model
         return $query->where('category', $category);
     }
 
-    // ========== HELPER METHODS ==========
-
-    /**
-     * Warna badge untuk kategori event
-     */
     public function getCategoryColor(): string
     {
-        return match($this->category) {
+        return match ($this->category) {
             'rapat' => 'info',
             'event' => 'primary',
             'akademik' => 'success',
@@ -82,12 +68,9 @@ class Event extends Model
         };
     }
 
-    /**
-     * Label kategori dengan icon
-     */
     public function getCategoryLabel(): string
     {
-        return match($this->category) {
+        return match ($this->category) {
             'rapat' => ' Rapat',
             'event' => ' Event',
             'akademik' => ' Akademik',
@@ -96,12 +79,9 @@ class Event extends Model
         };
     }
 
-    /**
-     * Bootstrap badge class untuk status
-     */
     public function getStatusBadgeClass(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'draft' => 'secondary',
             'published' => 'success',
             'ongoing' => 'info',
@@ -111,28 +91,22 @@ class Event extends Model
         };
     }
 
-    /**
-     * Cek event apakah upcoming
-     */
     public function isUpcoming(): bool
     {
         return $this->event_date > now();
     }
 
-    /**
-     * Cek event apakah sudah penuh
-     */
     public function isFull(): bool
     {
         return $this->capacity && $this->registered >= $this->capacity;
     }
 
-    /**
-     * Dapatkan slot yang tersedia
-     */
     public function getAvailableSlots(): int
     {
-        if (!$this->capacity) return 999;
+        if (!$this->capacity) {
+            return 999;
+        }
+
         return max(0, $this->capacity - $this->registered);
     }
 }

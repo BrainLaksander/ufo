@@ -1,33 +1,21 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Workflow;
 
+use App\Models\Core\Member;
+use App\Models\Core\Organization;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Task extends Model
 {
     use SoftDeletes;
 
-    protected $fillable = ['organization_id', 'title', 'description', 'priority', 'status', 'deadline', 'type', 'related_id', 'completed_at'];
-
-    protected $casts = ['deadline' => 'date', 'completed_at' => 'datetime'];
-
-    public function organization(): BelongsTo {
-        return $this->belongsTo(Organization::class);
-    }
-}
-
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
-class Task extends Model
-{
     protected $fillable = [
-        'organization_id', 'assigned_to', 'title', 'description',
-        'priority', 'status', 'task_type', 'deadline', 'completed_at',
-        'related_submission_id', 'related_report_id'
+        'organization_id', 'assigned_to', 'title', 'description', 'priority', 'status',
+        'deadline', 'type', 'task_type', 'related_id', 'related_submission_id',
+        'related_report_id', 'completed_at',
     ];
 
     protected $casts = [
@@ -55,27 +43,27 @@ class Task extends Model
         return $this->belongsTo(Report::class, 'related_report_id');
     }
 
-    // Helper: Cek apakah task overdue
     public function isOverdue(): bool
     {
         return $this->status !== 'completed' && $this->deadline && now()->isAfter($this->deadline);
     }
 
-    // Helper: Priority color
     public function getPriorityColor(): string
     {
-        return match($this->priority) {
+        return match ($this->priority) {
             'urgent' => 'danger',
             'normal' => 'warning',
             'low' => 'info',
-            default => 'secondary'
+            default => 'secondary',
         };
     }
 
-    // Helper: Days until deadline
     public function daysUntilDeadline(): ?int
     {
-        if (!$this->deadline) return null;
+        if (!$this->deadline) {
+            return null;
+        }
+
         return now()->diffInDays($this->deadline, false);
     }
 }

@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Auth;
 
-use App\Models\User;
+use App\Http\Controllers\Controller;
+use App\Models\Core\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -93,7 +94,7 @@ class AuthController extends Controller
         }
 
         return back()
-            ->withErrors(['email' => 'Akun pengurus UKM/BEM tidak ditemukan atau password salah'])
+            ->withErrors(['email' => 'Akun pengurus UKM tidak ditemukan atau password salah'])
             ->onlyInput('email', 'role');
     }
 

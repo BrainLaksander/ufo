@@ -1,21 +1,13 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\Engagement;
 
+use App\Models\Core\Organization;
+use App\Models\Core\User;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
-/**
- * LostFoundItem Model
- * Mewakili barang hilang/ditemukan
- * 
- * Dua skenario workflow:
- * 1. User lapor hilang → Admin tandai ditemukan → User claim → Closed
- * 2. Admin input ditemukan → User klaim → Verifikasi → Closed
- * 
- * Status: active, claimed, closed
- */
 class LostFoundItem extends Model
 {
     use SoftDeletes;
@@ -43,8 +35,6 @@ class LostFoundItem extends Model
         'updated_at' => 'datetime',
     ];
 
-    // ========== RELATIONSHIPS ==========
-
     public function organization(): BelongsTo
     {
         return $this->belongsTo(Organization::class);
@@ -59,8 +49,6 @@ class LostFoundItem extends Model
     {
         return $this->belongsTo(User::class, 'claimed_by');
     }
-
-    // ========== SCOPES ==========
 
     public function scopeLost($query)
     {
@@ -87,11 +75,9 @@ class LostFoundItem extends Model
         return $query->where('status', 'closed');
     }
 
-    // ========== HELPER METHODS ==========
-
     public function getTypeBadgeClass(): string
     {
-        return match($this->type) {
+        return match ($this->type) {
             'lost' => 'danger',
             'found' => 'success',
             default => 'secondary',
@@ -100,7 +86,7 @@ class LostFoundItem extends Model
 
     public function getTypeLabel(): string
     {
-        return match($this->type) {
+        return match ($this->type) {
             'lost' => ' Barang Hilang',
             'found' => ' Barang Ditemukan',
             default => 'Barang',
@@ -109,7 +95,7 @@ class LostFoundItem extends Model
 
     public function getStatusBadgeClass(): string
     {
-        return match($this->status) {
+        return match ($this->status) {
             'active' => 'info',
             'claimed' => 'warning',
             'closed' => 'secondary',
@@ -130,7 +116,6 @@ class LostFoundItem extends Model
             'claimed_at' => now(),
         ]);
 
-        // Trigger notification untuk reporter
         event(new \App\Events\ItemClaimed($this));
     }
 
