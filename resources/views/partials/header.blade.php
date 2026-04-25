@@ -1,7 +1,7 @@
 <header class="ufo-shell-header">
     <div class="container ufo-shell-header__inner">
         <a href="{{ route('home') }}" class="ufo-shell-brand" aria-label="UFO Home">
-            <span class="ufo-shell-brand__mark">UFO</span>
+            <img src="{{ asset('logoufo.png') }}" alt="Logo UFO" class="ufo-shell-brand__logo">
             <span class="ufo-shell-brand__name">Universitas Klabat</span>
         </a>
 

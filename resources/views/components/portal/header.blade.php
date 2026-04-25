@@ -3,7 +3,7 @@
         <div class="header-left">
             <button id="burger-btn-portal" class="burger-toggle" aria-label="Open menu"><i class="bi bi-list"></i></button>
             <a href="{{ route('home') }}" class="header-brand" aria-label="Kembali ke landing page UFO">
-                <span class="brand-icon"><i class="bi bi-box-arrow-in-right"></i></span>
+                <span class="brand-icon"><img src="{{ asset('logoufo.png') }}" alt="Logo UFO" class="brand-logo-image"></span>
                 <div>
                     <div class="brand-title">UFO Portal</div>
                     <div class="brand-subtitle">Internal</div>

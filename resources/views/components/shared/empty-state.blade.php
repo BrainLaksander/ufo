@@ -11,7 +11,7 @@
 
 <div class="text-center py-5">
     <div class="mb-3">
-        <i class="bi {{ $icon ?? 'bi-inbox' }}" style="font-size: 3rem; color: #ccc;"></i>
+        <i class="bi {{ $icon ?? 'bi-inbox' }} ufo-empty-icon"></i>
     </div>
     
     @if($title ?? false)
