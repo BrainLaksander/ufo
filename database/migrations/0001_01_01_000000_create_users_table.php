@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('password');
 
             //  ROLE USER
-            // admin | kemahasiswaan | pengurus | mahasiswa
+            // kemahasiswaan | pengurus | mahasiswa
             $table->string('role')->default('mahasiswa');
 
             $table->rememberToken();

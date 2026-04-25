@@ -13,8 +13,8 @@ return new class extends Migration {
     {
         Schema::table('users', function (Blueprint $table) {
             // Role column already created in create_users_table.php, skip re-adding
-            // $table->enum('role', ['admin', 'pengurus', 'mahasiswa'])->default('mahasiswa')->after('email');
-            
+            // $table->enum('role', ['kemahasiswaan', 'pengurus', 'mahasiswa'])->default('mahasiswa')->after('email');
+
             if (!Schema::hasColumn('users', 'organization_id')) {
                 $table->unsignedBigInteger('organization_id')->nullable()->after('role');
             }
@@ -27,18 +27,33 @@ return new class extends Migration {
             if (!Schema::hasColumn('users', 'last_login_at')) {
                 $table->timestamp('last_login_at')->nullable()->after('avatar');
             }
-
-            if (Schema::hasTable('organizations') && !Schema::hasColumn('users', 'foreign_organization_id')) {
-                $table->foreign('organization_id')->references('id')->on('organizations')->nullOnDelete();
-            }
         });
+
+        // Foreign key users.organization_id ditangani migration lanjutan
+        // agar urutan migrasi tetap aman saat organizations belum tersedia.
     }
 
     public function down(): void
     {
         Schema::table('users', function (Blueprint $table) {
-            $table->dropForeign(['organization_id']);
-            $table->dropColumn(['role', 'organization_id', 'phone', 'avatar', 'last_login_at']);
+            if (Schema::hasColumn('users', 'organization_id')) {
+                try {
+                    $table->dropForeign(['organization_id']);
+                } catch (\Throwable $e) {
+                    // Abaikan jika foreign key belum pernah dibuat.
+                }
+            }
+
+            $dropColumns = [];
+            foreach (['organization_id', 'phone', 'avatar', 'last_login_at'] as $column) {
+                if (Schema::hasColumn('users', $column)) {
+                    $dropColumns[] = $column;
+                }
+            }
+
+            if (!empty($dropColumns)) {
+                $table->dropColumn($dropColumns);
+            }
         });
     }
 };
