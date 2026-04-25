@@ -56,7 +56,7 @@ header .login-brand {
   z-index: 56;
   padding: 16px;
   width: 300px;
-  background: #ffcc00;
+  background: var(--accent);
   color: #111;
   transform: translateX(-110%);
   transition: transform 0.28s ease;
