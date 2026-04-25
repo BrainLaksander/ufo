@@ -1,51 +1,51 @@
 /* Kemahasiswaan layout */
 
 /* ===== LAYOUT ===== */
-.page-header {
-    position: fixed;
-    top: 0;
-    left: 280px;
-    right: 0;
-    z-index: 90;
+body.kemahasiswaan-layout .page-header {
+    position: relative;
+    z-index: 20;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    height: 96px;
-    padding: 22px 36px;
+    min-height: 84px;
+    padding: 18px 36px;
     background: var(--km-primary);
     color: white;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
 }
 
-.page-header h1 {
+body.kemahasiswaan-layout .page-header h1 {
     margin: 0;
-    font-size: 32px;
+    font-size: 30px;
+    line-height: 1.2;
 }
 
-.page-header .page-subtitle {
+body.kemahasiswaan-layout .page-header p,
+body.kemahasiswaan-layout .page-header .page-subtitle {
     margin: 6px 0 0;
-    color: rgba(255, 255, 255, 0.9);
+    color: rgba(255, 255, 255, 0.88);
     font-size: 14px;
 }
 
 body.kemahasiswaan-layout .main-content {
     margin-left: 280px;
-    min-height: calc(100vh - 120px);
-    padding-top: 120px;
+    width: calc(100% - 280px);
+    min-height: 100vh;
+    padding-top: 64px;
     background: #f3f4f6;
 }
 
-.content-grid {
+body.kemahasiswaan-layout .content-grid {
     padding: 24px 36px;
 }
 
-.stats-row {
+body.kemahasiswaan-layout .stats-row {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
     margin-top: 20px;
 }
 
-.stat-card {
+body.kemahasiswaan-layout .stat-card {
     position: relative;
     min-height: 120px;
     padding: 18px;
@@ -54,19 +54,19 @@ body.kemahasiswaan-layout .main-content {
     box-shadow: 0 1px 6px rgba(29, 30, 34, 0.06);
 }
 
-.stat-card .stat-label {
+body.kemahasiswaan-layout .stat-card .stat-label {
     color: #666;
     font-size: 14px;
 }
 
-.stat-card .stat-value {
+body.kemahasiswaan-layout .stat-card .stat-value {
     margin-top: 8px;
     color: var(--km-primary);
     font-size: 36px;
     font-weight: 700;
 }
 
-.stat-card .stat-icon {
+body.kemahasiswaan-layout .stat-card .stat-icon {
     position: absolute;
     top: 18px;
     right: 18px;
@@ -80,7 +80,7 @@ body.kemahasiswaan-layout .main-content {
     color: white;
 }
 
-.main-grid {
+body.kemahasiswaan-layout .main-grid {
     display: grid;
     align-items: start;
     grid-template-columns: 1fr 320px;
@@ -88,15 +88,15 @@ body.kemahasiswaan-layout .main-content {
     margin-top: 24px;
 }
 
-.chart-card,
-.quick-actions {
+body.kemahasiswaan-layout .chart-card,
+body.kemahasiswaan-layout .quick-actions {
     padding: 18px;
     border-radius: 8px;
     background: white;
     box-shadow: 0 1px 6px rgba(29, 30, 34, 0.06);
 }
 
-.chart-placeholder {
+body.kemahasiswaan-layout .chart-placeholder {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -104,12 +104,12 @@ body.kemahasiswaan-layout .main-content {
     color: #999;
 }
 
-.quick-actions h3 {
+body.kemahasiswaan-layout .quick-actions h3 {
     margin-top: 0;
     color: var(--km-primary);
 }
 
-.quick-actions .quick-create {
+body.kemahasiswaan-layout .quick-actions .quick-create {
     width: 100%;
     margin-top: 12px;
     padding: 12px;
@@ -120,7 +120,7 @@ body.kemahasiswaan-layout .main-content {
     font-weight: 700;
 }
 
-.quick-actions .btn.btn-dark {
+body.kemahasiswaan-layout .quick-actions .btn.btn-dark {
     border: none;
     background: var(--km-accent);
     color: white;
@@ -128,29 +128,54 @@ body.kemahasiswaan-layout .main-content {
 
 /* ===== RESPONSIVE ===== */
 @media (max-width: 1000px) {
-    .stats-row {
+    body.kemahasiswaan-layout .stats-row {
         grid-template-columns: repeat(2, 1fr);
     }
 
-    .main-grid {
+    body.kemahasiswaan-layout .main-grid {
         grid-template-columns: 1fr;
     }
 
     body.kemahasiswaan-layout .main-content {
         margin-left: 0;
+        width: 100%;
+        padding-top: 64px;
         padding-left: 0;
+        padding-right: 0;
     }
 
-    .page-header {
-        left: 0;
-        right: 0;
-        z-index: 100;
+    body.kemahasiswaan-layout .role-layout .role-main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 64px 14px 20px;
+    }
+
+    body.kemahasiswaan-layout .page-header {
+        min-height: 72px;
+        padding-top: 14px;
+        padding-bottom: 14px;
         padding-left: 16px;
         padding-right: 16px;
     }
 
+    body.kemahasiswaan-layout .page-header h1 {
+        font-size: 24px;
+    }
+
     #sidebar {
         position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
         transform: translateX(-110%);
+        z-index: 1060;
+    }
+
+    #sidebar[aria-hidden="false"] {
+        transform: translateX(0);
+    }
+
+    #sidebar-overlay {
+        z-index: 1050;
     }
 }
