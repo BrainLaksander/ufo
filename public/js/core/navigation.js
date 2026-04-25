@@ -1,53 +1,45 @@
-// core/navigation.js - Wire burger and sidebar toggles used by portal layouts
+// core/navigation.js - mahasiswa and kemahasiswaan shell interactions
 (function () {
-  var utils = window.UFOUtils || {};
-
-  function setMenuState(menuEl, overlayEl, isOpen) {
-    if (utils.setMenuState) {
-      utils.setMenuState(menuEl, overlayEl, isOpen);
-      return;
-    }
-
-    if (menuEl) {
-      menuEl.setAttribute('aria-hidden', isOpen ? 'false' : 'true');
-    }
-
-    if (overlayEl) {
-      overlayEl.classList.toggle('hidden', !isOpen);
-    }
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return;
   }
 
-  function wireMenu(toggleBtn, menuEl, overlayEl) {
-    if (!toggleBtn || !menuEl || !overlayEl) {
-      return;
-    }
-
-    toggleBtn.addEventListener('click', function (e) {
-      e.preventDefault();
-      var shouldOpen = menuEl.getAttribute('aria-hidden') !== 'false';
-      setMenuState(menuEl, overlayEl, shouldOpen);
-    });
-
-    overlayEl.addEventListener('click', function () {
-      setMenuState(menuEl, overlayEl, false);
-    });
-
-    menuEl.querySelectorAll('[data-close]').forEach(function (link) {
-      link.addEventListener('click', function () {
-        setMenuState(menuEl, overlayEl, false);
-      });
-    });
+  var utils = window.UFOUtils;
+  if (!utils) {
+    return;
   }
 
-  wireMenu(
-    document.getElementById('burger-btn'),
-    document.getElementById('burger-menu'),
-    document.getElementById('burger-overlay')
-  );
+  // Legacy id-based menus that still exist in old shell templates.
+  utils.wireDisclosureMenu({
+    toggleBtn: document.getElementById("burger-btn"),
+    menu: document.getElementById("burger-menu"),
+    overlay: document.getElementById("burger-overlay"),
+  });
 
-  wireMenu(
-    document.getElementById('sidebar-toggle'),
-    document.getElementById('sidebar'),
-    document.getElementById('sidebar-overlay')
-  );
+  utils.wireDisclosureMenu({
+    toggleBtn: document.getElementById("sidebar-toggle"),
+    menu: document.getElementById("sidebar"),
+    overlay: document.getElementById("sidebar-overlay"),
+  });
+
+  // New mahasiswa drawer.
+  utils.wirePanelToggle({
+    panel: utils.qs("[data-burger-panel]"),
+    overlay: utils.qs("[data-burger-overlay]"),
+    openTriggers: utils.qsa("[data-burger-open]"),
+    closeTrigger: utils.qs("[data-burger-close]"),
+    closeOnSelectors: [".figma-ufo-menu-link"],
+    openClass: "is-open",
+    overlayMode: "attribute",
+  });
+
+  // New mahasiswa notification drawer.
+  utils.wirePanelToggle({
+    panel: utils.qs("[data-notification-panel]"),
+    overlay: utils.qs("[data-notification-overlay]"),
+    openTrigger: utils.qs("[data-notification-open]"),
+    closeTrigger: utils.qs("[data-notification-close]"),
+    openClass: "is-open",
+    overlayMode: "attribute",
+  });
 })();

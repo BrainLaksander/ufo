@@ -1,35 +1,15 @@
 /* UFO - General styles (entry file) */
 
-/* Portal */
-@import url("./modules/portal/navigation.css");
-@import url("./modules/portal/layout.css");
-@import url("./modules/portal/auth.css");
-@import url("./modules/portal/dashboard.css");
+@import url("./views/palette.css");
+@import url("./views/shared.css");
 
 /* Mahasiswa */
 @import url("./modules/mahasiswa/layout.css");
 @import url("./modules/mahasiswa/components.css");
 @import url("./modules/mahasiswa/pages.css");
+@import url("./views/mahasiswa.css");
 
 /* Pengurus handled by public/css/pengurus.css */
-
-/* Kemahasiswaan */
-@import url("./modules/kemahasiswaan/pages.css");
-
-:root {
-    --primary: #5f3a74;
-    --accent: #ffcc00;
-    --danger: #cc0000;
-    --success: #00aa00;
-    --warning: #ffa500;
-    --text-primary: #111;
-    --text-secondary: #666;
-    --bg-light: #f7f7fb;
-    --border-color: #e6e6f0;
-    --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 6px 12px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.12);
-}
 
 * {
     box-sizing: border-box;
@@ -91,14 +71,11 @@ body {
     text-decoration: none;
 }
 
-.ufo-shell-brand__mark {
-    background: var(--primary);
-    color: #fff;
+.ufo-shell-brand__logo {
+    width: 34px;
+    height: 34px;
     border-radius: 8px;
-    padding: 0.24rem 0.48rem;
-    font-size: 0.82rem;
-    line-height: 1;
-    font-weight: 700;
+    object-fit: cover;
 }
 
 .ufo-shell-brand__name {
@@ -220,7 +197,7 @@ body {
 }
 
 .btn-primary:hover {
-    background: #5a2d7f;
+    background: var(--primary-strong);
     transform: translateY(-2px);
     box-shadow: var(--shadow-md);
 }
@@ -260,7 +237,7 @@ body {
 /* ===== PAGE HEADERS ===== */
 .page-header {
     padding: 20px 20px;
-    background: linear-gradient(135deg, var(--primary) 0%, #5a2d7f 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-strong) 100%);
     color: white;
     margin-bottom: 16px;
 }

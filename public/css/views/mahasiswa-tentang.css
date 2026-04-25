@@ -1,0 +1,285 @@
+.figma-tentang-page {
+    display: grid;
+    gap: 0.95rem;
+}
+
+.figma-tentang-page .figma-about-hero {
+    border-radius: 0;
+    margin: -1rem -1rem 0.25rem;
+    padding: 2.2rem 1rem;
+}
+
+.figma-tentang-page .figma-about-hero h1 {
+    margin-bottom: 0.4rem;
+    font-size: clamp(2.2rem, 4vw, 3.1rem);
+}
+
+.figma-tentang-page .figma-about-hero p {
+    font-size: 1rem;
+    opacity: 0.9;
+}
+
+.figma-tentang-page .figma-section {
+    border-radius: 16px;
+    border: 1px solid #d9dde6;
+    box-shadow: none;
+    margin-bottom: 0;
+    background: #fff;
+}
+
+.figma-tentang-page .figma-tentang-intro {
+    padding: 1.05rem;
+}
+
+.figma-tentang-page .figma-tentang-intro h2 {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    margin: 0 0 0.55rem;
+    color: var(--figma-primary);
+    font-size: 2rem;
+}
+
+.figma-tentang-page .figma-tentang-intro h2 i {
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--figma-primary);
+    color: #fff;
+    font-size: 1rem;
+}
+
+.figma-tentang-page .figma-tentang-intro p {
+    margin-bottom: 0.55rem;
+    color: #4d5567;
+    font-size: 1.05rem;
+}
+
+.figma-tentang-page .figma-tentang-intro p:last-child {
+    margin-bottom: 0;
+}
+
+.figma-tentang-page .figma-grid-2 {
+    gap: 0.9rem;
+}
+
+.figma-tentang-page .figma-tentang-vision,
+.figma-tentang-page .figma-tentang-mission {
+    padding: 1.05rem;
+}
+
+.figma-tentang-page .figma-tentang-vision h2,
+.figma-tentang-page .figma-tentang-mission h2 {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin: 0 0 0.65rem;
+    color: var(--figma-primary);
+    font-size: 2rem;
+}
+
+.figma-tentang-page .figma-tentang-vision h2 i,
+.figma-tentang-page .figma-tentang-mission h2 i {
+    width: 38px;
+    height: 38px;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    font-size: 1rem;
+}
+
+.figma-tentang-page .figma-tentang-vision h2 i {
+    background: #f4c400;
+    color: #3a2f08;
+}
+
+.figma-tentang-page .figma-tentang-mission h2 i {
+    background: #dc2626;
+}
+
+.figma-tentang-page .figma-tentang-vision p,
+.figma-tentang-page .figma-tentang-mission li {
+    color: #4f5668;
+    font-size: 1.06rem;
+}
+
+.figma-tentang-page .figma-tentang-mission ul {
+    margin: 0;
+    padding-left: 1.1rem;
+    display: grid;
+    gap: 0.5rem;
+}
+
+.figma-tentang-page .figma-tentang-mission li::marker {
+    color: #dc2626;
+}
+
+.figma-tentang-page .figma-tentang-feature-wrap {
+    padding: 1.05rem;
+}
+
+.figma-tentang-page .figma-tentang-feature-wrap h2 {
+    font-size: 2rem;
+    margin-bottom: 0.9rem;
+    color: var(--figma-primary);
+}
+
+.figma-tentang-page .figma-tentang-feature-wrap .figma-grid-3 {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 0.8rem;
+}
+
+.figma-tentang-page .figma-about-feature {
+    text-align: center;
+    border: 1px solid #e3e5eb;
+    border-radius: 14px;
+    padding: 1rem 0.75rem;
+    background: #fff;
+}
+
+.figma-tentang-page .figma-about-feature i {
+    width: 56px;
+    height: 56px;
+    border-radius: 999px;
+    margin-bottom: 0.55rem;
+    font-size: 1.35rem;
+}
+
+.figma-tentang-page .figma-about-feature h3 {
+    margin: 0 0 0.45rem;
+    font-size: 1.02rem;
+    font-weight: 800;
+}
+
+.figma-tentang-page .figma-about-feature p {
+    margin: 0;
+    font-size: 0.93rem;
+    color: #5d6475;
+    line-height: 1.45;
+}
+
+.figma-tentang-page .figma-about-feature-org {
+    background: #f8f4ff;
+    border-color: #e6dafb;
+}
+
+.figma-tentang-page .figma-about-feature-org i {
+    background: #6e3eb2;
+}
+
+.figma-tentang-page .figma-about-feature-event {
+    background: #fffdf0;
+    border-color: #f3e8ad;
+}
+
+.figma-tentang-page .figma-about-feature-event i {
+    background: #f4c400;
+    color: #3a2f08;
+}
+
+.figma-tentang-page .figma-about-feature-lf {
+    background: #fff8f8;
+    border-color: #f2dddd;
+}
+
+.figma-tentang-page .figma-about-feature-lf i {
+    background: #dc2626;
+}
+
+.figma-tentang-page .figma-about-feature-ann {
+    background: #f3f8ff;
+    border-color: #d8e4f8;
+}
+
+.figma-tentang-page .figma-about-feature-ann i {
+    background: #6e3eb2;
+}
+
+.figma-tentang-page .figma-about-contact {
+    border-radius: 14px;
+    padding: 1.3rem 1rem;
+    margin-bottom: 0;
+}
+
+.figma-tentang-page .figma-about-contact h2 {
+    margin-bottom: 1rem !important;
+    font-size: 2rem;
+}
+
+.figma-tentang-page .figma-about-contact-item i {
+    width: 50px;
+    height: 50px;
+    margin-bottom: 0.55rem;
+}
+
+.figma-tentang-page .figma-about-contact-item h3 {
+    margin-bottom: 0.25rem;
+    font-size: 1rem;
+}
+
+.figma-tentang-page .figma-about-contact-item p {
+    font-size: 0.95rem;
+    opacity: 0.92;
+}
+
+.figma-tentang-page .figma-about-bot {
+    border-radius: 14px;
+    padding: 1.05rem;
+}
+
+.figma-tentang-page .figma-about-bot-wrap {
+    grid-template-columns: 84px 1fr;
+    gap: 0.9rem;
+}
+
+.figma-tentang-page .figma-about-bot-mark {
+    width: 76px;
+    height: 76px;
+    font-size: 1.45rem;
+}
+
+.figma-tentang-page .figma-about-bot h3 {
+    margin-bottom: 0.35rem;
+    font-size: 2rem;
+    color: #5b2ca2;
+}
+
+.figma-tentang-page .figma-about-bot p {
+    color: #3c2f19;
+    font-size: 1.04rem;
+}
+
+@media (max-width: 1100px) {
+    .figma-tentang-page .figma-tentang-feature-wrap .figma-grid-3 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}
+
+@media (max-width: 768px) {
+    .figma-tentang-page .figma-about-hero {
+        margin-left: -0.7rem;
+        margin-right: -0.7rem;
+        padding: 1.6rem 0.9rem;
+    }
+
+    .figma-tentang-page .figma-tentang-intro h2,
+    .figma-tentang-page .figma-tentang-vision h2,
+    .figma-tentang-page .figma-tentang-mission h2,
+    .figma-tentang-page .figma-tentang-feature-wrap h2,
+    .figma-tentang-page .figma-about-contact h2,
+    .figma-tentang-page .figma-about-bot h3 {
+        font-size: 1.6rem;
+    }
+
+    .figma-tentang-page .figma-tentang-feature-wrap .figma-grid-3,
+    .figma-tentang-page .figma-about-contact-grid,
+    .figma-tentang-page .figma-about-bot-wrap {
+        grid-template-columns: 1fr;
+    }
+}
