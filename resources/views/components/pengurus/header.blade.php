@@ -1,18 +1,24 @@
-<header class="header pengurus-header">
-    <div class="header-container">
-        <div class="header-left">
-            <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Open sidebar"><i class="bi bi-list"></i></button>
-            <div class="header-brand">
-                <span class="brand-icon"><i class="bi bi-buildings-fill"></i></span>
-                <div class="brand-text">
-                    <div class="brand-title">Portal Pengurus</div>
-                    <div class="brand-subtitle">UNKLAB Forum Organization</div>
-                </div>
-            </div>
+<header class="ufo-pengurus-header">
+    <div class="ufo-pengurus-header-inner">
+        <div class="ufo-pengurus-header-left">
+            <button type="button" class="ufo-pengurus-icon-btn" data-burger-open aria-label="Buka menu pengurus">
+                <i class="bi bi-list"></i>
+            </button>
+
+            <a href="{{ route('portal.pengurus.dashboard') }}" class="ufo-pengurus-brand" aria-label="UFO Pengurus">
+                <span class="ufo-pengurus-brand-mark" aria-hidden="true"><img src="{{ asset('logoufo.png') }}" alt="Logo UFO" class="ufo-pengurus-brand-logo"></span>
+                <span class="ufo-pengurus-brand-text">
+                    <strong>UFO</strong>
+                    <small>UNKLAB Forum Organization</small>
+                </span>
+            </a>
         </div>
-        <div class="header-right">
-            <button class="notification-btn" aria-label="Notifications"><i class="bi bi-bell-fill"></i><span class="notification-dot"></span></button>
-            <a href="{{ route('portal.login') }}" class="btn-logout">Keluar</a>
+
+        <div class="ufo-pengurus-header-right">
+            <button type="button" class="ufo-pengurus-icon-btn ufo-pengurus-bell" data-notification-open aria-label="Buka notifikasi">
+                <i class="bi bi-bell"></i>
+                <span class="ufo-pengurus-dot" aria-hidden="true"></span>
+            </button>
         </div>
     </div>
 </header>
