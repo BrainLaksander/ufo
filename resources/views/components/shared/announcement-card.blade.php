@@ -7,7 +7,7 @@
     - $showReply: Show reply button? (default: false)
 --}}
 
-<div class="card mb-3 border-start border-3" style="border-left-color: #6A1B9A !important;">
+<div class="card mb-3 border-start border-3 ufo-card-accent-left">
     <div class="card-body">
         <div class="d-flex justify-content-between align-items-start mb-2">
             <div class="flex-grow-1">
@@ -17,7 +17,7 @@
                     {{ $announcement->published_at?->format('d M Y, H:i') ?? 'Belum dijadwalkan' }}
                 </p>
             </div>
-            @include('components.status-badge', ['status' => $announcement->status])
+            @include('components.shared.status-badge', ['status' => $announcement->status])
         </div>
 
         <p class="card-text small text-secondary mb-3">

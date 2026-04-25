@@ -34,11 +34,11 @@
 
             <div class="col-md-4 text-end">
                 <div class="mb-2">
-                    <span class="badge" style="background-color: #FFC107; color: black;">
+                    <span class="badge ufo-badge-accent">
                         {{ ucfirst($proposal->type) }}
                     </span>
                 </div>
-                @include('components.status-badge', ['status' => $proposal->status])
+                @include('components.shared.status-badge', ['status' => $proposal->status])
             </div>
         </div>
 
