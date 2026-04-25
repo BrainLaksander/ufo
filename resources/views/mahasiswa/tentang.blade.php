@@ -1,157 +1,109 @@
-@extends('layouts.app')
+@extends('layouts.public.mahasiswa')
 
-@section('title', 'Tentang UFO - Mahasiswa')
+@section('title', 'Tentang UFO')
 
 @push('styles')
-<style>
-  .ufo-about-page {
-    padding: 1.25rem 0 2rem;
-  }
-
-  .ufo-about-hero {
-    border-radius: 14px;
-    background: var(--primary);
-    color: #fff;
-    padding: 1.1rem 1.2rem;
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 0.95rem;
-  }
-
-  .ufo-about-hero h1 {
-    margin: 0 0 0.35rem;
-    font-size: 1.55rem;
-    font-weight: 700;
-  }
-
-  .ufo-about-hero p {
-    margin: 0;
-    opacity: 0.9;
-    font-size: 0.92rem;
-  }
-
-  .ufo-about-card {
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    background: #fff;
-    box-shadow: var(--shadow-sm);
-    padding: 0.95rem;
-    height: 100%;
-  }
-
-  .ufo-about-card h2 {
-    margin: 0 0 0.45rem;
-    font-size: 1.02rem;
-    font-weight: 700;
-    color: var(--primary);
-  }
-
-  .ufo-about-card p,
-  .ufo-about-card li {
-    margin: 0;
-    font-size: 0.88rem;
-    color: #465266;
-    line-height: 1.55;
-  }
-
-  .ufo-about-card ul {
-    margin: 0;
-    padding-left: 1.1rem;
-    display: grid;
-    gap: 0.4rem;
-  }
-
-  .ufo-about-links {
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    background: #fff;
-    box-shadow: var(--shadow-sm);
-    padding: 0.95rem;
-    margin-top: 1rem;
-  }
-
-  .ufo-about-links h2 {
-    margin: 0 0 0.6rem;
-    font-size: 1.02rem;
-    font-weight: 700;
-    color: var(--primary);
-  }
-
-  .ufo-about-grid {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0.55rem;
-  }
-
-  .ufo-about-link {
-    text-decoration: none;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 0.45rem 0.65rem;
-    font-size: 0.83rem;
-    font-weight: 700;
-    color: var(--primary);
-    background: #fff;
-    display: inline-flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 0.35rem;
-  }
-
-  .ufo-about-link:hover {
-    border-color: var(--primary);
-    background: rgba(95, 58, 116, 0.08);
-    color: var(--primary);
-  }
-
-  @media (max-width: 768px) {
-    .ufo-about-page {
-      padding-top: 1rem;
-    }
-
-    .ufo-about-hero h1 {
-      font-size: 1.3rem;
-    }
-
-    .ufo-about-grid {
-      grid-template-columns: 1fr;
-    }
-  }
-</style>
+<link rel="stylesheet" href="{{ asset('css/views/mahasiswa-tentang.css') }}">
 @endpush
 
 @section('content')
-<section class="ufo-about-page">
-  <div class="ufo-about-hero">
-    <h1>Tentang UFO</h1>
-    <p>Unklab Forum Organization adalah platform digital untuk kegiatan organisasi mahasiswa Universitas Klabat.</p>
-  </div>
+@php
+    $hero = $aboutContent['hero'] ?? [];
+    $intro = $aboutContent['intro'] ?? [];
+    $vision = $aboutContent['vision'] ?? [];
+    $mission = $aboutContent['mission'] ?? [];
+    $features = $aboutContent['features'] ?? [];
+    $contact = $aboutContent['contact'] ?? [];
+    $bot = $aboutContent['bot'] ?? [];
+@endphp
 
-  <div class="row g-3">
-    <div class="col-md-6">
-      <article class="ufo-about-card">
-        <h2>Visi</h2>
-        <p>Menjadi platform digital terpadu untuk kehidupan kampus yang lebih terorganisir, informatif, dan kolaboratif.</p>
-      </article>
-    </div>
-    <div class="col-md-6">
-      <article class="ufo-about-card">
-        <h2>Misi</h2>
-        <ul>
-          <li>Menyediakan informasi kampus yang akurat dan terkini.</li>
-          <li>Memfasilitasi komunikasi mahasiswa dan organisasi.</li>
-          <li>Membantu layanan kampus seperti Lost & Found.</li>
-        </ul>
-      </article>
-    </div>
-  </div>
+<section class="figma-page-container py-3 figma-tentang-page">
+    <header class="figma-about-hero">
+        <h1>{{ $hero['title'] ?? '' }}</h1>
+        <p>{{ $hero['subtitle'] ?? '' }}</p>
+    </header>
 
-  <section class="ufo-about-links" aria-label="Navigasi cepat UFO">
-    <h2>Jelajahi UFO</h2>
-    <div class="ufo-about-grid">
-      <a href="{{ route('mahasiswa.organisasi.index') }}" class="ufo-about-link">Organisasi <i class="bi bi-arrow-up-right"></i></a>
-      <a href="{{ route('mahasiswa.pengumuman') }}" class="ufo-about-link">Pengumuman <i class="bi bi-arrow-up-right"></i></a>
-      <a href="{{ route('mahasiswa.lost-found') }}" class="ufo-about-link">Lost &amp; Found <i class="bi bi-arrow-up-right"></i></a>
+    <article class="figma-section figma-tentang-intro">
+        <h2>
+            @if(!empty($intro['icon']))
+                <i class="{{ $intro['icon'] }}"></i>
+            @endif
+            {{ $intro['title'] ?? '' }}
+        </h2>
+        @foreach(($intro['paragraphs'] ?? []) as $paragraph)
+            <p>{{ $paragraph }}</p>
+        @endforeach
+    </article>
+
+    <div class="figma-grid-2 mb-3">
+        <article class="figma-section mb-0 figma-tentang-vision">
+            <h2>
+                @if(!empty($vision['icon']))
+                    <i class="{{ $vision['icon'] }}"></i>
+                @endif
+                {{ $vision['title'] ?? '' }}
+            </h2>
+            <p>{{ $vision['description'] ?? '' }}</p>
+        </article>
+
+        <article class="figma-section mb-0 figma-tentang-mission">
+            <h2>
+                @if(!empty($mission['icon']))
+                    <i class="{{ $mission['icon'] }}"></i>
+                @endif
+                {{ $mission['title'] ?? '' }}
+            </h2>
+            <ul>
+                @foreach(($mission['items'] ?? []) as $item)
+                    <li>{{ $item }}</li>
+                @endforeach
+            </ul>
+        </article>
     </div>
-  </section>
+
+    <article class="figma-section figma-tentang-feature-wrap">
+        <h2 class="text-center">{{ $features['title'] ?? '' }}</h2>
+        <div class="figma-grid-3">
+            @foreach(($features['items'] ?? []) as $feature)
+                <div class="figma-about-feature {{ $feature['tone_class'] ?? '' }}">
+                    @if(!empty($feature['icon']))
+                        <i class="{{ $feature['icon'] }}"></i>
+                    @endif
+                    <h3 class="h5">{{ $feature['title'] ?? '' }}</h3>
+                    <p class="figma-muted">{{ $feature['description'] ?? '' }}</p>
+                </div>
+            @endforeach
+        </div>
+    </article>
+
+    <article class="figma-about-contact mb-3">
+        <h2 class="text-center mb-3">{{ $contact['title'] ?? '' }}</h2>
+
+        <div class="figma-about-contact-grid">
+            @foreach(($contact['items'] ?? []) as $item)
+                <div class="figma-about-contact-item">
+                    @if(!empty($item['icon']))
+                        <i class="{{ $item['icon'] }}"></i>
+                    @endif
+                    <h3 class="h6">{{ $item['title'] ?? '' }}</h3>
+                    <p class="mb-0">{{ $item['value'] ?? '' }}</p>
+                </div>
+            @endforeach
+        </div>
+    </article>
+
+    <article class="figma-about-bot">
+        <div class="figma-about-bot-wrap">
+            <div class="figma-about-bot-mark">
+                @if(!empty($bot['icon']))
+                    <i class="{{ $bot['icon'] }}"></i>
+                @endif
+            </div>
+            <div>
+                <h3 class="h4">{{ $bot['title'] ?? '' }}</h3>
+                <p class="mb-0">{{ $bot['description'] ?? '' }}</p>
+            </div>
+        </div>
+    </article>
 </section>
 @endsection

@@ -2,7 +2,7 @@
 
 /* ===== MAHASISWA BURGER ===== */
 .burger-mahasiswa {
-    background: #ffcc00;
+    background: var(--accent);
     color: #111;
 }
 
@@ -57,7 +57,7 @@
 }
 
 .burger-mahasiswa .burger-link:hover {
-    background: rgba(102, 51, 153, 0.1);
+    background: rgba(var(--ufo-primary-rgb), 0.1);
     transform: translateX(4px);
 }
 
@@ -74,13 +74,13 @@
 }
 
 .burger-mahasiswa .organisasi-link {
-    background: #663399;
+    background: var(--primary);
     color: white;
     border-radius: 16px;
 }
 
 .burger-mahasiswa .organisasi-link:hover {
-    background: #5a2d7f;
+    background: var(--primary-strong);
     transform: translateX(0);
 }
 
@@ -130,8 +130,8 @@
     justify-content: space-between;
     flex-shrink: 0;
     padding: 16px;
-    border-bottom: 2px solid rgba(102, 51, 153, 0.2);
-    background: rgba(102, 51, 153, 0.08);
+    border-bottom: 2px solid rgba(var(--ufo-primary-rgb), 0.2);
+    background: rgba(var(--ufo-primary-rgb), 0.08);
 }
 
 .student-burger-header-content {
@@ -146,7 +146,7 @@
 }
 
 .student-burger-title {
-    color: #663399;
+    color: var(--primary);
     font-size: 18px;
     font-weight: 700;
 }
@@ -161,7 +161,7 @@
     height: 32px;
     padding: 0;
     border-radius: 6px;
-    color: #663399;
+    color: var(--primary);
     font-size: 24px;
     font-weight: bold;
     cursor: pointer;
@@ -169,12 +169,12 @@
 }
 
 .student-burger-close:hover {
-    background: rgba(102, 51, 153, 0.15);
-    color: #663399;
+    background: rgba(var(--ufo-primary-rgb), 0.15);
+    color: var(--primary);
 }
 
 .student-burger-close:active {
-    background: rgba(102, 51, 153, 0.25);
+    background: rgba(var(--ufo-primary-rgb), 0.25);
 }
 
 .student-burger-nav {
@@ -207,13 +207,13 @@
 }
 
 .student-burger-link:hover {
-    background: rgba(102, 51, 153, 0.1);
-    border-left-color: #663399;
+    background: rgba(var(--ufo-primary-rgb), 0.1);
+    border-left-color: var(--primary);
     padding-left: 18px;
 }
 
 .student-burger-link--active {
-    background: #663399;
+    background: var(--primary);
     color: white;
     border-left-color: white;
 }
@@ -223,7 +223,7 @@
 }
 
 .student-burger-link:active {
-    background: rgba(102, 51, 153, 0.15);
+    background: rgba(var(--ufo-primary-rgb), 0.15);
 }
 
 .student-burger-icon-item {
@@ -237,21 +237,21 @@
 .student-burger-divider {
     height: 1px;
     margin: 8px 0;
-    background: rgba(102, 51, 153, 0.15);
+    background: rgba(var(--ufo-primary-rgb), 0.15);
 }
 
 .student-burger-footer {
     margin-top: auto;
     padding: 16px;
-    border-top: 2px solid rgba(102, 51, 153, 0.2);
-    background: rgba(102, 51, 153, 0.08);
+    border-top: 2px solid rgba(var(--ufo-primary-rgb), 0.2);
+    background: rgba(var(--ufo-primary-rgb), 0.08);
     flex-shrink: 0;
     text-align: center;
 }
 
 .student-burger-footer-title {
     margin: 0;
-    color: #663399;
+    color: var(--primary);
     font-size: 12px;
     font-weight: 700;
     line-height: 1.4;
@@ -259,7 +259,7 @@
 
 .student-burger-footer-version {
     margin-top: 4px;
-    color: #663399;
+    color: var(--primary);
     opacity: 0.8;
     font-size: 11px;
 }
@@ -269,16 +269,16 @@
 }
 
 .student-burger-menu::-webkit-scrollbar-track {
-    background: rgba(102, 51, 153, 0.05);
+    background: rgba(var(--ufo-primary-rgb), 0.05);
 }
 
 .student-burger-menu::-webkit-scrollbar-thumb {
     border-radius: 3px;
-    background: rgba(102, 51, 153, 0.3);
+    background: rgba(var(--ufo-primary-rgb), 0.3);
 }
 
 .student-burger-menu::-webkit-scrollbar-thumb:hover {
-    background: rgba(102, 51, 153, 0.5);
+    background: rgba(var(--ufo-primary-rgb), 0.5);
 }
 
 /* ===== MAHASISWA HEADER ===== */
@@ -289,7 +289,7 @@
     right: 0;
     z-index: 40;
     height: 56px;
-    background: linear-gradient(135deg, var(--primary) 0%, #5a2d7f 100%);
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-strong) 100%);
     color: white;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }

@@ -1,481 +1,210 @@
-@extends('layouts.app')
+@extends('layouts.public.mahasiswa')
 
-@section('title', ($org['nama'] ?? 'Detail Organisasi') . ' - UFO')
-
-@php
-    $visi = $org['visiMisi']['visi'] ?? null;
-    $misiList = $org['visiMisi']['misi'] ?? [];
-    $rawPhone = preg_replace('/\D+/', '', $org['phone'] ?? '');
-    $waPhone = str_starts_with($rawPhone, '0') ? '62' . substr($rawPhone, 1) : $rawPhone;
-@endphp
-
-@push('styles')
-<style>
-    .ufo-orgd-page {
-        padding: 1.25rem 0 2rem;
-    }
-
-    .ufo-orgd-back {
-        margin-bottom: 0.8rem;
-    }
-
-    .ufo-orgd-back a {
-        text-decoration: none;
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        color: var(--primary);
-        background: #fff;
-        font-size: 0.8rem;
-        font-weight: 700;
-        padding: 0.38rem 0.6rem;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.3rem;
-    }
-
-    .ufo-orgd-hero {
-        border-radius: 14px;
-        background: var(--primary);
-        color: #fff;
-        padding: 1.2rem;
-        box-shadow: var(--shadow-sm);
-        margin-bottom: 1rem;
-    }
-
-    .ufo-orgd-hero h1 {
-        margin: 0 0 0.35rem;
-        font-size: 1.6rem;
-        font-weight: 700;
-    }
-
-    .ufo-orgd-hero p {
-        margin: 0;
-        opacity: 0.92;
-        font-size: 0.9rem;
-    }
-
-    .ufo-orgd-meta {
-        margin-top: 0.75rem;
-        display: flex;
-        flex-wrap: wrap;
-        gap: 0.45rem;
-    }
-
-    .ufo-orgd-pill {
-        border-radius: 999px;
-        padding: 0.22rem 0.54rem;
-        font-size: 0.75rem;
-        font-weight: 700;
-        line-height: 1;
-    }
-
-    .ufo-orgd-pill.light {
-        background: #fff;
-        color: var(--primary);
-    }
-
-    .ufo-orgd-pill.soft {
-        background: rgba(255, 255, 255, 0.18);
-        color: #fff;
-        border: 1px solid rgba(255, 255, 255, 0.26);
-    }
-
-    .ufo-orgd-card {
-        border-radius: 12px;
-        border: 1px solid var(--border-color);
-        background: #fff;
-        box-shadow: var(--shadow-sm);
-        padding: 0.95rem;
-        margin-bottom: 0.95rem;
-    }
-
-    .ufo-orgd-card h2 {
-        margin: 0 0 0.55rem;
-        font-size: 1rem;
-        color: var(--primary);
-        font-weight: 700;
-    }
-
-    .ufo-orgd-card p {
-        margin: 0;
-        font-size: 0.88rem;
-        color: #465266;
-        line-height: 1.55;
-    }
-
-    .ufo-orgd-list {
-        display: grid;
-        gap: 0.55rem;
-    }
-
-    .ufo-orgd-list-item {
-        border: 1px solid var(--border-color);
-        border-radius: 10px;
-        padding: 0.65rem;
-        background: #fff;
-    }
-
-    .ufo-orgd-list-item h3 {
-        margin: 0 0 0.2rem;
-        font-size: 0.92rem;
-        color: #1f2937;
-        font-weight: 700;
-    }
-
-    .ufo-orgd-list-item p {
-        margin: 0;
-        font-size: 0.82rem;
-        color: #5f697a;
-    }
-
-    .ufo-orgd-visi {
-        margin-bottom: 0.7rem;
-    }
-
-    .ufo-orgd-misi {
-        margin: 0;
-        padding-left: 1.1rem;
-        display: grid;
-        gap: 0.4rem;
-    }
-
-    .ufo-orgd-misi li {
-        font-size: 0.85rem;
-        color: #465266;
-        line-height: 1.5;
-    }
-
-    .ufo-orgd-structure {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 0.55rem;
-    }
-
-    .ufo-orgd-structure-item {
-        border: 1px solid var(--border-color);
-        border-radius: 10px;
-        background: #fff;
-        padding: 0.62rem;
-    }
-
-    .ufo-orgd-structure-item h3 {
-        margin: 0 0 0.16rem;
-        color: var(--primary);
-        font-size: 0.86rem;
-        font-weight: 700;
-    }
-
-    .ufo-orgd-structure-item p {
-        margin: 0;
-        color: #5f697a;
-        font-size: 0.81rem;
-    }
-
-    .ufo-orgd-sidebar {
-        position: sticky;
-        top: 86px;
-    }
-
-    .ufo-orgd-info-grid {
-        display: grid;
-        gap: 0.55rem;
-    }
-
-    .ufo-orgd-info-item {
-        border: 1px solid var(--border-color);
-        border-radius: 10px;
-        padding: 0.58rem;
-    }
-
-    .ufo-orgd-info-item small {
-        display: block;
-        font-size: 0.7rem;
-        color: #6b7280;
-        font-weight: 700;
-        margin-bottom: 0.15rem;
-        letter-spacing: 0.03em;
-    }
-
-    .ufo-orgd-info-item p,
-    .ufo-orgd-info-item a {
-        margin: 0;
-        font-size: 0.84rem;
-        color: #1f2937;
-        text-decoration: none;
-    }
-
-    .ufo-orgd-actions {
-        margin-top: 0.75rem;
-        display: grid;
-        gap: 0.45rem;
-    }
-
-    .ufo-orgd-btn {
-        border: 1px solid var(--border-color);
-        border-radius: 8px;
-        padding: 0.46rem 0.72rem;
-        background: #fff;
-        color: var(--primary);
-        text-decoration: none;
-        font-size: 0.82rem;
-        font-weight: 700;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        gap: 0.3rem;
-    }
-
-    .ufo-orgd-btn.primary {
-        background: var(--primary);
-        border-color: var(--primary);
-        color: #fff;
-    }
-
-    .ufo-orgd-btn.disabled {
-        opacity: 0.55;
-        pointer-events: none;
-    }
-
-    .ufo-orgd-empty {
-        border-radius: 10px;
-        border: 1px dashed #ccd4e0;
-        padding: 0.7rem;
-        color: #5f697a;
-        font-size: 0.84rem;
-        text-align: center;
-    }
-
-    @media (max-width: 991px) {
-        .ufo-orgd-sidebar {
-            position: static;
-            top: auto;
-        }
-    }
-
-    @media (max-width: 768px) {
-        .ufo-orgd-page {
-            padding-top: 1rem;
-        }
-
-        .ufo-orgd-hero h1 {
-            font-size: 1.3rem;
-        }
-
-        .ufo-orgd-structure {
-            grid-template-columns: 1fr;
-        }
-    }
-</style>
-@endpush
+@section('title', ($org['name'] ?? 'Detail Organisasi') . ' - UFO')
 
 @section('content')
-<section class="ufo-orgd-page">
-    <div class="ufo-orgd-back">
-        <a href="{{ route('mahasiswa.organisasi.index') }}"><i class="bi bi-arrow-left"></i>Kembali ke Daftar</a>
+@php
+    $ui = $pageContent ?? [];
+@endphp
+<section class="figma-page-container py-3">
+    <a href="{{ route('mahasiswa.organisasi.index') }}" class="figma-link-back">
+        <i class="bi bi-arrow-left"></i>
+        {{ $ui['back_to_list'] ?? '' }}
+    </a>
+
+    <article class="figma-org-detail-hero">
+        <img src="{{ $org['banner'] ?? '' }}" alt="{{ $org['name'] ?? 'Organisasi' }}">
+        <div class="figma-org-detail-hero-content">
+            <div class="figma-org-logo">{{ strtoupper($org['logo_text'] ?? 'ORG') }}</div>
+            <div>
+                <h1>{{ $org['name'] ?? '-' }}</h1>
+                <p>{{ $org['tagline'] ?? '-' }}</p>
+            </div>
+        </div>
+    </article>
+
+    <div class="figma-org-members-badge">
+        <i class="bi bi-people"></i>
+        {{ $org['active_members'] ?? 0 }} Anggota Aktif
     </div>
 
-    <div class="ufo-orgd-hero">
-        <h1>{{ $org['nama'] ?? 'Organisasi' }}</h1>
-        <p>{{ $org['tagline'] ?? '-' }}</p>
+    <div class="figma-org-action-grid">
+        <button type="button" class="figma-btn-primary" data-bs-toggle="modal" data-bs-target="#contactModal">
+            <i class="bi bi-chat-dots"></i>
+            {{ $ui['contact_button'] ?? '' }}
+        </button>
 
-        <div class="ufo-orgd-meta">
-            <span class="ufo-orgd-pill light">{{ $org['kategori'] ?? 'Umum' }}</span>
-            <span class="ufo-orgd-pill soft"><i class="bi bi-people-fill me-1"></i>{{ $org['members'] ?? 0 }} anggota</span>
-            @if(!empty($org['registrationOpen']))
-                <span class="ufo-orgd-pill soft"><i class="bi bi-unlock-fill me-1"></i>Pendaftaran Buka</span>
-            @else
-                <span class="ufo-orgd-pill soft"><i class="bi bi-lock-fill me-1"></i>Pendaftaran Tutup</span>
-            @endif
-        </div>
+        <a href="{{ route('mahasiswa.event', ['org' => $org['id'] ?? 0]) }}" class="figma-btn-secondary">
+            <i class="bi bi-calendar-event"></i>
+            {{ $ui['org_events_button'] ?? '' }}
+        </a>
+
+        <a href="{{ route('mahasiswa.organisasi.daftar', ['id' => $org['id'] ?? 0]) }}" class="figma-btn-danger">
+            <i class="bi bi-pencil-square"></i>
+            {{ $ui['register_button'] ?? '' }}
+        </a>
     </div>
 
-    <div class="row g-3">
-        <div class="col-lg-8">
-            <article class="ufo-orgd-card">
-                <h2>Tentang Organisasi</h2>
-                <p>{{ $org['deskripsi'] ?? 'Deskripsi belum tersedia.' }}</p>
-            </article>
+    <article class="figma-section">
+        <h2>{{ $ui['vision_title'] ?? '' }}</h2>
+        <p>{{ $org['visi'] ?? '-' }}</p>
 
-            <article class="ufo-orgd-card">
-                <h2>Visi &amp; Misi</h2>
+        <h2 class="mt-3">{{ $ui['mission_title'] ?? '' }}</h2>
+        <ul>
+            @foreach(($org['misi'] ?? []) as $item)
+                <li>{{ $item }}</li>
+            @endforeach
+        </ul>
+    </article>
 
-                @if(!empty($visi))
-                    <p class="ufo-orgd-visi"><strong>Visi:</strong> {{ $visi }}</p>
-                @endif
+    <article class="figma-highlight">
+        <h2 class="h4 mb-2">{{ $ui['culture_title'] ?? '' }}</h2>
+        <p class="mb-0">{{ $org['culture'] ?? '-' }}</p>
+    </article>
 
-                @if(!empty($misiList))
-                    <ul class="ufo-orgd-misi">
-                        @foreach($misiList as $misi)
-                            <li>{{ $misi }}</li>
-                        @endforeach
-                    </ul>
-                @else
-                    <div class="ufo-orgd-empty">Misi belum tersedia.</div>
-                @endif
-            </article>
-
-            <article class="ufo-orgd-card">
-                <h2>Budaya Organisasi</h2>
-                <p>{{ $org['budaya'] ?? '-' }}</p>
-            </article>
-
-            <article class="ufo-orgd-card">
-                <h2>Program &amp; Kegiatan</h2>
-                @if(!empty($org['programs']))
-                    <div class="ufo-orgd-list">
-                        @foreach($org['programs'] as $program)
-                            <div class="ufo-orgd-list-item">
-                                <h3>{{ $program['nama'] ?? '-' }}</h3>
-                                <p>{{ $program['deskripsi'] ?? '-' }}</p>
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="ufo-orgd-empty">Belum ada program yang dipublikasikan.</div>
-                @endif
-            </article>
-
-            <article class="ufo-orgd-card">
-                <h2>Acara Mendatang</h2>
-                @if(!empty($org['events']))
-                    <div class="ufo-orgd-list">
-                        @foreach($org['events'] as $event)
-                            <div class="ufo-orgd-list-item">
-                                <h3>{{ $event['nama'] ?? '-' }}</h3>
-                                <p>{{ $event['date'] ?? '-' }} | {{ $event['deskripsi'] ?? '-' }}</p>
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="ufo-orgd-empty">Belum ada acara mendatang.</div>
-                @endif
-            </article>
-
-            <article class="ufo-orgd-card">
-                <h2>Struktur Organisasi</h2>
-                @if(!empty($org['struktur']))
-                    <div class="ufo-orgd-structure">
-                        @foreach($org['struktur'] as $item)
-                            <div class="ufo-orgd-structure-item">
-                                <h3>{{ $item['posisi'] ?? '-' }}</h3>
-                                <p>{{ $item['nama'] ?? '-' }}</p>
-                            </div>
-                        @endforeach
-                    </div>
-                @else
-                    <div class="ufo-orgd-empty">Struktur belum tersedia.</div>
-                @endif
-            </article>
+    <article class="figma-section">
+        <h2>{{ $ui['programs_title'] ?? '' }}</h2>
+        <div class="figma-program-grid" id="program-grid">
+            @foreach(($org['programs'] ?? []) as $index => $program)
+                <button type="button" class="figma-program-btn" data-program-index="{{ $index }}">
+                    <strong>{{ $program['name'] ?? '-' }}</strong>
+                </button>
+            @endforeach
         </div>
+    </article>
 
-        <div class="col-lg-4">
-            <aside class="ufo-orgd-sidebar">
-                <article class="ufo-orgd-card">
-                    <h2>Informasi</h2>
-
-                    <div class="ufo-orgd-info-grid">
-                        <div class="ufo-orgd-info-item">
-                            <small>KATEGORI</small>
-                            <p>{{ $org['kategori'] ?? '-' }}</p>
-                        </div>
-
-                        <div class="ufo-orgd-info-item">
-                            <small>ANGGOTA</small>
-                            <p>{{ $org['members'] ?? 0 }} Anggota</p>
-                        </div>
-
-                        <div class="ufo-orgd-info-item">
-                            <small>KONTAK</small>
-                            @if(!empty($org['contact']))
-                                <a href="mailto:{{ $org['contact'] }}">{{ $org['contact'] }}</a>
-                            @else
-                                <p>-</p>
-                            @endif
-                        </div>
-
-                        <div class="ufo-orgd-info-item">
-                            <small>TELEPON</small>
-                            @if(!empty($org['phone']))
-                                <a href="tel:{{ $org['phone'] }}">{{ $org['phone'] }}</a>
-                            @else
-                                <p>-</p>
-                            @endif
-                        </div>
+    <article class="figma-section">
+        <h2>{{ $ui['history_title'] ?? '' }}</h2>
+        <div class="figma-event-list">
+            @foreach(($org['events'] ?? []) as $event)
+                <a href="{{ route('mahasiswa.organisasi.event.detail', ['orgId' => $org['id'] ?? 0, 'eventId' => $event['id'] ?? '']) }}" class="figma-event-item">
+                    <div>
+                        <strong>{{ $event['name'] ?? '-' }}</strong>
+                        <br>
+                        <small>{{ $event['date'] ?? '-' }}</small>
                     </div>
-
-                    <div class="ufo-orgd-actions">
-                        @if(!empty($org['registrationOpen']))
-                            <button type="button" class="ufo-orgd-btn primary" data-bs-toggle="modal" data-bs-target="#registrationModal">
-                                <i class="bi bi-pencil-square"></i>Daftar Sekarang
-                            </button>
-                        @else
-                            <span class="ufo-orgd-btn disabled"><i class="bi bi-lock-fill"></i>Pendaftaran Tutup</span>
-                        @endif
-
-                        @if(!empty($waPhone))
-                            <a href="https://wa.me/{{ $waPhone }}" class="ufo-orgd-btn" target="_blank" rel="noopener">
-                                <i class="bi bi-whatsapp"></i>WhatsApp
-                            </a>
-                        @endif
-
-                        @if(!empty($org['contact']))
-                            <a href="mailto:{{ $org['contact'] }}" class="ufo-orgd-btn">
-                                <i class="bi bi-envelope-fill"></i>Email
-                            </a>
-                        @endif
-                    </div>
-                </article>
-            </aside>
+                    <i class="bi bi-calendar-event"></i>
+                </a>
+            @endforeach
         </div>
-    </div>
+    </article>
 
-    <div class="modal fade" id="registrationModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Pendaftaran {{ $org['nama'] ?? 'Organisasi' }}</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+    <article class="figma-section">
+        <h2>{{ $ui['structure_title'] ?? '' }}</h2>
+        <div class="figma-structure-grid">
+            @foreach(($org['structure'] ?? []) as $member)
+                <div class="figma-structure-item">
+                    <strong>{{ $member['position'] ?? '-' }}</strong>
+                    <p class="mb-0">{{ $member['name'] ?? '-' }}</p>
                 </div>
-                <div class="modal-body">
-                    <form id="registrationForm">
-                        <div class="mb-3">
-                            <label class="form-label">Nama Lengkap</label>
-                            <input type="text" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">NIM</label>
-                            <input type="text" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Email</label>
-                            <input type="email" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Telepon</label>
-                            <input type="tel" class="form-control" required>
-                        </div>
-                        <div class="mb-3">
-                            <label class="form-label">Motivasi Bergabung</label>
-                            <textarea class="form-control" rows="4" required></textarea>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                    <button type="button" class="btn btn-primary" onclick="submitRegistration()">Kirim Pendaftaran</button>
+            @endforeach
+        </div>
+    </article>
+</section>
+
+<div class="modal fade" id="programModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="programModalTitle">{{ $ui['program_modal_title'] ?? '' }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body" id="programModalBody"></div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="contactModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">{{ $ui['contact_modal_title_prefix'] ?? '' }} {{ $org['name'] ?? '' }}</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body">
+                <div class="figma-org-contact-grid">
+                    @if(!empty($org['social_media']['instagram']))
+                        <a href="{{ $org['social_media']['instagram'] }}" target="_blank" rel="noopener" class="figma-org-contact-link instagram">
+                            <i class="bi bi-instagram"></i>
+                            {{ $ui['contact_instagram_label'] ?? '' }}
+                        </a>
+                    @endif
+
+                    @if(!empty($org['social_media']['whatsapp']))
+                        <a href="{{ $org['social_media']['whatsapp'] }}" target="_blank" rel="noopener" class="figma-org-contact-link whatsapp">
+                            <i class="bi bi-whatsapp"></i>
+                            {{ $ui['contact_whatsapp_label'] ?? '' }}
+                        </a>
+                    @endif
+
+                    @if(!empty($org['social_media']['email']))
+                        <a href="{{ $org['social_media']['email'] }}" class="figma-org-contact-link email">
+                            <i class="bi bi-envelope"></i>
+                            {{ $ui['contact_email_label'] ?? '' }}
+                        </a>
+                    @endif
+
+                    @if(!empty($org['social_media']['website']))
+                        <a href="{{ $org['social_media']['website'] }}" target="_blank" rel="noopener" class="figma-org-contact-link website">
+                            <i class="bi bi-globe2"></i>
+                            {{ $ui['contact_website_label'] ?? '' }}
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>
     </div>
-</section>
+</div>
 @endsection
 
 @push('scripts')
 <script>
-    function submitRegistration() {
-        alert('Pendaftaran berhasil dikirim. Tim organisasi akan menghubungi Anda.');
-        document.getElementById('registrationForm').reset();
-        bootstrap.Modal.getInstance(document.getElementById('registrationModal')).hide();
+(function () {
+    var programs = @json($org['programs'] ?? []);
+    var ui = @json($ui);
+    var buttons = Array.from(document.querySelectorAll('[data-program-index]'));
+    var modalEl = document.getElementById('programModal');
+
+    if (!modalEl || buttons.length === 0) {
+        return;
     }
+
+    var modal = new bootstrap.Modal(modalEl);
+    var titleEl = document.getElementById('programModalTitle');
+    var bodyEl = document.getElementById('programModalBody');
+
+    function asList(values) {
+        if (!Array.isArray(values) || values.length === 0) {
+            return '<p class="mb-0">' + (ui.program_empty_activities || '') + '</p>';
+        }
+
+        return '<ul>' + values.map(function (item) {
+            return '<li>' + item + '</li>';
+        }).join('') + '</ul>';
+    }
+
+    buttons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            var index = Number(button.getAttribute('data-program-index') || -1);
+            var program = programs[index];
+            if (!program) {
+                return;
+            }
+
+            titleEl.textContent = program.name || (ui.program_modal_title || '');
+            bodyEl.innerHTML = `
+                <p><strong>${ui.program_goal_label || ''}</strong> ${program.goal || '-'}</p>
+                <h6>${ui.program_activities_label || ''}</h6>
+                ${asList(program.activities || [])}
+                <div class="figma-register-alert mt-3 mb-3">
+                    <strong>${ui.program_period_label || ''}</strong> ${program.period || '-'}
+                </div>
+                <p class="mb-0"><strong>${ui.program_impact_label || ''}</strong> ${program.impact || '-'}</p>
+            `;
+
+            modal.show();
+        });
+    });
+})();
 </script>
 @endpush

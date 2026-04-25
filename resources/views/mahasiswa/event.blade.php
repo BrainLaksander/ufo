@@ -1,106 +1,134 @@
-@extends('layouts.app')
+@extends('layouts.public.mahasiswa')
 
-@section('title', 'Event Mahasiswa - UFO')
+@section('title', 'Event - UFO')
 
 @push('styles')
-<style>
-  .ufo-event-page {
-    padding: 1.25rem 0 2rem;
-  }
-
-  .ufo-event-hero {
-    border-radius: 14px;
-    background: var(--primary);
-    color: #fff;
-    padding: 1.1rem 1.2rem;
-    box-shadow: var(--shadow-sm);
-    margin-bottom: 0.95rem;
-  }
-
-  .ufo-event-hero h1 {
-    margin: 0 0 0.35rem;
-    font-size: 1.55rem;
-    font-weight: 700;
-  }
-
-  .ufo-event-hero p {
-    margin: 0;
-    opacity: 0.9;
-    font-size: 0.92rem;
-  }
-
-  .ufo-event-card {
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-    background: #fff;
-    box-shadow: var(--shadow-sm);
-    padding: 1rem;
-  }
-
-  .ufo-event-card h2 {
-    margin: 0 0 0.4rem;
-    font-size: 1.08rem;
-    color: var(--primary);
-    font-weight: 700;
-  }
-
-  .ufo-event-card p {
-    margin: 0;
-    color: var(--text-secondary);
-    font-size: 0.9rem;
-  }
-
-  .ufo-event-actions {
-    margin-top: 0.8rem;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem;
-  }
-
-  .ufo-event-link {
-    text-decoration: none;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 0.42rem 0.66rem;
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: var(--primary);
-    background: #fff;
-  }
-
-  .ufo-event-link:hover {
-    border-color: var(--primary);
-    background: rgba(95, 58, 116, 0.08);
-    color: var(--primary);
-  }
-
-  @media (max-width: 768px) {
-    .ufo-event-page {
-      padding-top: 1rem;
-    }
-
-    .ufo-event-hero h1 {
-      font-size: 1.3rem;
-    }
-  }
-</style>
+<link rel="stylesheet" href="{{ asset('css/views/mahasiswa-event.css') }}">
 @endpush
 
 @section('content')
-<section class="ufo-event-page">
-  <div class="ufo-event-hero">
-    <h1>Event Mahasiswa</h1>
-    <p>Informasi event kampus akan ditampilkan di sini.</p>
-  </div>
+@php
+    $ui = $pageContent ?? [];
+@endphp
+<section class="figma-page-container figma-event-page py-3" aria-label="Halaman event">
+    <header class="figma-page-header">
+        <h1>{{ $ui['title'] ?? '' }}</h1>
+        <p>{{ $ui['subtitle'] ?? '' }}</p>
+    </header>
 
-  <article class="ufo-event-card">
-    <h2>Belum ada event publik</h2>
-    <p>Cek kembali nanti atau lihat update terbaru dari menu pengumuman.</p>
-
-    <div class="ufo-event-actions">
-      <a href="{{ route('mahasiswa.pengumuman') }}" class="ufo-event-link">Lihat Pengumuman</a>
-      <a href="{{ route('mahasiswa.organisasi.index') }}" class="ufo-event-link">Lihat Organisasi</a>
+    <div class="figma-search">
+        <i class="bi bi-search"></i>
+        <input type="text" id="event-search" placeholder="{{ $ui['search_placeholder'] ?? '' }}">
     </div>
-  </article>
+
+    <div class="figma-chip-row" id="event-categories">
+        @foreach($categories as $index => $category)
+            <button type="button" class="figma-chip {{ $index === 0 ? 'is-active' : '' }}" data-event-category="{{ $category }}">{{ $category }}</button>
+        @endforeach
+    </div>
+
+    <p class="figma-muted mb-3"><span id="event-count">0</span> {{ $ui['count_suffix'] ?? '' }}</p>
+
+    <div class="figma-grid-3" id="event-grid"></div>
+
+    <div class="figma-empty-state d-none" id="event-empty">
+        <h3 class="h5 mb-2">{{ $ui['empty_title'] ?? '' }}</h3>
+        <p id="event-empty-message" class="mb-3">{{ $ui['empty_message'] ?? '' }}</p>
+        <a href="{{ route('mahasiswa.event') }}" class="figma-btn-primary d-none" id="event-show-all">{{ $ui['show_all_label'] ?? '' }}</a>
+    </div>
 </section>
 @endsection
+
+@push('scripts')
+<script>
+(function () {
+    var events = @json($events);
+    var orgFilter = @json($orgFilter);
+    var organizations = @json($organizations);
+    var ui = @json($ui);
+
+    var searchInput = document.getElementById('event-search');
+    var categoryButtons = Array.from(document.querySelectorAll('[data-event-category]'));
+    var grid = document.getElementById('event-grid');
+    var count = document.getElementById('event-count');
+    var empty = document.getElementById('event-empty');
+    var emptyMessage = document.getElementById('event-empty-message');
+    var showAll = document.getElementById('event-show-all');
+
+    var currentCategory = 'Semua';
+
+    function byOrgName(orgId) {
+        var found = organizations.find(function (item) {
+            return Number(item.id) === Number(orgId);
+        });
+
+        return found ? found.name : null;
+    }
+
+    function renderCard(event) {
+        return `
+            <article class="figma-card figma-event-card">
+                <div class="figma-event-card-image">
+                    <img src="${event.poster}" alt="${event.title}">
+                    <span class="figma-event-category">${event.category}</span>
+                </div>
+                <div class="figma-event-card-body">
+                    <h3>${event.title}</h3>
+                    <div class="figma-meta-row"><i class="bi bi-people"></i> ${event.organizer}</div>
+                    <div class="figma-meta-row"><i class="bi bi-calendar-event"></i> ${event.date} | ${event.time}</div>
+                    <div class="figma-meta-row"><i class="bi bi-geo-alt"></i> ${event.location}</div>
+                    <p class="figma-muted mb-0">${event.participants} peserta terdaftar</p>
+                    <a href="/event/${event.id}" class="figma-btn-primary mt-2">${ui.detail_button_label || ''}</a>
+                </div>
+            </article>
+        `;
+    }
+
+    function render() {
+        var query = (searchInput.value || '').trim().toLowerCase();
+
+        var filtered = events.filter(function (event) {
+            var matchSearch = (event.title || '').toLowerCase().includes(query) ||
+                (event.organizer || '').toLowerCase().includes(query);
+            var matchCategory = currentCategory === 'Semua' || event.category === currentCategory;
+            var matchOrg = !orgFilter || String(event.organizer_id) === String(orgFilter);
+
+            return matchSearch && matchCategory && matchOrg;
+        });
+
+        grid.innerHTML = filtered.map(renderCard).join('');
+        count.textContent = String(filtered.length);
+
+        var hasResult = filtered.length > 0;
+        empty.classList.toggle('d-none', hasResult);
+
+        if (!hasResult) {
+            if (orgFilter) {
+                var orgName = byOrgName(orgFilter);
+                if (orgName) {
+                    emptyMessage.textContent = orgName + ' belum memiliki event yang sesuai filter saat ini.';
+                    showAll.classList.remove('d-none');
+                } else {
+                    emptyMessage.textContent = ui.empty_title || '';
+                }
+            } else {
+                emptyMessage.textContent = ui.empty_message || '';
+                showAll.classList.add('d-none');
+            }
+        }
+    }
+
+    categoryButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            currentCategory = button.getAttribute('data-event-category') || 'Semua';
+            categoryButtons.forEach(function (item) { item.classList.remove('is-active'); });
+            button.classList.add('is-active');
+            render();
+        });
+    });
+
+    searchInput.addEventListener('input', render);
+    render();
+})();
+</script>
+@endpush
