@@ -1,233 +1,185 @@
-@extends('layouts.pengurus')
+@extends('layouts.portal.pengurus')
 
 @section('title', 'Lost & Found')
 
+@php
+    $isBem = $isBem ?? false;
+    $items = $items ?? [];
+    $priorityItems = $priorityItems ?? [];
+    $statusLabel = $statusLabel ?? [];
+    $statusPill = $statusPill ?? [];
+    $statusOptions = collect($statusLabel)
+        ->filter(fn ($label, $code) => trim((string) $code) !== '' && trim((string) $label) !== '')
+        ->all();
+    $itemStatusOptions = collect($items)
+        ->pluck('item_status')
+        ->filter(fn ($value) => trim((string) $value) !== '')
+        ->unique()
+        ->values()
+        ->all();
+@endphp
+
 @section('content')
-<!-- Page Header -->
-<div class="page-header">
-    <h1>Lost & Found</h1>
-    <p>Kelola laporan barang hilang dan barang ditemukan</p>
+<div class="ufo-kboard-page">
+    <section class="ufo-kboard-section">
+        <h1 class="ufo-kboard-heading">Lost &amp; Found</h1>
+        <p class="ufo-kboard-lead">
+            {{ $isBem ? 'Kelola laporan barang hilang dan temuan dari mahasiswa.' : 'Laporkan atau cari barang yang hilang atau ditemukan.' }}
+        </p>
+
+        <div class="ufo-kboard-row three mt-3">
+            <article class="ufo-kboard-stat blue">
+                <h3>{{ count($items) }}</h3>
+                <p>Total Laporan</p>
+            </article>
+            <article class="ufo-kboard-stat gold">
+                <h3>{{ collect($items)->where('status', 'pending')->count() }}</h3>
+                <p>Menunggu Persetujuan</p>
+            </article>
+            <article class="ufo-kboard-stat green">
+                <h3>{{ count($priorityItems) }}</h3>
+                <p>Prioritas Tinggi</p>
+            </article>
+        </div>
+    </section>
+
+    @if(count($priorityItems) > 0)
+        <section class="ufo-kboard-section ufo-pg-priority-wrap">
+            <div class="ufo-kboard-item-head mb-2">
+                <h3 class="ufo-kboard-item-title text-white mb-0">Prioritas Tinggi</h3>
+                <span class="ufo-kboard-pill pending">{{ count($priorityItems) }} item aktif</span>
+            </div>
+
+            <div class="ufo-pg-priority-grid">
+                @foreach($priorityItems as $item)
+                    <article>
+                        <div class="top">
+                            <span class="ufo-kboard-pill {{ $item['type'] === 'lost' ? 'rejected' : 'approved' }}">
+                                {{ $item['type'] === 'lost' ? 'Hilang' : 'Ditemukan' }}
+                            </span>
+                            <span class="ufo-kboard-pill draft">{{ str_replace('_', ' ', ucfirst($item['item_status'])) }}</span>
+                        </div>
+                        <h4>{{ $item['title'] }}</h4>
+                        <p>{{ $item['description'] }}</p>
+                        <small><i class="bi bi-geo-alt"></i> {{ $item['location'] }}</small>
+                    </article>
+                @endforeach
+            </div>
+        </section>
+    @endif
+
+    <section class="ufo-kboard-section">
+        <div class="ufo-kboard-toolbar">
+            <input type="text" class="ufo-kboard-field" placeholder="Cari barang, pelapor, atau lokasi...">
+            <select class="ufo-kboard-select">
+                <option value="">Semua Status</option>
+                @foreach($statusOptions as $code => $label)
+                    <option value="{{ $code }}">{{ $label }}</option>
+                @endforeach
+            </select>
+        </div>
+    </section>
+
+    <section class="ufo-kboard-section">
+        <div class="ufo-kboard-list">
+            @forelse($items as $item)
+                <article class="ufo-pg-lf-card">
+                    <div class="ufo-pg-lf-main">
+                        <div class="ufo-pg-lf-icon {{ $item['type'] === 'lost' ? 'lost' : 'found' }}">
+                            <i class="bi {{ $item['type'] === 'lost' ? 'bi-exclamation-triangle' : 'bi-check-circle' }}"></i>
+                        </div>
+
+                        <div class="ufo-pg-lf-body">
+                            <div class="ufo-kboard-item-head mb-2">
+                                <div>
+                                    <h3 class="ufo-kboard-item-title">{{ $item['title'] }}</h3>
+                                    <p class="ufo-kboard-item-meta">{{ $item['type'] === 'lost' ? 'Barang Hilang' : 'Barang Ditemukan' }}</p>
+                                </div>
+                                <div class="d-flex flex-wrap gap-1 justify-content-end">
+                                    @if($item['priority'])
+                                        <span class="ufo-kboard-pill pending">Prioritas</span>
+                                    @endif
+                                    <span class="ufo-kboard-pill {{ $statusPill[$item['status']] ?? 'draft' }}">{{ $statusLabel[$item['status']] ?? \Illuminate\Support\Str::title(str_replace('_', ' ', (string) $item['status'])) }}</span>
+                                    <span class="ufo-kboard-pill draft">{{ str_replace('_', ' ', ucfirst($item['item_status'])) }}</span>
+                                </div>
+                            </div>
+
+                            <p class="ufo-kboard-item-text mb-2">{{ $item['description'] }}</p>
+
+                            <div class="ufo-pg-lf-meta">
+                                <span><i class="bi bi-geo-alt"></i> {{ $item['location'] }}</span>
+                                <span><i class="bi bi-calendar3"></i> {{ \Carbon\Carbon::parse($item['date'])->translatedFormat('d M Y') }}</span>
+                                <span><i class="bi bi-person"></i> {{ $item['reporter'] }}</span>
+                            </div>
+
+                            @if(!empty($item['notes']))
+                                <div class="ufo-pg-lf-note">
+                                    <strong>Catatan BEM:</strong>
+                                    <span>{{ $item['notes'] }}</span>
+                                </div>
+                            @endif
+
+                            <div class="ufo-kboard-item-actions mt-3">
+                                @if($isBem && $item['status'] === 'pending')
+                                    <button class="ufo-kboard-btn primary" data-bs-toggle="modal" data-bs-target="#reviewModal" type="button">Review</button>
+                                @endif
+
+                                @if($isBem && $item['status'] === 'approved')
+                                    <button class="ufo-kboard-btn gold" type="button">{{ $item['priority'] ? 'Prioritas Aktif' : 'Set Prioritas' }}</button>
+                                    <button class="ufo-kboard-btn ghost" type="button">Kelola Status</button>
+                                @endif
+
+                                <button class="ufo-kboard-btn ghost" type="button">Lihat Detail</button>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+            @empty
+                <p class="ufo-kboard-item-meta mb-0">Belum ada laporan Lost &amp; Found di database.</p>
+            @endforelse
+        </div>
+    </section>
 </div>
 
-<!-- Statistics -->
-<div class="row mb-5">
-    <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card card-dashboard card-stat" style="background: linear-gradient(135deg, #3B82F6 0%, #1E40AF 100%); color: white;">
-            <div class="card-stat-icon"><i class="bi bi-box-fill"></i></div>
-            <div class="card-stat-number">23</div>
-            <div class="card-stat-label">Total Laporan</div>
-        </div>
-    </div>
-
-    <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card card-dashboard card-stat" style="background: linear-gradient(135deg, #EF4444 0%, #991B1B 100%); color: white;">
-            <div class="card-stat-icon"><i class="bi bi-exclamation-triangle-fill"></i></div>
-            <div class="card-stat-number">8</div>
-            <div class="card-stat-label">Barang Hilang</div>
-        </div>
-    </div>
-
-    <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card card-dashboard card-stat" style="background: linear-gradient(135deg, #22C55E 0%, #15803D 100%); color: white;">
-            <div class="card-stat-icon"><i class="bi bi-box2-heart-fill"></i></div>
-            <div class="card-stat-number">12</div>
-            <div class="card-stat-label">Barang Ditemukan</div>
-        </div>
-    </div>
-
-    <div class="col-md-6 col-lg-3 mb-4">
-        <div class="card card-dashboard card-stat" style="background: linear-gradient(135deg, #A78BFA 0%, #7C3AED 100%); color: white;">
-            <div class="card-stat-icon"><i class="bi bi-check2-all"></i></div>
-            <div class="card-stat-number">3</div>
-            <div class="card-stat-label">Terselesaikan</div>
-        </div>
-    </div>
-</div>
-
-<!-- Filter and Search -->
-<div class="row mb-4">
-    <div class="col-md-4">
-        <input type="text" class="form-control" placeholder="Cari barang...">
-    </div>
-    <div class="col-md-4">
-        <select class="form-select">
-            <option>Semua Tipe</option>
-            <option>Barang Hilang</option>
-            <option>Barang Ditemukan</option>
-        </select>
-    </div>
-    <div class="col-md-4">
-        <select class="form-select">
-            <option>Semua Status</option>
-            <option>Open</option>
-            <option>Resolved</option>
-            <option>Archived</option>
-        </select>
-    </div>
-</div>
-
-<!-- Lost & Found Items -->
-<div class="row">
-    <div class="col-lg-8 mb-4">
-        <div class="card card-dashboard">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                        <h5 class="card-title"><i class="bi bi-exclamation-triangle-fill"></i> Dompet Kulit Hitam (HILANG)</h5>
-                        <small class="text-muted">
-                            <i class="bi bi-geo-alt-fill"></i> Gedung A, Lantai 2 | <i class="bi bi-calendar-date-fill"></i> 24 Feb 2026
-                        </small>
-                    </div>
-                    <span class="badge bg-danger">Open</span>
-                </div>
-                <p class="text-muted mb-2">
-                    <strong>Pelapor:</strong> Ahmad Rifki<br>
-                    <strong>Email:</strong> rifki@email.com<br>
-                    <strong>Telepon:</strong> +62 812-3456-7890<br>
-                    <strong>Deskripsi:</strong> Dompet kulit hitam berisi KTM dan uang tunai
-                </p>
-                <div class="alert alert-light mb-3">
-                    <strong class="text-muted">Catatan Internal:</strong><br>
-                    <small>Status masih open, belum ada yang melaporkan menemukan item ini</small>
-                </div>
-                <div>
-                    <button class="btn btn-sm btn-info me-2" data-bs-toggle="modal" data-bs-target="#editNoteModal">
-                        <i class="bi bi-pencil-square"></i> Edit Catatan
-                    </button>
-                    <button class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> Tandai Selesai</button>
-                    <button class="btn btn-sm btn-danger"><i class="bi bi-archive-fill"></i> Archive</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-8 mb-4">
-        <div class="card card-dashboard">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                        <h5 class="card-title"><i class="bi bi-box2-heart-fill"></i> Kunci Loker Kuning (DITEMUKAN)</h5>
-                        <small class="text-muted">
-                            <i class="bi bi-geo-alt-fill"></i> Perpustakaan | <i class="bi bi-calendar-date-fill"></i> 20 Feb 2026
-                        </small>
-                    </div>
-                    <span class="badge bg-success">Resolved</span>
-                </div>
-                <p class="text-muted mb-2">
-                    <strong>Pelapor:</strong> Siti Nurhaliza<br>
-                    <strong>Email:</strong> siti.nur@email.com<br>
-                    <strong>Telepon:</strong> +62 812-9876-5432<br>
-                    <strong>Deskripsi:</strong> Kunci loker kuning dengan nomor 45
-                </p>
-                <div class="alert alert-light mb-3">
-                    <strong class="text-muted">Catatan Internal:</strong><br>
-                    <small>Sudah diambil oleh pemilik pada 22 Feb 2026</small>
-                </div>
-                <div>
-                    <button class="btn btn-sm btn-info me-2" data-bs-toggle="modal" data-bs-target="#editNoteModal">
-                        <i class="bi bi-pencil-square"></i> Edit Catatan
-                    </button>
-                    <button class="btn btn-sm btn-danger"><i class="bi bi-archive-fill"></i> Archive</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-8 mb-4">
-        <div class="card card-dashboard">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                        <h5 class="card-title"><i class="bi bi-exclamation-triangle-fill"></i> Airpods Pro (HILANG)</h5>
-                        <small class="text-muted">
-                            <i class="bi bi-geo-alt-fill"></i> Ruang Rapat UFO | <i class="bi bi-calendar-date-fill"></i> 18 Feb 2026
-                        </small>
-                    </div>
-                    <span class="badge bg-warning text-dark">Open</span>
-                </div>
-                <p class="text-muted mb-2">
-                    <strong>Pelapor:</strong> Muhammad Hendra<br>
-                    <strong>Email:</strong> hendra.m@email.com<br>
-                    <strong>Telepon:</strong> +62 815-7777-8888<br>
-                    <strong>Deskripsi:</strong> Airpods Pro warna putih dalam charging case
-                </p>
-                <div class="alert alert-light mb-3">
-                    <strong class="text-muted">Catatan Internal:</strong><br>
-                    <small>Follow up dengan pengguna lain yang mungkin melihat item ini</small>
-                </div>
-                <div>
-                    <button class="btn btn-sm btn-info me-2" data-bs-toggle="modal" data-bs-target="#editNoteModal">
-                        <i class="bi bi-pencil-square"></i> Edit Catatan
-                    </button>
-                    <button class="btn btn-sm btn-success"><i class="bi bi-check-lg"></i> Tandai Selesai</button>
-                    <button class="btn btn-sm btn-danger"><i class="bi bi-archive-fill"></i> Archive</button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="col-lg-8 mb-4">
-        <div class="card card-dashboard">
-            <div class="card-body">
-                <div class="d-flex justify-content-between align-items-start mb-3">
-                    <div>
-                        <h5 class="card-title"><i class="bi bi-box2-heart-fill"></i> Laptop Lenovo (DITEMUKAN)</h5>
-                        <small class="text-muted">
-                            <i class="bi bi-geo-alt-fill"></i> Kafeteria Kampus | <i class="bi bi-calendar-date-fill"></i> 15 Feb 2026
-                        </small>
-                    </div>
-                    <span class="badge bg-success">Resolved</span>
-                </div>
-                <p class="text-muted mb-2">
-                    <strong>Pelapor:</strong> Budi Santoso<br>
-                    <strong>Email:</strong> budi.s@email.com<br>
-                    <strong>Telepon:</strong> +62 816-5555-6666<br>
-                    <strong>Deskripsi:</strong> Laptop Lenovo hitam dengan stiker UFO
-                </p>
-                <div class="alert alert-light mb-3">
-                    <strong class="text-muted">Catatan Internal:</strong><br>
-                    <small>Diklaim oleh pemilik, berhasil dikembalikan dengan identitas terverifikasi</small>
-                </div>
-                <div>
-                    <button class="btn btn-sm btn-info me-2" data-bs-toggle="modal" data-bs-target="#editNoteModal">
-                        <i class="bi bi-pencil-square"></i> Edit Catatan
-                    </button>
-                    <button class="btn btn-sm btn-danger"><i class="bi bi-archive-fill"></i> Archive</button>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Edit Note Modal -->
-<div class="modal fade" id="editNoteModal" tabindex="-1">
-    <div class="modal-dialog">
+<div class="modal fade" id="reviewModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Edit Catatan Internal</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                <h5 class="modal-title">Review Laporan Lost &amp; Found</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
             <div class="modal-body">
-                <div class="mb-3">
-                    <label class="form-label">Catatan Moderator</label>
-                    <textarea class="form-control" rows="5">Status masih open, belum ada yang melaporkan menemukan item ini</textarea>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">Update Status</label>
-                    <select class="form-select">
-                        <option>Open - Sedang Dicari</option>
-                        <option>Investigating - Sedang Diinvestigasi</option>
-                        <option>Resolved - Selesai Dimana</option>
-                        <option>Archived - Diarsipkan</option>
-                    </select>
+                <div class="row g-3">
+                    <div class="col-12">
+                        <label class="form-label">Catatan Review</label>
+                        <textarea class="form-control" rows="4" placeholder="Tulis catatan validasi atau instruksi revisi"></textarea>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Keputusan</label>
+                        <select class="form-select">
+                            <option value="">Pilih keputusan</option>
+                            @foreach($statusOptions as $code => $label)
+                                <option value="{{ $code }}">{{ $label }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Status Barang</label>
+                        <select class="form-select">
+                            <option value="">Pilih status barang</option>
+                            @foreach($itemStatusOptions as $status)
+                                <option value="{{ $status }}">{{ \Illuminate\Support\Str::title(str_replace('_', ' ', (string) $status)) }}</option>
+                            @endforeach
+                        </select>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Batal</button>
-                <button type="button" class="btn btn-primary-custom">Simpan Catatan</button>
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                <button type="button" class="btn btn-danger">Tolak</button>
+                <button type="button" class="btn btn-success">Setujui</button>
             </div>
         </div>
     </div>
 </div>
-
 @endsection

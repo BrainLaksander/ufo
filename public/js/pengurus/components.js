@@ -33,7 +33,7 @@
         }
     });
 
-    // Logout dummy
+    // Logout fallback
     var logout = document.getElementById("pengurus-logout");
     if (logout)
         logout.addEventListener("click", function (e) {

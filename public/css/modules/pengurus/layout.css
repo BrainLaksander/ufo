@@ -2,9 +2,9 @@
 
 /* ===== TOKENS ===== */
 :root {
-  --primary: #5f3a74;
-  --accent: #ffcc00;
-  --danger: #cc0000;
+  --primary: var(--ufo-color-primary);
+  --accent: var(--ufo-color-accent);
+  --danger: var(--ufo-color-danger);
 }
 
 /* ===== GLOBAL RESET ===== */
@@ -16,7 +16,7 @@
 body {
   margin: 0;
   font-family: Inter, system-ui, Arial, Helvetica, sans-serif;
-  background: #f7f7fb;
+  background: var(--ufo-color-bg);
   color: #111;
 }
 
