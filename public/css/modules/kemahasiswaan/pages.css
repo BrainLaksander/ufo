@@ -1,122 +1,1894 @@
-/* Kemahasiswaan pages */
+/* Kemahasiswaan pages (design parity) */
 
-/* ===== PENGUMUMAN PAGE ===== */
-
-.pengumuman-page .page-title {
-    color: #1565c0;
+body.kemahasiswaan-layout .kmh-page {
+    width: min(1320px, 100%);
+    margin: 0 auto;
+    display: grid;
+    gap: 1.15rem;
 }
 
-.pengumuman-page .stat-card {
-    background: #f8f9fa;
-    border-radius: 1rem;
+body.kemahasiswaan-layout .kmh-card {
+    background: var(--km-card);
+    border: 1px solid var(--km-border);
+    border-radius: 0.85rem;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+    overflow: hidden;
 }
 
-.pengumuman-page .stat-total h2 {
-    color: #1565c0;
+body.kemahasiswaan-layout .kmh-card-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.8rem;
+    padding: 0.9rem 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
 }
 
-.pengumuman-page .stat-published h2 {
-    color: #2e7d32;
+body.kemahasiswaan-layout .kmh-card-head h2,
+body.kemahasiswaan-layout .kmh-card-head h3,
+body.kemahasiswaan-layout .kmh-card-head h4 {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.25;
+    color: #1f2937;
+    font-weight: 600;
 }
 
-.pengumuman-page .stat-scheduled h2 {
-    color: #1976d2;
+body.kemahasiswaan-layout .kmh-card-head small {
+    color: var(--km-muted-text);
+    font-size: 0.78rem;
 }
 
-.pengumuman-page .stat-draft h2 {
-    color: #757575;
+body.kemahasiswaan-layout .kmh-card-body {
+    padding: 1rem;
 }
 
-.pengumuman-page .btn-create-announcement {
-    border-color: #1565c0;
-    border-radius: 0.8rem;
-    background: #1565c0;
+body.kemahasiswaan-layout .kmh-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+body.kemahasiswaan-layout .kmh-stats-grid.is-three {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+body.kemahasiswaan-layout .kmh-stats-grid.is-two {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+body.kemahasiswaan-layout .kmh-stat-card {
+    background: var(--km-card);
+    border: 1px solid var(--km-border);
+    border-radius: 0.85rem;
+    min-height: 140px;
+    padding: 1rem 1.05rem;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.04);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.8rem;
+}
+
+body.kemahasiswaan-layout .kmh-stat-card p {
+    margin: 0;
+    color: var(--km-muted-text);
+    font-size: 0.92rem;
+    max-width: 14ch;
+}
+
+body.kemahasiswaan-layout .kmh-stat-value {
+    margin-top: 0.3rem;
+    display: block;
+    font-size: clamp(2rem, 2.4vw, 2.2rem);
+    line-height: 1;
+    color: #111827;
     font-weight: 700;
 }
 
-.pengumuman-page .btn-create-announcement:hover {
-    background: #0d47a1;
-    border-color: #0d47a1;
+body.kemahasiswaan-layout .kmh-stat-icon {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 0.6rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    flex-shrink: 0;
+    background: #ede7f6;
+    color: #3b1c57;
 }
 
-.pengumuman-page .email-distribution-alert {
-    background: #e3f2fd;
-    color: #1f2937;
-    border-radius: 1rem;
+body.kemahasiswaan-layout .kmh-stat-card.tone-warning .kmh-stat-icon {
+    background: #fff8dc;
+    color: #7c5f00;
 }
 
-.pengumuman-page #tablePengumuman thead {
-    background: #f8f9fa;
+body.kemahasiswaan-layout .kmh-stat-card.tone-success .kmh-stat-icon {
+    background: #e8f9ec;
+    color: #0d6830;
 }
 
-.pengumuman-page #tablePengumuman th {
-    color: #374151;
-    font-weight: 600;
-    white-space: nowrap;
+body.kemahasiswaan-layout .kmh-stat-card.tone-info .kmh-stat-icon {
+    background: #e5f1ff;
+    color: #1d4ed8;
 }
 
-.pengumuman-page #tablePengumuman tbody tr {
-    transition: background-color 0.2s ease;
-}
-
-.pengumuman-page #tablePengumuman tbody tr:hover {
-    background-color: #f5f8ff;
-}
-
-.pengumuman-page .announcement-title {
-    color: #1565c0;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.pengumuman-page .announcement-title:hover {
-    color: #0d47a1;
-}
-
-.pengumuman-page .action-link {
-    font-size: 0.87rem;
-    font-weight: 600;
-    text-decoration: none;
-}
-
-.pengumuman-page .action-view {
-    color: #1565c0;
-}
-
-.pengumuman-page .action-edit {
+body.kemahasiswaan-layout .kmh-stat-card.tone-muted .kmh-stat-icon {
+    background: #f3f4f6;
     color: #4b5563;
 }
 
-.pengumuman-page .action-delete {
-    color: #dc2626;
+body.kemahasiswaan-layout .kmh-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.7rem;
+    flex-wrap: wrap;
 }
 
-.pengumuman-page .status-published {
-    background: #c8e6c9;
-    color: #1b5e20;
+body.kemahasiswaan-layout .kmh-toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+    flex: 1 1 0;
+    min-width: 0;
+    flex-wrap: wrap;
 }
 
-.pengumuman-page .status-scheduled {
-    background: #bbdefb;
-    color: #0d47a1;
+body.kemahasiswaan-layout .kmh-toolbar-end {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex-wrap: wrap;
 }
 
-.pengumuman-page .status-draft {
+body.kemahasiswaan-layout .kmh-toolbar-caption {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.8rem;
+    line-height: 1.35;
+}
+
+body.kemahasiswaan-layout .kmh-toolbar-field {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.48rem;
+    min-height: 2.55rem;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 0.6rem;
+    padding: 0 0.72rem;
+    background: #ffffff;
+}
+
+body.kemahasiswaan-layout .kmh-toolbar-field.is-search {
+    flex: 1 1 16rem;
+    min-width: 12rem;
+}
+
+body.kemahasiswaan-layout .kmh-toolbar-icon {
+    color: #6b7280;
+    font-size: 0.85rem;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+body.kemahasiswaan-layout .kmh-toolbar-input,
+body.kemahasiswaan-layout .kmh-toolbar-select {
+    border: 0;
+    box-shadow: none;
+    background: transparent;
+    color: #1f2937;
+    font-size: 0.84rem;
+    line-height: 1.25;
+    width: 100%;
+    padding: 0;
+}
+
+body.kemahasiswaan-layout .kmh-toolbar-input:focus,
+body.kemahasiswaan-layout .kmh-toolbar-select:focus {
+    outline: none;
+    box-shadow: none;
+}
+
+body.kemahasiswaan-layout .kmh-toolbar-select {
+    min-width: 11rem;
+    padding-right: 0.3rem;
+}
+
+body.kemahasiswaan-layout .kmh-table .kmh-filter-empty-row td {
+    text-align: center;
+    color: #6b7280;
+    font-style: italic;
+}
+
+body.kemahasiswaan-layout .kmh-table tr.kmh-row-detail > td {
+    border-top: 0;
+}
+
+body.kemahasiswaan-layout .kmh-page .form-label {
+    margin-bottom: 0.35rem;
+    color: #4b5563;
+    font-size: 0.78rem;
+    font-weight: 600;
+}
+
+body.kemahasiswaan-layout .kmh-page .form-control,
+body.kemahasiswaan-layout .kmh-page .form-select,
+body.kemahasiswaan-layout .kmh-page textarea {
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 0.55rem;
+    box-shadow: none;
+    font-size: 0.87rem;
+}
+
+body.kemahasiswaan-layout .kmh-page .form-control:focus,
+body.kemahasiswaan-layout .kmh-page .form-select:focus,
+body.kemahasiswaan-layout .kmh-page textarea:focus {
+    border-color: rgba(59, 28, 87, 0.48);
+    box-shadow: 0 0 0 0.18rem rgba(59, 28, 87, 0.12);
+}
+
+body.kemahasiswaan-layout .kmh-page .btn-primary {
+    border-color: #3b1c57;
+    background: #3b1c57;
+}
+
+body.kemahasiswaan-layout .kmh-page .btn-primary:hover,
+body.kemahasiswaan-layout .kmh-page .btn-primary:focus {
+    border-color: #2f1548;
+    background: #2f1548;
+}
+
+body.kemahasiswaan-layout .kmh-page .table-responsive {
+    border-radius: 0.75rem;
+}
+
+body.kemahasiswaan-layout .kmh-page .kmh-table {
+    margin-bottom: 0;
+}
+
+body.kemahasiswaan-layout .kmh-page .kmh-table thead th {
+    padding: 0.72rem 0.75rem;
+    background: #f8f9fc;
+    color: #374151;
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    text-transform: uppercase;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
+}
+
+body.kemahasiswaan-layout .kmh-page .kmh-table tbody td {
+    vertical-align: middle;
+    font-size: 0.86rem;
+    color: #1f2937;
+    padding: 0.72rem 0.75rem;
+}
+
+body.kemahasiswaan-layout .kmh-page .kmh-table tbody tr:hover {
+    background: #f8f9fc;
+}
+
+body.kemahasiswaan-layout .kmh-status-pill {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 0.2rem 0.55rem;
+    font-size: 0.7rem;
+    line-height: 1;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+body.kemahasiswaan-layout .kmh-status-pill.is-success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+body.kemahasiswaan-layout .kmh-status-pill.is-warning {
+    background: #fef3c7;
+    color: #a16207;
+}
+
+body.kemahasiswaan-layout .kmh-status-pill.is-info {
+    background: #dbeafe;
+    color: #1d4ed8;
+}
+
+body.kemahasiswaan-layout .kmh-status-pill.is-primary {
+    background: #ede7f6;
+    color: #3b1c57;
+}
+
+body.kemahasiswaan-layout .kmh-status-pill.is-danger {
+    background: #fee2e2;
+    color: #b91c1c;
+}
+
+body.kemahasiswaan-layout .kmh-status-pill.is-muted {
     background: #e5e7eb;
     color: #374151;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 768px) {
-    .pengumuman-page .page-title {
-        font-size: 1.75rem;
+body.kemahasiswaan-layout .kmh-action-links {
+    display: inline-flex;
+    gap: 0.55rem;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+body.kemahasiswaan-layout .kmh-action-link {
+    border: 0;
+    background: transparent;
+    text-decoration: none;
+    color: #4b5563;
+    font-size: 0.78rem;
+    font-weight: 700;
+    padding: 0;
+}
+
+body.kemahasiswaan-layout .kmh-action-link:hover {
+    text-decoration: underline;
+}
+
+body.kemahasiswaan-layout .kmh-action-link.is-primary {
+    color: #1d4ed8;
+}
+
+body.kemahasiswaan-layout .kmh-action-link.is-warning {
+    color: #b45309;
+}
+
+body.kemahasiswaan-layout .kmh-action-link.is-danger {
+    color: #dc2626;
+}
+
+body.kemahasiswaan-layout .kmh-empty-row {
+    text-align: center;
+    color: #6b7280;
+    padding: 1rem 0.6rem;
+}
+
+body.kemahasiswaan-layout .kmh-grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+body.kemahasiswaan-layout .kmh-grid-2.is-4-6 {
+    grid-template-columns: 5fr 7fr;
+}
+
+body.kemahasiswaan-layout .kmh-inline-review {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+body.kemahasiswaan-layout .kmh-inline-review .form-select,
+body.kemahasiswaan-layout .kmh-inline-review .form-control {
+    min-height: 2rem;
+    font-size: 0.78rem;
+}
+
+body.kemahasiswaan-layout .kmh-inline-review .form-select {
+    min-width: 7.5rem;
+}
+
+body.kemahasiswaan-layout .kmh-inline-review .form-control {
+    min-width: 13rem;
+}
+
+body.kemahasiswaan-layout .kmh-inline-review .btn {
+    min-width: 4.75rem;
+}
+
+/* Dashboard (rebuilt, layout-preserving) */
+body.kemahasiswaan-layout .kmh-dashboard-page {
+    gap: 1rem;
+}
+
+body.kemahasiswaan-layout .kmh-dashboard-stats {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+body.kemahasiswaan-layout .kmh-dashboard-stats .kmh-stat-card {
+    min-height: 140px;
+}
+
+body.kemahasiswaan-layout .kmh-dashboard-stats .kmh-stat-content {
+    min-width: 0;
+}
+
+body.kemahasiswaan-layout .kmh-dashboard-main-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 330px;
+    gap: 1rem;
+    align-items: start;
+}
+
+body.kemahasiswaan-layout .kmh-dashboard-chart-card,
+body.kemahasiswaan-layout .kmh-dashboard-side-panel,
+body.kemahasiswaan-layout .kmh-dashboard-announce-card {
+    width: 100%;
+}
+
+body.kemahasiswaan-layout .kmh-chart-shell {
+    height: 320px;
+    position: relative;
+}
+
+body.kemahasiswaan-layout .kmh-chart-shell canvas {
+    width: 100%;
+    height: 100%;
+}
+
+body.kemahasiswaan-layout .kmh-quick-actions {
+    display: grid;
+    gap: 0.65rem;
+}
+
+body.kemahasiswaan-layout .kmh-quick-btn {
+    border: 0;
+    border-radius: 0.58rem;
+    min-height: 2.8rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0;
+    font-size: 0.86rem;
+    font-weight: 700;
+    text-decoration: none;
+}
+
+body.kemahasiswaan-layout .kmh-dashboard-side-panel {
+    display: flex;
+    flex-direction: column;
+}
+
+body.kemahasiswaan-layout .kmh-side-section-head {
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+body.kemahasiswaan-layout .kmh-side-section-head h3 {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.45rem;
+    color: #6b7280;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+body.kemahasiswaan-layout .kmh-quick-btn.is-primary {
+    background: var(--primary);
+    color: #ffffff;
+}
+
+body.kemahasiswaan-layout .kmh-quick-btn.is-accent {
+    background: var(--accent);
+    color: var(--primary);
+}
+
+body.kemahasiswaan-layout .kmh-page-pengumuman .kmh-toolbar {
+    align-items: stretch;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengumuman .kmh-toolbar-end {
+    margin-left: auto;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengumuman .kmh-pengumuman-cta {
+    min-height: 3.05rem;
+    padding: 0.85rem 1.15rem;
+    border-radius: 0.72rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-strong) 100%);
+    box-shadow: 0 10px 24px rgba(59, 28, 87, 0.18);
+}
+
+body.kemahasiswaan-layout .kmh-page-pengumuman .kmh-pengumuman-cta i {
+    width: 1.45rem;
+    height: 1.45rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.14);
+    font-size: 0.85rem;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengumuman .kmh-pengumuman-cta:hover {
+    background: linear-gradient(135deg, #452061 0%, #2f1548 100%);
+    color: #ffffff;
+    box-shadow: 0 14px 28px rgba(59, 28, 87, 0.22);
+}
+
+body.kemahasiswaan-layout .kmh-page-pengumuman .kmh-info-banner {
+    border: 1px solid rgba(29, 78, 216, 0.14);
+    border-radius: 0.82rem;
+    padding: 0.95rem 1rem;
+    background: linear-gradient(180deg, #eff6ff 0%, #eaf1ff 100%);
+    color: #1e3a8a;
+    box-shadow: 0 2px 8px rgba(29, 78, 216, 0.06);
+}
+
+body.kemahasiswaan-layout .kmh-page-pengumuman .kmh-info-banner strong {
+    color: #1d4ed8;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengumuman .kmh-form-action-btn {
+    min-height: 2.8rem;
+    border-radius: 0.62rem;
+    padding-inline: 1rem;
+    font-weight: 700;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengumuman .kmh-inline-review .kmh-form-action-btn {
+    min-width: 5rem;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengumuman .kmh-inline-review .form-select,
+body.kemahasiswaan-layout .kmh-page-pengumuman .kmh-inline-review .form-control {
+    border-radius: 0.62rem;
+    background: #ffffff;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengumuman .kmh-card .kmh-toolbar-field {
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengumuman .kmh-card .kmh-toolbar-field:focus-within {
+    border-color: rgba(59, 28, 87, 0.28);
+    box-shadow: 0 0 0 0.18rem rgba(59, 28, 87, 0.1);
+}
+
+body.kemahasiswaan-layout .kmh-event-list {
+    display: grid;
+    gap: 0.65rem;
+    padding: 0.95rem;
+}
+
+body.kemahasiswaan-layout .kmh-event-item {
+    padding: 0.62rem 0.72rem;
+    border: 1px solid #ebedf0;
+    border-radius: 0.58rem;
+    background: #f3f4f6;
+}
+
+body.kemahasiswaan-layout .kmh-event-item h4 {
+    margin: 0;
+    color: #1f2937;
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+body.kemahasiswaan-layout .kmh-event-item p {
+    margin: 0.22rem 0 0;
+    color: #6b7280;
+    font-size: 0.8rem;
+}
+
+body.kemahasiswaan-layout .kmh-event-item.is-empty {
+    background: #f8f9fc;
+    border-style: dashed;
+}
+
+body.kemahasiswaan-layout .kmh-dashboard-table-body {
+    padding-top: 0;
+}
+
+body.kemahasiswaan-layout .kmh-announcement-table-wrap .kmh-table {
+    min-width: 640px;
+}
+
+body.kemahasiswaan-layout .kmh-dashboard-announce-card .kmh-table tbody td:nth-child(2) {
+    color: #6b7280;
+}
+
+/* Kalender page */
+body.kemahasiswaan-layout .kmh-kalender-page {
+    gap: 1rem;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-control-card .kmh-card-body,
+body.kemahasiswaan-layout .kmh-calendar-grid-card .kmh-card-body {
+    padding: 1.1rem 1.2rem;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-top-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1rem;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-top-head h2 {
+    margin: 0;
+    color: #3b1c57;
+    font-size: 2rem;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-top-head p {
+    margin: 0.36rem 0 0;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-add-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.55rem;
+    min-height: 2.5rem;
+    padding: 0 1rem;
+    border-radius: 0.58rem;
+    background: var(--primary);
+    color: #ffffff;
+    text-decoration: none;
+    font-size: 0.86rem;
+    font-weight: 700;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-add-btn:hover {
+    background: #2f1548;
+    color: #ffffff;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-filter-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 260px) minmax(0, 1fr);
+    gap: 1rem 1.2rem;
+    margin-bottom: 0.9rem;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-label {
+    display: inline-block;
+    margin-bottom: 0.45rem;
+    color: #4b5563;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-select {
+    width: 100%;
+    min-height: 2.45rem;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 0.56rem;
+    padding: 0 0.72rem;
+    background: #ffffff;
+    color: #1f2937;
+    font-size: 0.86rem;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-search-wrap {
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+    min-height: 2.45rem;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 0.56rem;
+    padding: 0 0.72rem;
+    background: #ffffff;
+    gap: 0.48rem;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-search-wrap i {
+    color: #6b7280;
+    font-size: 0.86rem;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-search-wrap input {
+    border: 0;
+    background: transparent;
+    width: 100%;
+    color: #1f2937;
+    font-size: 0.86rem;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-search-wrap input:focus {
+    outline: none;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-legend {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.8rem 1rem;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-legend-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    color: #4b5563;
+    font-size: 0.82rem;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-dot {
+    width: 0.58rem;
+    height: 0.58rem;
+    border-radius: 999px;
+    display: inline-flex;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-dot.is-akademik { background: #3b82f6; }
+body.kemahasiswaan-layout .kmh-calendar-dot.is-organisasi { background: #22c55e; }
+body.kemahasiswaan-layout .kmh-calendar-dot.is-masa_tenang { background: #ef4444; }
+body.kemahasiswaan-layout .kmh-calendar-dot.is-libur { background: #facc15; }
+body.kemahasiswaan-layout .kmh-calendar-dot.is-event_besar { background: #3b1c57; }
+
+body.kemahasiswaan-layout .kmh-calendar-month-head {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    margin-bottom: 0.95rem;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-month-head h3 {
+    margin: 0;
+    font-size: 1.85rem;
+    color: #3b1c57;
+    font-weight: 700;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-nav-btn {
+    width: 2rem;
+    height: 2rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    text-decoration: none;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-nav-btn:hover {
+    background: #f3f4f6;
+    color: #1f2937;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-view-toggle {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.25rem;
+    border-radius: 0.55rem;
+    background: #f3f4f6;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-view-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+    min-height: 2rem;
+    padding: 0 0.76rem;
+    border-radius: 0.5rem;
+    color: #6b7280;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-view-btn.is-active {
+    background: #3b1c57;
+    color: #ffffff;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-month-grid {
+    border: 1px solid #e5e7eb;
+    border-radius: 0.72rem;
+    overflow: hidden;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-week-header,
+body.kemahasiswaan-layout .kmh-calendar-days {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+}
+
+body.kemahasiswaan-layout .kmh-calendar-week-cell {
+    background: #f8fafc;
+    padding: 0.62rem 0.5rem;
+    text-align: center;
+    color: #4b5563;
+    font-size: 0.78rem;
+    font-weight: 700;
+    border-right: 1px solid #e5e7eb;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-week-cell:last-child {
+    border-right: 0;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-day {
+    min-height: 106px;
+    padding: 0.45rem 0.42rem;
+    border-right: 1px solid #e5e7eb;
+    border-top: 1px solid #e5e7eb;
+    background: #ffffff;
+    display: flex;
+    flex-direction: column;
+    gap: 0.32rem;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-day:nth-child(7n) {
+    border-right: 0;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-day.is-outside {
+    background: #f9fafb;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-date {
+    color: #4b5563;
+    font-size: 0.74rem;
+    font-weight: 700;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-events {
+    display: grid;
+    gap: 0.26rem;
+    min-height: 0;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-pill {
+    display: inline-flex;
+    align-items: center;
+    border-radius: 0.36rem;
+    padding: 0.18rem 0.4rem;
+    font-size: 0.66rem;
+    line-height: 1.1;
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-pill.is-akademik { background: #dbeafe; color: #1d4ed8; }
+body.kemahasiswaan-layout .kmh-calendar-pill.is-organisasi { background: #dcfce7; color: #166534; }
+body.kemahasiswaan-layout .kmh-calendar-pill.is-masa_tenang { background: #fee2e2; color: #b91c1c; }
+body.kemahasiswaan-layout .kmh-calendar-pill.is-libur { background: #fef3c7; color: #92400e; }
+body.kemahasiswaan-layout .kmh-calendar-pill.is-event_besar { background: #ede7f6; color: #3b1c57; }
+
+body.kemahasiswaan-layout .kmh-calendar-empty {
+    min-height: 0.95rem;
+}
+
+body.kemahasiswaan-layout .kmh-calendar-more {
+    color: #6b7280;
+    font-size: 0.64rem;
+}
+
+/* Kontak page */
+body.kemahasiswaan-layout .kmh-kontak-page {
+    gap: 0.95rem;
+}
+
+body.kemahasiswaan-layout .kmh-contact-hero-card .kmh-card-body,
+body.kemahasiswaan-layout .kmh-contact-search-card .kmh-card-body {
+    padding: 0.72rem 0.9rem;
+}
+
+body.kemahasiswaan-layout .kmh-contact-hero {
+    display: flex;
+    align-items: center;
+    gap: 0.78rem;
+}
+
+body.kemahasiswaan-layout .kmh-contact-hero-icon {
+    width: 2.35rem;
+    height: 2.35rem;
+    border-radius: 0.58rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #3b1c57;
+    color: #ffffff;
+    font-size: 1rem;
+}
+
+body.kemahasiswaan-layout .kmh-contact-hero h2 {
+    margin: 0;
+    color: #1f2937;
+    font-size: 2.1rem;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+body.kemahasiswaan-layout .kmh-contact-hero p {
+    margin: 0.2rem 0 0;
+    color: #6b7280;
+    font-size: 0.9rem;
+}
+
+body.kemahasiswaan-layout .kmh-contact-search-wrap {
+    display: inline-flex;
+    align-items: center;
+    width: 100%;
+    min-height: 2.5rem;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 0.58rem;
+    padding: 0 0.76rem;
+    background: #ffffff;
+    gap: 0.48rem;
+}
+
+body.kemahasiswaan-layout .kmh-contact-search-wrap i {
+    color: #6b7280;
+    font-size: 0.88rem;
+}
+
+body.kemahasiswaan-layout .kmh-contact-search-wrap input {
+    width: 100%;
+    border: 0;
+    background: transparent;
+    color: #1f2937;
+    font-size: 0.88rem;
+}
+
+body.kemahasiswaan-layout .kmh-contact-search-wrap input:focus {
+    outline: none;
+}
+
+body.kemahasiswaan-layout .kmh-contact-mini-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.7rem;
+}
+
+body.kemahasiswaan-layout .kmh-contact-mini-card {
+    background: var(--km-card);
+    border: 1px solid var(--km-border);
+    border-radius: 0.72rem;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+    padding: 0.68rem 0.76rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.6rem;
+}
+
+body.kemahasiswaan-layout .kmh-contact-mini-card p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.8rem;
+}
+
+body.kemahasiswaan-layout .kmh-contact-mini-card strong {
+    margin-top: 0.1rem;
+    display: block;
+    color: #111827;
+    font-size: 2rem;
+    line-height: 1;
+    font-weight: 700;
+}
+
+body.kemahasiswaan-layout .kmh-contact-mini-card span {
+    width: 2.05rem;
+    height: 2.05rem;
+    border-radius: 0.52rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ede7f6;
+    color: #3b1c57;
+}
+
+body.kemahasiswaan-layout .kmh-contact-mini-card:nth-child(2) span,
+body.kemahasiswaan-layout .kmh-contact-mini-card:nth-child(3) span {
+    background: #fff8dc;
+    color: #7c5f00;
+}
+
+body.kemahasiswaan-layout .kmh-contact-org-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem;
+}
+
+body.kemahasiswaan-layout .kmh-contact-org-card {
+    background: var(--km-card);
+    border: 1px solid var(--km-border);
+    border-radius: 0.8rem;
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.05);
+    overflow: hidden;
+}
+
+body.kemahasiswaan-layout .kmh-contact-org-head {
+    background: #3b1c57;
+    color: #ffffff;
+    padding: 0.72rem 0.8rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.7rem;
+}
+
+body.kemahasiswaan-layout .kmh-contact-org-head h3 {
+    margin: 0;
+    font-size: 1.35rem;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+body.kemahasiswaan-layout .kmh-contact-org-tags {
+    margin-top: 0.42rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.38rem;
+    flex-wrap: wrap;
+}
+
+body.kemahasiswaan-layout .kmh-contact-tag {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.15rem;
+    border-radius: 999px;
+    padding: 0 0.55rem;
+    background: rgba(255, 208, 0, 0.22);
+    color: #ffd452;
+    border: 1px solid rgba(255, 208, 0, 0.45);
+    font-size: 0.66rem;
+    font-weight: 700;
+}
+
+body.kemahasiswaan-layout .kmh-contact-tag.is-muted {
+    background: rgba(229, 231, 235, 0.18);
+    color: #e5e7eb;
+    border-color: rgba(229, 231, 235, 0.28);
+}
+
+body.kemahasiswaan-layout .kmh-contact-org-head-icon {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 0.52rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffd000;
+    color: #3b1c57;
+    font-size: 1rem;
+}
+
+body.kemahasiswaan-layout .kmh-contact-members {
+    padding: 0.72rem;
+    display: grid;
+    gap: 0.62rem;
+}
+
+body.kemahasiswaan-layout .kmh-contact-member-card {
+    background: #f3f1f8;
+    border-left: 3px solid #7a5ba5;
+    border-radius: 0.5rem;
+    padding: 0.58rem 0.62rem;
+}
+
+body.kemahasiswaan-layout .kmh-contact-member-role {
+    margin: 0;
+    color: #7a5ba5;
+    font-size: 0.76rem;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.34rem;
+}
+
+body.kemahasiswaan-layout .kmh-contact-member-card h4 {
+    margin: 0.26rem 0 0.35rem;
+    color: #1f2937;
+    font-size: 1.26rem;
+    line-height: 1.2;
+    font-weight: 700;
+}
+
+body.kemahasiswaan-layout .kmh-contact-member-card p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.82rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.36rem;
+    width: 100%;
+}
+
+body.kemahasiswaan-layout .kmh-contact-member-card p + p {
+    margin-top: 0.24rem;
+}
+
+body.kemahasiswaan-layout .kmh-contact-member-card a {
+    color: #6b7280;
+    text-decoration: none;
+}
+
+body.kemahasiswaan-layout .kmh-contact-member-card a:hover {
+    text-decoration: underline;
+}
+
+/* Organisasi page */
+body.kemahasiswaan-layout .kmh-organisasi-page {
+    gap: 1rem;
+}
+
+body.kemahasiswaan-layout .kmh-organisasi-toolbar-card {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+}
+
+body.kemahasiswaan-layout .kmh-organisasi-page .kmh-toolbar {
+    align-items: stretch;
+}
+
+body.kemahasiswaan-layout .kmh-organisasi-page .kmh-toolbar-group {
+    flex: 1 1 28rem;
+}
+
+body.kemahasiswaan-layout .kmh-organisasi-page .kmh-toolbar-end {
+    margin-left: auto;
+    align-self: center;
+}
+
+body.kemahasiswaan-layout .kmh-org-add-btn {
+    min-height: 3.05rem;
+    padding: 0.85rem 1.15rem;
+    border-radius: 0.72rem;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-strong) 100%);
+    box-shadow: 0 10px 24px rgba(59, 28, 87, 0.18);
+}
+
+body.kemahasiswaan-layout .kmh-org-add-btn i {
+    width: 1.45rem;
+    height: 1.45rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.14);
+    font-size: 0.85rem;
+}
+
+body.kemahasiswaan-layout .kmh-org-add-btn:hover {
+    background: linear-gradient(135deg, #452061 0%, #2f1548 100%);
+    color: #ffffff;
+    box-shadow: 0 14px 28px rgba(59, 28, 87, 0.22);
+}
+
+body.kemahasiswaan-layout .kmh-org-table thead th {
+    background: #f8f9fc;
+    color: #1f2937;
+}
+
+body.kemahasiswaan-layout .kmh-org-table tbody td:nth-child(1) {
+    min-width: 16rem;
+}
+
+body.kemahasiswaan-layout .kmh-org-name-cell {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+body.kemahasiswaan-layout .kmh-org-avatar {
+    width: 2.5rem;
+    height: 2.5rem;
+    border-radius: 0.7rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #f4ecff;
+    color: #3b1c57;
+    flex-shrink: 0;
+    box-shadow: inset 0 0 0 1px rgba(59, 28, 87, 0.08);
+}
+
+body.kemahasiswaan-layout .kmh-org-avatar i {
+    font-size: 1rem;
+}
+
+body.kemahasiswaan-layout .kmh-org-name {
+    color: #1f2937;
+    font-weight: 600;
+}
+
+body.kemahasiswaan-layout .kmh-org-actions {
+    gap: 0.35rem;
+}
+
+body.kemahasiswaan-layout .kmh-org-actions .kmh-action-link {
+    width: 2.1rem;
+    height: 2.1rem;
+    border-radius: 0.62rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ffffff;
+    border: 1px solid rgba(0, 0, 0, 0.08);
+    text-decoration: none;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+}
+
+body.kemahasiswaan-layout .kmh-org-actions .kmh-action-link:hover {
+    text-decoration: none;
+    transform: translateY(-1px);
+}
+
+body.kemahasiswaan-layout .kmh-org-actions .kmh-action-link i {
+    font-size: 0.88rem;
+}
+
+body.kemahasiswaan-layout .kmh-org-actions .kmh-action-link.is-primary {
+    color: #3b1c57;
+}
+
+body.kemahasiswaan-layout .kmh-org-actions .kmh-action-link.is-warning {
+    color: #ca8a04;
+}
+
+body.kemahasiswaan-layout .kmh-org-actions .kmh-action-link.is-danger {
+    color: #dc2626;
+}
+
+body.kemahasiswaan-layout .kmh-org-inline-edit {
+    margin-top: 0.25rem;
+}
+
+body.kemahasiswaan-layout .kmh-org-inline-edit .form-control,
+body.kemahasiswaan-layout .kmh-org-inline-edit .form-select {
+    border-radius: 0.62rem;
+}
+
+body.kemahasiswaan-layout .kmh-org-inline-edit .kmh-form-action-btn {
+    width: 100%;
+    min-height: 2.55rem;
+}
+
+body.kemahasiswaan-layout .kmh-org-page-badge {
+    width: 2.15rem;
+    height: 2.15rem;
+    border-radius: 0.62rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #ede7f6;
+    color: #3b1c57;
+    font-weight: 700;
+    font-size: 0.88rem;
+    border: 1px solid rgba(59, 28, 87, 0.12);
+}
+
+body.kemahasiswaan-layout .kmh-page-organisasi .kmh-stats-grid .kmh-stat-card {
+    min-height: 126px;
+}
+
+body.kemahasiswaan-layout .kmh-page-organisasi .kmh-org-table thead th:nth-child(1) {
+    min-width: 17.5rem;
+}
+
+body.kemahasiswaan-layout .kmh-page-organisasi .kmh-org-table thead th:nth-child(4) {
+    min-width: 15rem;
+}
+
+body.kemahasiswaan-layout .kmh-page-organisasi .kmh-org-table thead th:nth-child(6),
+body.kemahasiswaan-layout .kmh-page-organisasi .kmh-org-table tbody td:nth-child(6) {
+    text-align: center;
+}
+
+body.kemahasiswaan-layout .kmh-page-organisasi .kmh-org-name-cell {
+    gap: 0.68rem;
+}
+
+body.kemahasiswaan-layout .kmh-page-organisasi .kmh-org-avatar {
+    width: 2.35rem;
+    height: 2.35rem;
+}
+
+body.kemahasiswaan-layout .kmh-page-organisasi .kmh-org-name {
+    font-size: 0.9rem;
+}
+
+body.kemahasiswaan-layout .kmh-page-organisasi .kmh-org-actions .kmh-action-link {
+    width: 1.9rem;
+    height: 1.9rem;
+}
+
+/* Pengajuan page */
+body.kemahasiswaan-layout .kmh-page-pengajuan {
+    gap: 1rem;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-tab-card {
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+}
+
+body.kemahasiswaan-layout .kmh-tab-links {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0;
+    overflow: hidden;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 0.72rem;
+    background: #ffffff;
+}
+
+body.kemahasiswaan-layout .kmh-tab-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+}
+
+body.kemahasiswaan-layout .kmh-tab-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 3rem;
+    flex: 1 1 0;
+    padding: 0.7rem 1rem;
+    background: #f8f9fc;
+    color: #6b7280;
+    text-decoration: none;
+    font-size: 0.84rem;
+    font-weight: 600;
+    border-right: 1px solid rgba(0, 0, 0, 0.08);
+    box-shadow: inset 0 -2px 0 transparent;
+}
+
+body.kemahasiswaan-layout .kmh-tab-link:hover {
+    background: #eef2ff;
+    color: #1d4ed8;
+}
+
+body.kemahasiswaan-layout .kmh-tab-link:last-child {
+    border-right: 0;
+}
+
+body.kemahasiswaan-layout .kmh-tab-link.is-active {
+    background: #eef4ff;
+    color: #1d4ed8;
+    box-shadow: inset 0 -3px 0 #2f6bff;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-toolbar {
+    align-items: stretch;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-toolbar-group {
+    flex: 1 1 28rem;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-toolbar-end {
+    margin-left: auto;
+    align-self: center;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-toolbar-caption {
+    color: #64748b;
+    font-weight: 600;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-card .kmh-toolbar-field {
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-card .kmh-toolbar-field:focus-within {
+    border-color: rgba(29, 78, 216, 0.28);
+    box-shadow: 0 0 0 0.18rem rgba(29, 78, 216, 0.1);
+}
+
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-form-action-btn,
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-review-submit-btn {
+    min-height: 2.55rem;
+    padding: 0 0.9rem;
+    border-radius: 0.62rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    font-weight: 700;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-review-submit-btn {
+    white-space: nowrap;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-review-submit-btn i {
+    font-size: 0.88rem;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-inline-review .form-select,
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-inline-review .form-control {
+    border-radius: 0.62rem;
+    background: #ffffff;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-inline-review .form-select {
+    min-width: 8.4rem;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-inline-review .form-control {
+    min-width: 12.5rem;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-table thead th:nth-child(1),
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-table thead th:nth-child(2),
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-table thead th:nth-child(3) {
+    color: #1d4ed8;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-table tbody td:nth-child(1) {
+    color: #1d4ed8;
+    font-weight: 600;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-table tbody td:nth-child(5) {
+    color: #6b7280;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-table tbody td:nth-child(6),
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-table tbody td:nth-child(6) .kmh-inline-review {
+    white-space: nowrap;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-table tbody td:nth-child(6) .kmh-inline-review {
+    justify-content: center;
+}
+
+body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-table tbody td:nth-child(6) .btn {
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+}
+
+/* Pengumuman page */
+body.kemahasiswaan-layout .kmh-info-banner {
+    border-radius: 0.7rem;
+    border: 1px solid #c7dbff;
+    background: #eaf2ff;
+    color: #1f2937;
+    padding: 0.8rem 0.95rem;
+    font-size: 0.83rem;
+}
+
+/* Notifikasi page */
+body.kemahasiswaan-layout .kmh-filter-chips {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+}
+
+body.kemahasiswaan-layout .kmh-filter-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    padding: 0.36rem 0.72rem;
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 700;
+    background: #eceff3;
+    color: #374151;
+}
+
+body.kemahasiswaan-layout .kmh-filter-chip:hover {
+    background: #dfe4ea;
+    color: #1f2937;
+}
+
+body.kemahasiswaan-layout .kmh-filter-chip.is-active {
+    background: #3b1c57;
+    color: #ffffff;
+}
+
+body.kemahasiswaan-layout .kmh-notification-list {
+    display: grid;
+    gap: 0.7rem;
+}
+
+body.kemahasiswaan-layout .kmh-notification-item {
+    background: var(--km-card);
+    border: 1px solid var(--km-border);
+    border-left: 4px solid transparent;
+    border-radius: 0.8rem;
+    box-shadow: 0 1px 6px rgba(15, 23, 42, 0.04);
+    padding: 0.85rem 0.9rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+body.kemahasiswaan-layout .kmh-notification-item.is-unread {
+    border-left-color: var(--accent);
+}
+
+body.kemahasiswaan-layout .kmh-notification-icon {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 0.6rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 0.95rem;
+}
+
+body.kemahasiswaan-layout .kmh-notification-icon.tone-pengajuan {
+    background: #e5efff;
+    color: #1d4ed8;
+}
+
+body.kemahasiswaan-layout .kmh-notification-icon.tone-laporan {
+    background: #e8f9ec;
+    color: #0d6830;
+}
+
+body.kemahasiswaan-layout .kmh-notification-icon.tone-pengumuman {
+    background: #fff8dc;
+    color: #7c5f00;
+}
+
+body.kemahasiswaan-layout .kmh-notification-icon.tone-akun {
+    background: #ede7f6;
+    color: #3b1c57;
+}
+
+body.kemahasiswaan-layout .kmh-notification-icon.tone-jadwal {
+    background: #eceff3;
+    color: #374151;
+}
+
+body.kemahasiswaan-layout .kmh-notification-content {
+    min-width: 0;
+    flex: 1;
+}
+
+body.kemahasiswaan-layout .kmh-notification-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.7rem;
+    margin-bottom: 0.2rem;
+}
+
+body.kemahasiswaan-layout .kmh-notification-title {
+    margin: 0;
+    color: #1f2937;
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+body.kemahasiswaan-layout .kmh-notification-time {
+    color: #6b7280;
+    font-size: 0.72rem;
+    white-space: nowrap;
+}
+
+body.kemahasiswaan-layout .kmh-notification-message {
+    margin: 0;
+    color: #374151;
+    font-size: 0.83rem;
+    line-height: 1.45;
+}
+
+body.kemahasiswaan-layout .kmh-notification-meta {
+    margin-top: 0.45rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+body.kemahasiswaan-layout .kmh-notification-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.3rem;
+    border: 0;
+    border-radius: 999px;
+    min-height: 1.8rem;
+    padding: 0 0.62rem;
+    background: #eef2ff;
+    color: #1d4ed8;
+    text-decoration: none;
+    font-size: 0.74rem;
+    font-weight: 700;
+    line-height: 1;
+}
+
+body.kemahasiswaan-layout .kmh-notification-action:hover {
+    background: #dbeafe;
+    color: #1e40af;
+}
+
+body.kemahasiswaan-layout .kmh-notification-action:focus-visible {
+    outline: 2px solid rgba(29, 78, 216, 0.35);
+    outline-offset: 2px;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
-    .pengumuman-page .stat-card {
-        margin-bottom: 0.25rem;
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-dashboard-main-grid {
+        grid-template-columns: minmax(0, 1fr) 300px;
     }
 
-    .pengumuman-page #tablePengumuman {
-        font-size: 0.9rem;
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-chart-shell {
+        height: 300px;
+    }
+
+    body.kemahasiswaan-layout .kmh-grid-2.is-4-6 {
+        grid-template-columns: 1fr;
+    }
+
+    body.kemahasiswaan-layout .kmh-calendar-filter-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    body.kemahasiswaan-layout .kmh-contact-org-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 1024px) {
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-dashboard-main-grid {
+        grid-template-columns: minmax(0, 1fr);
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-chart-shell {
+        height: 288px;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-event-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-announcement-table-wrap .kmh-table {
+        min-width: 580px;
+    }
+}
+
+@media (max-width: 900px) {
+    body.kemahasiswaan-layout .kmh-stats-grid.is-three,
+    body.kemahasiswaan-layout .kmh-stats-grid.is-two,
+    body.kemahasiswaan-layout .kmh-grid-2 {
+        grid-template-columns: 1fr;
+    }
+
+    body.kemahasiswaan-layout .kmh-toolbar-field,
+    body.kemahasiswaan-layout .kmh-toolbar-field.is-search {
+        width: 100%;
+        min-width: 0;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-tab-links {
+        border-radius: 0.65rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-tab-link {
+        width: 100%;
+        border-right: 0;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-tab-link:last-child {
+        border-bottom: 0;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-pengumuman .kmh-toolbar-group,
+    body.kemahasiswaan-layout .kmh-page-pengumuman .kmh-toolbar-end {
+        width: 100%;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-pengumuman .kmh-pengumuman-cta {
+        width: 100%;
+    }
+
+    body.kemahasiswaan-layout .kmh-toolbar-select {
+        min-width: 0;
+    }
+
+    body.kemahasiswaan-layout .kmh-page .kmh-table thead th,
+    body.kemahasiswaan-layout .kmh-page .kmh-table tbody td {
+        font-size: 0.78rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-inline-review {
+        justify-content: flex-start;
+    }
+
+    body.kemahasiswaan-layout .kmh-inline-review .form-control,
+    body.kemahasiswaan-layout .kmh-inline-review .form-select {
+        min-width: 100%;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-inline-review {
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-review-submit-btn,
+    body.kemahasiswaan-layout .kmh-page-pengajuan .kmh-form-action-btn {
+        width: 100%;
+    }
+
+    body.kemahasiswaan-layout .kmh-calendar-top-head {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    body.kemahasiswaan-layout .kmh-calendar-add-btn {
+        width: 100%;
+    }
+
+    body.kemahasiswaan-layout .kmh-calendar-month-head {
+        flex-wrap: wrap;
+    }
+
+    body.kemahasiswaan-layout .kmh-calendar-view-toggle {
+        margin-left: 0;
+    }
+
+    body.kemahasiswaan-layout .kmh-calendar-week-cell {
+        font-size: 0.7rem;
+        padding: 0.5rem 0.2rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-calendar-day {
+        min-height: 88px;
+        padding: 0.4rem 0.3rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-calendar-pill {
+        font-size: 0.6rem;
+        padding: 0.14rem 0.32rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-contact-mini-stats {
+        grid-template-columns: 1fr;
+    }
+
+    body.kemahasiswaan-layout .kmh-contact-hero h2 {
+        font-size: 1.7rem;
+    }
+}
+
+@media (max-width: 640px) {
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    body.kemahasiswaan-layout .kmh-card-head {
+        padding: 0.78rem 0.85rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-card-body {
+        padding: 0.85rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-chart-shell {
+        height: 240px;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-event-list {
+        grid-template-columns: 1fr;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-event-list {
+        padding: 0.8rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stat-card {
+        min-height: 126px;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stat-card p {
+        font-size: 0.86rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stat-value {
+        font-size: clamp(1.7rem, 6vw, 1.95rem);
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-quick-btn {
+        min-height: 2.65rem;
+        font-size: 0.82rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-announcement-table-wrap .kmh-table {
+        min-width: 520px;
+    }
+
+    body.kemahasiswaan-layout .kmh-notification-head {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    body.kemahasiswaan-layout .kmh-calendar-control-card .kmh-card-body,
+    body.kemahasiswaan-layout .kmh-calendar-grid-card .kmh-card-body {
+        padding: 0.85rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-calendar-top-head h2 {
+        font-size: 1.45rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-calendar-month-head h3 {
+        font-size: 1.25rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-calendar-view-btn {
+        min-height: 1.9rem;
+        font-size: 0.74rem;
+        padding: 0 0.58rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-calendar-week-cell {
+        font-size: 0.62rem;
+        padding: 0.4rem 0.1rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-calendar-day {
+        min-height: 72px;
+    }
+
+    body.kemahasiswaan-layout .kmh-calendar-pill {
+        font-size: 0.56rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-calendar-more {
+        font-size: 0.56rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-contact-hero-card .kmh-card-body,
+    body.kemahasiswaan-layout .kmh-contact-search-card .kmh-card-body {
+        padding: 0.72rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-contact-hero {
+        align-items: flex-start;
+    }
+
+    body.kemahasiswaan-layout .kmh-contact-hero h2 {
+        font-size: 1.35rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-contact-hero p {
+        font-size: 0.8rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-contact-mini-card strong {
+        font-size: 1.7rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-contact-org-head h3 {
+        font-size: 1.05rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-contact-org-head-icon {
+        width: 1.85rem;
+        height: 1.85rem;
+        font-size: 0.88rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-contact-member-card h4 {
+        font-size: 1rem;
     }
 }

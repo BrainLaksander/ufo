@@ -1,236 +1,390 @@
-/* Kemahasiswaan components and sidebar theme */
+/* Kemahasiswaan shell components (design parity: design/departemen) */
 
-/* ===== TOKENS ===== */
-:root {
-    --km-primary: #3b1c57;
-    --km-accent: #5f3a74;
-    --km-yellow: #ffcc00;
-    --km-muted: #f4f5f7;
+body.kemahasiswaan-layout {
+    --km-bg: var(--ufo-color-bg);
+    --km-card: var(--ufo-color-surface);
+    --km-border: rgba(0, 0, 0, 0.1);
+    --km-primary: var(--ufo-color-primary);
+    --km-primary-strong: var(--ufo-color-primary-strong);
+    --km-accent: var(--ufo-color-accent);
+    --km-text: var(--ufo-color-foreground);
+    --km-muted-text: var(--ufo-color-muted);
+    font-family: "Plus Jakarta Sans", "Segoe UI", Tahoma, sans-serif;
+    background: var(--km-bg);
+    color: var(--km-text);
 }
 
-/* ===== SIDEBAR COMPONENTS ===== */
 body.kemahasiswaan-layout .header.header-portal {
     display: none;
 }
 
-.kemahasiswaan-sidebar {
+body.kemahasiswaan-layout .role-layout {
+    min-height: 100vh;
+    background: var(--km-bg);
+}
+
+body.kemahasiswaan-layout .kmh-shell-main.role-main-content {
+    margin-left: 280px;
+    width: calc(100% - 280px);
+    min-height: 100vh;
+    padding: 84px 24px 24px;
+    background: var(--km-bg);
+}
+
+/* ===== Header ===== */
+body.kemahasiswaan-layout .kemahasiswaan-header {
     position: fixed;
     top: 0;
-    left: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    width: 280px;
-    height: 100vh;
-    overflow: hidden;
-    background: linear-gradient(180deg, var(--km-accent) 0%, var(--km-primary) 100%);
-    color: white;
+    left: 280px;
+    right: 0;
+    width: calc(100% - 280px);
+    min-height: 78px;
+    background: var(--km-primary);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: none;
+    z-index: 1030;
 }
 
-.kemahasiswaan-sidebar .sidebar-top {
-    padding: 96px 24px 0;
+body.kemahasiswaan-layout .kemahasiswaan-header .kmh-shell-header-container {
+    min-height: 78px;
+    max-width: none;
+    padding: 0 24px;
 }
 
-.kemahasiswaan-sidebar .dept-title h2 {
-    margin: 0 0 16px;
-    font-size: 32px;
-    font-weight: 800;
-    line-height: 1.05;
-}
-
-.kemahasiswaan-sidebar .university {
-    color: var(--km-yellow);
-    font-size: 13px;
-    font-weight: 700;
-}
-
-.kemahasiswaan-sidebar .sidebar-nav {
-    flex: 1 1 auto;
-    padding: 14px 20px 140px;
-    overflow-y: auto;
-}
-
-.kemahasiswaan-sidebar .sidebar-nav ul {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-}
-
-.kemahasiswaan-sidebar .sidebar-nav li {
-    margin-bottom: 12px;
-}
-
-.kemahasiswaan-sidebar .sidebar-nav .nav-link {
+body.kemahasiswaan-layout .kmh-shell-header-left {
     display: flex;
     align-items: center;
-    gap: 12px;
-    box-sizing: border-box;
-    width: 100%;
-    padding: 10px 14px;
-    border-radius: 12px;
-    background: transparent;
-    color: rgba(255, 255, 255, 0.95);
-    text-decoration: none;
-    transition: background 0.12s ease, transform 0.06s ease;
+    gap: 0.75rem;
+    min-width: 0;
 }
 
-.kemahasiswaan-sidebar .sidebar-nav .nav-link:hover {
-    background: rgba(255, 255, 255, 0.04);
-    transform: translateY(-1px);
+body.kemahasiswaan-layout .kmh-shell-heading {
+    min-width: 0;
 }
 
-.kemahasiswaan-sidebar .sidebar-nav .nav-link.active {
-    background: #fff;
-    box-shadow: 0 6px 18px rgba(27, 13, 46, 0.12);
-    color: var(--km-primary);
+body.kemahasiswaan-layout .kmh-shell-page-title {
+    margin: 0;
+    font-size: clamp(1.7rem, 2.3vw, 2.1rem);
+    line-height: 1.2;
+    color: #ffffff;
     font-weight: 700;
+    letter-spacing: -0.01em;
 }
 
-.kemahasiswaan-sidebar .sidebar-nav .nav-icon {
+body.kemahasiswaan-layout .kmh-shell-page-subtitle {
+    margin: 0.24rem 0 0;
+    font-size: 0.9rem;
+    line-height: 1.3;
+    color: rgba(255, 255, 255, 0.75);
+}
+
+body.kemahasiswaan-layout .kmh-shell-header-actions {
+    display: inline-flex;
+    align-items: center;
+}
+
+body.kemahasiswaan-layout .kmh-header-notification-btn {
+    width: 2.35rem;
+    height: 2.35rem;
+    border-radius: 999px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    flex-shrink: 0;
-    width: 36px;
-    height: 36px;
-    border-radius: 8px;
-    background: rgba(255, 255, 255, 0.06);
-    color: white;
-    font-size: 14px;
-}
-
-.kemahasiswaan-sidebar .sidebar-nav .nav-text {
-    display: inline-block;
-    color: inherit;
-    font-size: 15px;
-    font-weight: 600;
-    line-height: 1.2;
-}
-
-.kemahasiswaan-sidebar .sidebar-nav .nav-link.active .nav-icon {
+    color: #ffffff;
     background: transparent;
-    color: var(--km-primary);
+    text-decoration: none;
+    position: relative;
 }
 
-.kemahasiswaan-sidebar .notif-badge {
-    display: inline-block;
-    margin-left: auto;
-    padding: 4px 8px;
+body.kemahasiswaan-layout .kmh-header-notification-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+}
+
+body.kemahasiswaan-layout .kmh-header-notification-count {
+    position: absolute;
+    top: 0.1rem;
+    right: 0.1rem;
+    min-width: 1rem;
+    height: 1rem;
     border-radius: 999px;
-    background: var(--km-yellow);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 0.22rem;
+    background: var(--km-accent);
     color: var(--km-primary);
-    font-size: 12px;
+    font-size: 0.63rem;
     font-weight: 700;
     line-height: 1;
 }
 
-.kemahasiswaan-sidebar .sidebar-nav .nav-link.active .notif-badge {
-    background: var(--km-primary);
-    color: white;
+body.kemahasiswaan-layout .kemahasiswaan-header .sidebar-toggle {
+    display: none;
+    width: 2.3rem;
+    height: 2.3rem;
+    border: 0;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    padding: 0;
 }
 
-.kemahasiswaan-sidebar .sidebar-divider {
-    height: 1px;
-    margin: 12px 14px;
-    background: rgba(255, 255, 255, 0.06);
+body.kemahasiswaan-layout .kemahasiswaan-header .sidebar-toggle:hover {
+    background: rgba(255, 255, 255, 0.22);
 }
 
-.kemahasiswaan-sidebar .sidebar-footer {
-    z-index: 20;
+/* ===== Sidebar ===== */
+body.kemahasiswaan-layout .kemahasiswaan-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
     display: flex;
-    flex-shrink: 0;
     flex-direction: column;
-    justify-content: center;
-    min-height: 110px;
-    padding: 16px 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.04);
-    background: transparent;
+    transform: translateX(0);
+    overflow: hidden;
+    background: var(--km-primary);
+    color: #ffffff;
+    z-index: 1050;
 }
 
-.kemahasiswaan-sidebar .sidebar-footer .profile {
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-top {
+    padding: 1.45rem 1.2rem 1rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .dept-title h2 {
+    margin: 0;
+    font-size: 1.88rem;
+    line-height: 1.25;
+    color: #ffffff;
+    font-weight: 500;
+}
+
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .university {
+    margin-top: 0.36rem;
+    color: var(--km-accent);
+    font-size: 0.98rem;
+    font-weight: 600;
+}
+
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.95rem 0.8rem;
+}
+
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-nav li {
+    margin-bottom: 0.36rem;
+}
+
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-nav .nav-link {
     display: flex;
     align-items: center;
-    gap: 12px;
-}
-
-.kemahasiswaan-sidebar .sidebar-footer .avatar {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    background: #ffcc33;
-    color: #3b1c57;
-    font-weight: 700;
-}
-
-.kemahasiswaan-sidebar .sidebar-footer .name {
-    font-weight: 700;
-}
-
-.kemahasiswaan-sidebar .sidebar-footer .role {
-    font-size: 12px;
-    opacity: 0.9;
-}
-
-.kemahasiswaan-sidebar .sidebar-footer .logout {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-top: 12px;
-    color: rgba(255, 255, 255, 0.95);
-    font-size: 18px;
+    gap: 0.65rem;
+    border-radius: 0.65rem;
+    padding: 0.64rem 0.74rem;
+    color: rgba(255, 255, 255, 0.86);
     text-decoration: none;
+    transition: background 0.2s ease, color 0.2s ease;
 }
 
-.kemahasiswaan-sidebar .sidebar-footer .logout svg {
-    width: 20px;
-    height: 20px;
-    opacity: 0.95;
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-nav .nav-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
 }
 
-.kemahasiswaan-sidebar::-webkit-scrollbar {
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-nav .nav-link.active {
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+    box-shadow: none;
+}
+
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-nav .nav-icon {
+    width: 1.1rem;
+    height: 1.1rem;
+    border-radius: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.92rem;
+    background: transparent;
+    color: inherit;
+    flex-shrink: 0;
+}
+
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-nav .nav-text {
+    font-size: 0.9rem;
+    line-height: 1.25;
+    font-weight: 500;
+}
+
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-divider {
+    margin: 0.65rem 0.35rem;
+    height: 1px;
+    background: rgba(255, 255, 255, 0.14);
+}
+
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .notif-badge {
+    margin-left: auto;
+    padding: 0.2rem 0.45rem;
+    border-radius: 999px;
+    background: var(--km-accent);
+    color: var(--km-primary);
+    font-size: 0.68rem;
+    font-weight: 700;
+}
+
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .nav-link.active .notif-badge {
+    background: var(--km-primary);
+    color: #ffffff;
+}
+
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-footer {
+    padding: 0.95rem 0.85rem 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    background: rgba(0, 0, 0, 0.08);
+}
+
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-footer .profile {
+    display: flex;
+    align-items: center;
+    gap: 0.62rem;
+}
+
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-footer .avatar {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--km-accent);
+    color: var(--km-primary);
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-footer .name {
+    color: #ffffff;
+    font-size: 0.82rem;
+    font-weight: 700;
+    line-height: 1.2;
+}
+
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-footer .role {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.72rem;
+}
+
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-footer .logout {
+    margin-top: 0.72rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.52rem;
+    padding: 0.45rem 0.6rem;
+    border-radius: 0.5rem;
+    color: rgba(255, 255, 255, 0.9);
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-footer .logout:hover {
+    background: rgba(255, 255, 255, 0.12);
+    color: #ffffff;
+}
+
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-nav::-webkit-scrollbar {
     width: 10px;
 }
 
-.kemahasiswaan-sidebar::-webkit-scrollbar-thumb {
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-nav::-webkit-scrollbar-thumb {
     border-radius: 10px;
     background: rgba(0, 0, 0, 0.22);
 }
 
-/* ===== COMPONENT OVERRIDES ===== */
-.badge.bg-success {
-    padding: 6px 12px;
-    border-radius: 16px;
-    background: #e8f9ec;
-    color: #05632a;
+/* ===== Overlay and helpers ===== */
+body.kemahasiswaan-layout #sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.45);
+    z-index: 1045;
 }
 
-.badge.bg-secondary {
-    padding: 6px 12px;
-    border-radius: 12px;
-    background: #f3f4f6;
-    color: #666;
+body.kemahasiswaan-layout #sidebar-overlay.hidden {
+    display: none;
 }
 
-.table-responsive .table tbody tr td {
+body.kemahasiswaan-layout .table-responsive .table tbody tr td {
     vertical-align: middle;
 }
 
-/* ===== RESPONSIVE ===== */
-@media (max-width: 500px) {
-    .kemahasiswaan-sidebar {
-        width: 320px;
+/* ===== Responsive ===== */
+@media (max-width: 1024px) {
+    body.kemahasiswaan-layout .kmh-shell-main.role-main-content {
+        margin-left: 0;
+        width: 100%;
+        padding: 88px 14px 20px;
     }
 
-    .kemahasiswaan-sidebar .sidebar-nav {
-        padding: 12px 0 180px;
+    body.kemahasiswaan-layout .kemahasiswaan-header {
+        left: 0;
+        width: 100%;
+    }
+
+    body.kemahasiswaan-layout .kemahasiswaan-header .kmh-shell-header-container {
+        padding: 0 14px;
+    }
+
+    body.kemahasiswaan-layout .kemahasiswaan-header .sidebar-toggle {
+        display: inline-flex;
+    }
+
+    body.kemahasiswaan-layout .kmh-shell-page-subtitle {
+        display: none;
+    }
+
+    body.kemahasiswaan-layout .kemahasiswaan-sidebar {
+        width: min(86vw, 320px);
+        transform: translateX(-110%);
+        box-shadow: 0 16px 32px rgba(0, 0, 0, 0.35);
+    }
+
+    body.kemahasiswaan-layout .kemahasiswaan-sidebar[aria-hidden="false"] {
+        transform: translateX(0);
     }
 }
 
-@media (max-height: 700px) {
-    .kemahasiswaan-sidebar .sidebar-nav {
-        max-height: calc(100vh - 220px);
+@media (max-width: 640px) {
+    body.kemahasiswaan-layout .kmh-shell-page-title {
+        font-size: 1.3rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-shell-main.role-main-content {
+        padding-top: 86px;
+    }
+
+    body.kemahasiswaan-layout .kmh-shell-page-subtitle {
+        font-size: 0.76rem;
+    }
+
+    body.kemahasiswaan-layout .kemahasiswaan-sidebar .dept-title h2 {
+        font-size: 1.46rem;
+    }
+
+    body.kemahasiswaan-layout .kemahasiswaan-sidebar .university {
+        font-size: 0.84rem;
     }
 }

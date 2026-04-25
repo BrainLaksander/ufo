@@ -1,18 +1,28 @@
+@php
+    $pageTitle = trim($__env->yieldContent('page_title', 'Dashboard'));
+    $pageSubtitle = trim($__env->yieldContent('page_subtitle', 'Sistem Administrasi & Kontrol Organisasi Mahasiswa'));
+    $notificationCount = (int) ($headerNotificationCount ?? 0);
+@endphp
+
 <header class="header kemahasiswaan-header">
-    <div class="header-container">
-        <div class="header-left">
-            <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Open sidebar"><i class="bi bi-list"></i></button>
-            <a href="{{ route('home') }}" class="header-brand" aria-label="Kembali ke landing page UFO">
-                <span class="brand-icon"><i class="bi bi-mortarboard-fill"></i></span>
-                <div class="brand-text">
-                    <div class="brand-title">Portal Kemahasiswaan</div>
-                    <div class="brand-subtitle">UNKLAB Forum Organization</div>
-                </div>
-            </a>
+    <div class="header-container kmh-shell-header-container">
+        <div class="kmh-shell-header-left">
+            <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Buka sidebar">
+                <i class="bi bi-list"></i>
+            </button>
+            <div class="kmh-shell-heading">
+                <h1 class="kmh-shell-page-title">{{ $pageTitle }}</h1>
+                <p class="kmh-shell-page-subtitle">{{ $pageSubtitle }}</p>
+            </div>
         </div>
-        <div class="header-right">
-            <button class="notification-btn" aria-label="Notifications"><i class="bi bi-bell-fill"></i><span class="notification-dot"></span></button>
-            <a href="{{ route('portal.login') }}" class="btn-logout">Keluar</a>
+
+        <div class="kmh-shell-header-actions">
+            <a href="{{ route('portal.kemahasiswaan.notifikasi') }}" class="notification-btn kmh-header-notification-btn" aria-label="Notifikasi sistem">
+                <i class="bi bi-bell-fill"></i>
+                @if($notificationCount > 0)
+                    <span class="kmh-header-notification-count">{{ min($notificationCount, 99) }}</span>
+                @endif
+            </a>
         </div>
     </div>
 </header>

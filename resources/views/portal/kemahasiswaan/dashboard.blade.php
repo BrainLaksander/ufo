@@ -1,0 +1,140 @@
+@extends('layouts.portal.kemahasiswaan')
+
+@section('title', 'Dashboard Kemahasiswaan - UFO')
+@section('page_title', 'Dashboard')
+@section('page_subtitle', 'Sistem Administrasi & Kontrol Organisasi Mahasiswa')
+@section('page_class', 'kmh-page-dashboard')
+
+@php
+    $stats = $stats ?? [];
+    $monthlyActivity = $monthlyActivity ?? [];
+    $upcomingEvents = $upcomingEvents ?? [];
+    $recentAnnouncements = $recentAnnouncements ?? [];
+
+    $chartPayload = collect($monthlyActivity)
+        ->map(fn ($item) => [
+            'label' => (string) ($item['month'] ?? ''),
+            'value' => (int) ($item['value'] ?? 0),
+        ])
+        ->values()
+        ->all();
+@endphp
+
+@section('content')
+<div class="kmh-page kmh-dashboard-page">
+    <section class="kmh-stats-grid kmh-dashboard-stats" aria-label="Ringkasan statistik dashboard">
+        @foreach ($stats as $item)
+            <article class="kmh-stat-card tone-{{ $item['tone'] ?? 'primary' }}">
+                <div class="kmh-stat-content">
+                    <p>{{ $item['label'] ?? '-' }}</p>
+                    <strong class="kmh-stat-value">{{ $item['value'] ?? '0' }}</strong>
+                </div>
+                <span class="kmh-stat-icon">
+                    <i class="bi {{ $item['icon'] ?? 'bi-bar-chart-line' }}"></i>
+                </span>
+            </article>
+        @endforeach
+    </section>
+
+    <section class="kmh-dashboard-main-grid" aria-label="Konten utama dashboard">
+        <article class="kmh-card kmh-dashboard-chart-card">
+            <header class="kmh-card-head">
+                <div class="d-inline-flex align-items-center gap-2">
+                    <i class="bi bi-graph-up-arrow text-primary"></i>
+                    <h2 class="mb-0">Grafik Kegiatan Bulanan {{ now()->year }}</h2>
+                </div>
+            </header>
+            <div class="kmh-card-body">
+                <div class="kmh-chart-shell">
+                    <canvas id="activities-chart" aria-label="Grafik kegiatan bulanan" role="img"></canvas>
+                </div>
+            </div>
+        </article>
+
+        <aside class="kmh-card kmh-dashboard-side-panel" aria-label="Panel aksi dan kegiatan mendatang">
+            <header class="kmh-card-head">
+                <h3>Quick Actions</h3>
+            </header>
+            <div class="kmh-card-body">
+                <div class="kmh-quick-actions">
+                    <a href="{{ route('portal.kemahasiswaan.pengajuan') }}" class="kmh-quick-btn is-primary">
+                        <span>Review Kegiatan</span>
+                    </a>
+                    <a href="{{ route('portal.kemahasiswaan.pengumuman') }}" class="kmh-quick-btn is-accent">
+                        <span>Buat Pengumuman</span>
+                    </a>
+                </div>
+            </div>
+
+            <header class="kmh-card-head kmh-side-section-head">
+                <h3>
+                    <i class="bi bi-calendar3" aria-hidden="true"></i>
+                    Kegiatan Mendatang
+                </h3>
+            </header>
+            <div class="kmh-event-list" role="list">
+                @forelse ($upcomingEvents as $event)
+                    <article class="kmh-event-item" role="listitem">
+                        <h4>{{ $event['title'] ?? '-' }}</h4>
+                        <p>{{ $event['date'] ?? '-' }}</p>
+                    </article>
+                @empty
+                    <article class="kmh-event-item is-empty" role="listitem">
+                        <h4>Belum ada kegiatan mendatang</h4>
+                        <p>Data kegiatan akan tampil setelah event terdaftar.</p>
+                    </article>
+                @endforelse
+            </div>
+        </aside>
+    </section>
+
+    <section class="kmh-card kmh-dashboard-announce-card">
+        <header class="kmh-card-head">
+            <h2>Pengumuman Terbaru</h2>
+            <a href="{{ route('portal.kemahasiswaan.pengumuman') }}" class="kmh-action-link is-primary">Lihat Semua</a>
+        </header>
+        <div class="kmh-card-body pt-0 kmh-dashboard-table-body">
+            <div class="table-responsive kmh-announcement-table-wrap">
+                <table class="table kmh-table">
+                    <thead>
+                        <tr>
+                            <th>Judul Pengumuman</th>
+                            <th>Tanggal</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($recentAnnouncements as $announcement)
+                            @php
+                                $statusClass = match ($announcement['status'] ?? '') {
+                                    'Terpublikasi' => 'is-success',
+                                    'Terjadwal' => 'is-info',
+                                    'Draft' => 'is-muted',
+                                    default => 'is-warning',
+                                };
+                            @endphp
+                            <tr>
+                                <td>{{ $announcement['judul'] ?? '-' }}</td>
+                                <td>({{ $announcement['tanggal'] ?? '-' }})</td>
+                                <td>
+                                    <span class="kmh-status-pill {{ $statusClass }}">{{ $announcement['status'] ?? '-' }}</span>
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="3" class="kmh-empty-row">Belum ada pengumuman terbaru.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+</div>
+@endsection
+
+@push('scripts')
+<script>
+window.kemahasiswaanMonthlyActivity = @json($chartPayload);
+</script>
+@endpush

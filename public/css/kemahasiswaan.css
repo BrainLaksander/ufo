@@ -1,5 +1,9 @@
 /* Kemahasiswaan entry stylesheet */
 
+@import url("./views/palette.css");
+@import url("./views/shared.css");
+
 @import url("./modules/kemahasiswaan/layout.css");
 @import url("./modules/kemahasiswaan/components.css");
 @import url("./modules/kemahasiswaan/pages.css");
+@import url("./views/kemahasiswaan.css");
