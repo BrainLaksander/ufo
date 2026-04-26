@@ -14,56 +14,21 @@
         <div class="ufo-kboard-item-head">
             <div>
                 <h1 class="ufo-kboard-heading">Pengumuman Organisasi</h1>
-                <p class="ufo-kboard-lead">Kelola pengumuman event organisasi Anda dengan mudah.</p>
+                <p class="ufo-kboard-lead">Kelola pengumuman organisasi Anda dengan mudah.</p>
             </div>
 
-            <button class="ufo-kboard-btn primary" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Buat Pengumuman" data-modal-message="Modal ini membuka konteks pembuatan pengumuman baru." type="button">
+            <button class="ufo-kboard-btn primary" data-bs-toggle="modal" data-bs-target="#createAnnouncementModal" type="button">
                 <i class="bi bi-plus-lg"></i>
                 Buat Pengumuman
             </button>
         </div>
-    </section>
 
-    <section class="ufo-kboard-section collapse" id="announcementCreateForm">
-        <h3 class="ufo-kboard-item-title mb-3">Buat Pengumuman Baru</h3>
-
-        <div class="ufo-kboard-row two">
-            <label class="ufo-kboard-span-full">
-                <span class="ufo-kboard-item-meta">Judul Pengumuman</span>
-                <input type="text" class="ufo-kboard-field" placeholder="{{ $announcementTitlePlaceholder ?? '' }}">
-            </label>
-
-            <label class="ufo-kboard-span-full">
-                <span class="ufo-kboard-item-meta">Deskripsi</span>
-                <textarea class="ufo-kboard-textarea" placeholder="{{ $announcementDescriptionPlaceholder ?? '' }}"></textarea>
-            </label>
-
-            <label>
-                <span class="ufo-kboard-item-meta">Tanggal Mulai</span>
-                <input type="date" class="ufo-kboard-field">
-            </label>
-
-            <label>
-                <span class="ufo-kboard-item-meta">Tanggal Berakhir</span>
-                <input type="date" class="ufo-kboard-field">
-            </label>
-
-            <label class="ufo-kboard-span-full">
-                <span class="ufo-kboard-item-meta">Pilih Event</span>
-                <select class="ufo-kboard-select">
-                    @forelse($eventOptions as $event)
-                        <option value="{{ $event['id'] }}">{{ $event['name'] }}</option>
-                    @empty
-                        <option>Tidak ada event tersedia</option>
-                    @endforelse
-                </select>
-            </label>
-        </div>
-
-        <div class="ufo-kboard-item-actions mt-3">
-            <button class="ufo-kboard-btn primary" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Publikasikan Pengumuman" data-modal-message="Aksi publikasi pengumuman dibuka sebagai modal konfirmasi." type="button">Publikasikan</button>
-            <button class="ufo-kboard-btn ghost" type="button" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Batal Buat Pengumuman" data-modal-message="Aksi batal dibuka sebagai modal konfirmasi.">Batal</button>
-        </div>
+        @if(session('success'))
+            <div class="alert alert-success mt-3 mb-0">{{ session('success') }}</div>
+        @endif
+        @if(session('error'))
+            <div class="alert alert-danger mt-3 mb-0">{{ session('error') }}</div>
+        @endif
     </section>
 
     <section class="ufo-kboard-section">
@@ -96,8 +61,8 @@
                             <p class="ufo-kboard-item-text">{{ $item['description'] }}</p>
 
                             <div class="ufo-kboard-item-actions">
-                                <button class="ufo-kboard-btn primary" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Edit Pengumuman" data-modal-message="Modal ini menampilkan form edit pengumuman." type="button">Edit</button>
-                                <button class="ufo-kboard-btn ghost" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Lihat Pengumuman" data-modal-message="Modal ini menampilkan detail pengumuman." type="button">Lihat</button>
+                                <a href="#" class="ufo-kboard-btn primary">Edit</a>
+                                <a href="#" class="ufo-kboard-btn ghost">Lihat</a>
                             </div>
                         </article>
                     @endforeach
@@ -119,9 +84,9 @@
                             <p class="ufo-kboard-item-text">{{ $item['description'] }}</p>
 
                             <div class="ufo-kboard-item-actions">
-                                <button class="ufo-kboard-btn ghost" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Lihat Pengumuman" data-modal-message="Modal ini menampilkan detail pengumuman." type="button">Lihat</button>
+                                <a href="#" class="ufo-kboard-btn ghost">Lihat</a>
                                 @if($item['status'] === 'Aktif')
-                                    <button class="ufo-kboard-btn primary" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Edit Pengumuman" data-modal-message="Modal ini menampilkan form edit pengumuman." type="button">Edit</button>
+                                    <a href="#" class="ufo-kboard-btn primary">Edit</a>
                                 @endif
                             </div>
                         </article>
@@ -130,5 +95,78 @@
             </div>
         </div>
     </section>
+
+    <div class="modal fade" id="createAnnouncementModal" tabindex="-1" aria-labelledby="createAnnouncementModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <form method="POST" action="{{ route('portal.pengurus.announcements.store') }}">
+                    @csrf
+
+                    <div class="modal-header">
+                        <div>
+                            <h5 class="modal-title" id="createAnnouncementModalLabel">Buat Pengumuman Baru</h5>
+                            <small class="text-muted">Susun pengumuman organisasi sebelum dipublikasikan.</small>
+                        </div>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">Judul Pengumuman <span class="text-danger">*</span></label>
+                                <input type="text" name="judul" class="form-control" maxlength="140" value="{{ old('judul') }}" placeholder="Masukkan judul pengumuman..." required>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Kategori <span class="text-danger">*</span></label>
+                                <select name="kategori" class="form-select" required>
+                                    <option value="">Pilih kategori</option>
+                                    <option value="Rapat">Rapat</option>
+                                    <option value="Event">Event</option>
+                                    <option value="Deadline">Deadline</option>
+                                    <option value="Informasi Umum">Informasi Umum</option>
+                                    <option value="Lainnya">Lainnya</option>
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Target Distribusi <span class="text-danger">*</span></label>
+                                <select name="target" class="form-select" required>
+                                    <option value="">Pilih target</option>
+                                    <option value="Seluruh anggota">Seluruh anggota</option>
+                                    <option value="Anggota aktif">Anggota aktif</option>
+                                    <option value="Pengurus">Pengurus</option>
+                                    <option value="Mahasiswa umum">Mahasiswa umum</option>
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">Konten Pengumuman <span class="text-danger">*</span></label>
+                                <textarea name="konten" class="form-control" rows="5" maxlength="10000" placeholder="Tulis isi pengumuman..." required>{{ old('konten') }}</textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Jadwal Publish (Opsional)</label>
+                                <input type="datetime-local" name="publish_at" class="form-control" value="{{ old('publish_at') }}">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">Aksi Simpan <span class="text-danger">*</span></label>
+                                <select name="submit_action" class="form-select" required>
+                                    <option value="draft">Simpan Draft</option>
+                                    <option value="publish_now">Publikasikan Sekarang</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="ufo-kboard-btn primary">Simpan Pengumuman</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection

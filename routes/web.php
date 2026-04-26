@@ -100,6 +100,7 @@ Route::prefix('pengurus')->name('portal.pengurus.')->middleware(['auth', 'role:p
 
     Route::get('/announcements', [IzinKegiatanWorkflowController::class, 'pengurusAnnouncements'])->name('announcements');
     Route::get('/announcements/create', [IzinKegiatanWorkflowController::class, 'pengurusAnnouncementForm'])->name('announcements.create');
+    Route::post('/announcements', [IzinKegiatanWorkflowController::class, 'storePengurusAnnouncement'])->name('announcements.store');
 
     Route::get('/lostandfound', [IzinKegiatanWorkflowController::class, 'pengurusLostAndFound'])->name('lostandfound');
     Route::get('/proposals', [IzinKegiatanWorkflowController::class, 'pengurusIndex'])->name('proposals');

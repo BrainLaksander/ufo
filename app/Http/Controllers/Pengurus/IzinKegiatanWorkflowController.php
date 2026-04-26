@@ -428,10 +428,77 @@ class IzinKegiatanWorkflowController extends Controller
         ]);
     }
 
+    public function storePengurusAnnouncement(Request $request): RedirectResponse
+    {
+        $context = $this->resolvePengurusContext($request);
+
+        if (!$context['organization_id'] || !$context['member_id']) {
+            return back()->with('error', $this->refLabel('flash_message', 'pengurus_data_incomplete'));
+        }
+
+        $validated = $request->validate([
+            'judul' => 'required|string|max:140',
+            'kategori' => 'required|string|max:60',
+            'target' => 'required|string|max:100',
+            'konten' => 'required|string|max:10000',
+            'publish_at' => 'nullable|date',
+            'submit_action' => 'required|in:draft,publish_now',
+        ]);
+
+        $publishAt = !empty($validated['publish_at'])
+            ? Carbon::parse($validated['publish_at'])
+            : null;
+
+        $submitAction = (string) $validated['submit_action'];
+        $publishStatus = 'draft';
+        if ($submitAction === 'publish_now') {
+            $publishStatus = ($publishAt && $publishAt->isFuture()) ? 'scheduled' : 'published';
+        }
+
+        $rawContent = trim((string) $validated['konten']);
+        $normalizedContent = preg_replace('/\s+/u', ' ', strip_tags($rawContent)) ?? $rawContent;
+        $summary = Str::limit(trim($normalizedContent), 240, '...');
+
+        $accountId = null;
+        if (Schema::hasTable('kemahasiswaan_ukm_accounts')) {
+            $accountId = (int) (DB::table('kemahasiswaan_ukm_accounts')
+                ->where('organization_id', $context['organization_id'])
+                ->where('status', 'active')
+                ->orderBy('id')
+                ->value('id') ?? 0);
+        }
+
+        DB::table('kemahasiswaan_announcements')->insert([
+            'ukm_account_id' => $accountId > 0 ? $accountId : null,
+            'title' => $validated['judul'],
+            'category' => $validated['kategori'],
+            'target_audience' => $validated['target'],
+            'summary' => $summary,
+            'content' => $rawContent,
+            'publish_at' => $publishAt,
+            'publish_status' => $publishStatus,
+            'submit_action' => $submitAction,
+            'email_review_status' => 'approved',
+            'email_review_note' => null,
+            'reviewed_by' => $this->resolveSessionUserId($request),
+            'reviewed_at' => now(),
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return back()->with('success', 'Pengumuman berhasil disimpan.');
+    }
+
     public function pengurusLostAndFound(Request $request): View
     {
         $context = $this->resolvePengurusContext($request);
         $organizationId = $context['organization_id'];
+
+        abort_unless(
+            $this->canAccessLostFoundForOrganization($organizationId),
+            403,
+            'Fitur Lost & Found hanya dapat diakses oleh BEM Universitas Klabat.'
+        );
 
         $organization = null;
         if ($organizationId && Schema::hasTable('organizations')) {
@@ -441,10 +508,7 @@ class IzinKegiatanWorkflowController extends Controller
                 ->first();
         }
 
-        $sessionRole = Str::lower((string) data_get($request->session()->get('user'), 'role', ''));
-        $isBem = Str::contains($sessionRole, 'bem')
-            || Str::contains(Str::lower((string) ($organization->shortname ?? '')), 'bem')
-            || Str::contains(Str::lower((string) ($organization->name ?? '')), 'bem');
+        $isBem = true;
 
         $rows = collect();
         if (Schema::hasTable('lost_found_items')) {
@@ -1142,6 +1206,7 @@ class IzinKegiatanWorkflowController extends Controller
 
     private function buildPengurusShellData(?int $organizationId): array
     {
+        $canAccessLostFound = $this->canAccessLostFoundForOrganization($organizationId);
         $notifications = [];
 
         if (Schema::hasTable('kemahasiswaan_activity_logs')) {
@@ -1223,6 +1288,7 @@ class IzinKegiatanWorkflowController extends Controller
 
         return [
             'notifications' => $notifications,
+            'canAccessLostFound' => $canAccessLostFound,
         ];
     }
 
@@ -2113,6 +2179,35 @@ class IzinKegiatanWorkflowController extends Controller
         $user = DB::table('users')->select('id')->where('email', $email)->first();
 
         return $user ? (int) $user->id : null;
+    }
+
+    private function canAccessLostFoundForOrganization(?int $organizationId): bool
+    {
+        if (!$organizationId || !Schema::hasTable('organizations')) {
+            return false;
+        }
+
+        $organization = DB::table('organizations')
+            ->select(['name', 'shortname'])
+            ->where('id', $organizationId)
+            ->first();
+
+        return $this->isBemUniversitasKlabat(
+            (string) ($organization->name ?? ''),
+            (string) ($organization->shortname ?? '')
+        );
+    }
+
+    private function isBemUniversitasKlabat(string $name, string $shortname): bool
+    {
+        $normalizedName = Str::lower(trim($name));
+        $normalizedShortname = Str::lower(trim($shortname));
+
+        $shortnameAllowed = in_array($normalizedShortname, ['bem', 'bem unklab', 'bem universitas klabat'], true);
+        $nameMentionsBem = Str::contains($normalizedName, ['bem', 'badan eksekutif mahasiswa']);
+        $nameMentionsUniversity = Str::contains($normalizedName, ['universitas klabat', 'unklab']);
+
+        return $shortnameAllowed || ($nameMentionsBem && $nameMentionsUniversity);
     }
 
     private function resolvePengurusContext(Request $request): array

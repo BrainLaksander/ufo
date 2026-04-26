@@ -17,110 +17,19 @@
             </div>
 
             <div class="ufo-kboard-item-actions mt-0">
-                <button class="ufo-kboard-btn primary" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Buat Event Baru" data-modal-message="Form event baru tersedia pada area edit event. Modal ini memastikan tombol membuka dialog terlebih dahulu." type="button">
+                <button class="ufo-kboard-btn primary" data-bs-toggle="modal" data-bs-target="#createEventModal" type="button">
                     <i class="bi bi-plus-lg"></i>
-                    Buat Event Baru
-                </button>
-                <button class="ufo-kboard-btn gold" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Buat Berita Event" data-modal-message="Form berita event dibuka melalui modal agar tombol selalu memunculkan dialog." type="button">
-                    <i class="bi bi-file-earmark-text"></i>
-                    Buat Berita Event
+                    Tambah Event
                 </button>
             </div>
         </div>
-    </section>
 
-    <section class="ufo-kboard-section collapse" id="eventCreateForm">
-        <h3 class="ufo-kboard-item-title mb-3">Buat Event Baru</h3>
-
-        <div class="ufo-kboard-row two">
-            <div class="ufo-kboard-span-full">
-                <label class="ufo-kboard-item-meta mb-2 d-block">Poster Event</label>
-                <div class="ufo-pg-upload-box">
-                    <i class="bi bi-image"></i>
-                    <p class="mb-0">Klik untuk upload poster</p>
-                    <small>PNG, JPG (maks. 5MB)</small>
-                </div>
-            </div>
-
-            <label class="ufo-kboard-span-full">
-                <span class="ufo-kboard-item-meta">Nama Event</span>
-                <input type="text" class="ufo-kboard-field" placeholder="{{ $eventNamePlaceholder ?? '' }}">
-            </label>
-
-            <label class="ufo-kboard-span-full">
-                <span class="ufo-kboard-item-meta">Deskripsi</span>
-                <textarea class="ufo-kboard-textarea" placeholder="{{ $eventDescriptionPlaceholder ?? '' }}"></textarea>
-            </label>
-
-            <label>
-                <span class="ufo-kboard-item-meta">Tanggal</span>
-                <input type="date" class="ufo-kboard-field">
-            </label>
-
-            <label>
-                <span class="ufo-kboard-item-meta">Waktu</span>
-                <input type="time" class="ufo-kboard-field">
-            </label>
-
-            <label class="ufo-kboard-span-full">
-                <span class="ufo-kboard-item-meta">Lokasi / Platform</span>
-                <input type="text" class="ufo-kboard-field" placeholder="{{ $eventLocationPlaceholder ?? '' }}">
-            </label>
-
-            <label class="ufo-kboard-span-full">
-                <span class="ufo-kboard-item-meta">Link Pendaftaran</span>
-                <input type="url" class="ufo-kboard-field" placeholder="https://forms.gle/...">
-            </label>
-        </div>
-
-        <div class="ufo-kboard-item-actions mt-3">
-            <button class="ufo-kboard-btn primary" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Publikasikan Event" data-modal-message="Aksi publikasi event dibuka sebagai modal konfirmasi." type="button">Publikasikan Event</button>
-            <button class="ufo-kboard-btn ghost" type="button" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Batal Buat Event" data-modal-message="Aksi batal dibuka sebagai modal konfirmasi.">Batal</button>
-        </div>
-    </section>
-
-    <section class="ufo-kboard-section collapse" id="eventNewsForm">
-        <h3 class="ufo-kboard-item-title mb-3">Buat Berita Event</h3>
-
-        <div class="ufo-kboard-row two">
-            <label class="ufo-kboard-span-full">
-                <span class="ufo-kboard-item-meta">Judul Berita</span>
-                <input type="text" class="ufo-kboard-field" placeholder="{{ $eventNewsTitlePlaceholder ?? '' }}">
-            </label>
-
-            <label class="ufo-kboard-span-full">
-                <span class="ufo-kboard-item-meta">Tanggal Pelaksanaan</span>
-                <input type="date" class="ufo-kboard-field">
-            </label>
-
-            <label class="ufo-kboard-span-full">
-                <span class="ufo-kboard-item-meta">Cerita Kegiatan</span>
-                <textarea class="ufo-kboard-textarea" placeholder="{{ $eventNewsDescriptionPlaceholder ?? '' }}"></textarea>
-            </label>
-
-            <label class="ufo-kboard-span-full">
-                <span class="ufo-kboard-item-meta">Highlight / Kesan Event</span>
-                <textarea class="ufo-kboard-textarea" placeholder="{{ $eventNewsHighlightPlaceholder ?? '' }}"></textarea>
-            </label>
-
-            <div class="ufo-kboard-span-full">
-                <label class="ufo-kboard-item-meta mb-2 d-block">Dokumentasi Foto (Opsional)</label>
-                <div class="ufo-pg-upload-box">
-                    <i class="bi bi-cloud-upload"></i>
-                    <p class="mb-0">Klik untuk upload foto dokumentasi</p>
-                    <small>JPG, PNG (maks. 10MB total)</small>
-                </div>
-            </div>
-        </div>
-
-        <div class="ufo-kboard-item-actions mt-3">
-            <button class="ufo-kboard-btn primary" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Publikasikan Berita" data-modal-message="Aksi publikasi berita event dibuka sebagai modal konfirmasi." type="button">Publikasikan Berita</button>
-            <button class="ufo-kboard-btn ghost" type="button" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Batal Buat Berita Event" data-modal-message="Aksi batal dibuka sebagai modal konfirmasi.">Batal</button>
-        </div>
-
-        <div class="alert alert-info mt-3 mb-0" role="alert">
-            Berita event akan ditampilkan sebagai histori di profil organisasi dan dapat dilihat oleh mahasiswa.
-        </div>
+        @if(session('success'))
+            <div class="alert alert-success mt-3 mb-0">{{ session('success') }}</div>
+        @endif
+        @if(session('error'))
+            <div class="alert alert-danger mt-3 mb-0">{{ session('error') }}</div>
+        @endif
     </section>
 
     <section class="ufo-kboard-section">
@@ -157,8 +66,8 @@
                                 <p class="ufo-kboard-item-meta"><i class="bi bi-people"></i> {{ $event['registrants'] }} pendaftar</p>
 
                                 <div class="ufo-kboard-item-actions mt-3">
-                                    <a href="{{ route('portal.pengurus.events.create') }}" class="ufo-kboard-btn primary" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Edit Event" data-modal-message="Modal ini menampilkan form edit event.">Edit Event</a>
-                                    <a href="{{ route('portal.pengurus.events.detail', ['id' => $event['id']]) }}" class="ufo-kboard-btn ghost" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Lihat Detail Event" data-modal-message="Modal ini menampilkan detail event.">Lihat Detail</a>
+                                    <a href="{{ route('portal.pengurus.events.create') }}" class="ufo-kboard-btn primary">Edit Event</a>
+                                    <a href="{{ route('portal.pengurus.events.detail', ['id' => $event['id']]) }}" class="ufo-kboard-btn ghost">Lihat Detail</a>
                                 </div>
                             </div>
                         </article>
@@ -189,12 +98,7 @@
                                 <p class="ufo-kboard-item-meta"><i class="bi bi-people"></i> {{ $event['participants'] }} peserta</p>
 
                                 <div class="ufo-kboard-item-actions mt-3">
-                                    @if($event['has_news'])
-                                        <button class="ufo-kboard-btn primary" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Lihat Berita" data-modal-message="Modal ini menampilkan ringkasan berita event." type="button">Lihat Berita</button>
-                                    @else
-                                        <button class="ufo-kboard-btn gold" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Buat Berita Event" data-modal-message="Modal ini dibuka untuk membuat berita event baru." type="button">Buat Berita Event</button>
-                                    @endif
-                                        <button class="ufo-kboard-btn ghost" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Detail Event" data-modal-message="Modal ini menampilkan detail event yang dipilih." type="button">Detail</button>
+                                    <a href="{{ route('portal.pengurus.events.detail', ['id' => $event['id']]) }}" class="ufo-kboard-btn ghost">Detail</a>
                                 </div>
                             </div>
                         </article>
@@ -203,5 +107,68 @@
             </div>
         </div>
     </section>
+
+    <div class="modal fade" id="createEventModal" tabindex="-1" aria-labelledby="createEventModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-scrollable modal-dialog-centered">
+            <div class="modal-content">
+                <form method="POST" action="{{ route('portal.pengurus.events.store') }}">
+                    @csrf
+
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="createEventModalLabel">Tambah Event Baru</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label for="event_name" class="form-label">Nama Event <span class="text-danger">*</span></label>
+                                <input id="event_name" name="name" type="text" class="form-control" required placeholder="Contoh: Workshop Web Development" value="{{ old('name') }}">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="event_date" class="form-label">Tanggal <span class="text-danger">*</span></label>
+                                <input id="event_date" name="start_date" type="date" class="form-control" required value="{{ old('start_date') }}">
+                            </div>
+
+                            <div class="col-md-6">
+                                <label for="event_time" class="form-label">Waktu</label>
+                                <input id="event_time" type="text" class="form-control" placeholder="Contoh: 09:00 - 12:00">
+                            </div>
+
+                            <div class="col-12">
+                                <label for="event_location" class="form-label">Lokasi <span class="text-danger">*</span></label>
+                                <input id="event_location" name="location" type="text" class="form-control" required placeholder="Contoh: Auditorium Utama" value="{{ old('location') }}">
+                            </div>
+
+                            <div class="col-12">
+                                <label for="event_quota" class="form-label">Kapasitas <span class="text-danger">*</span></label>
+                                <input id="event_quota" name="quota" type="number" class="form-control" min="1" required placeholder="Jumlah peserta maksimal" value="{{ old('quota') }}">
+                            </div>
+
+                            <div class="col-12">
+                                <label for="event_description" class="form-label">Deskripsi <span class="text-danger">*</span></label>
+                                <textarea id="event_description" name="description" class="form-control" rows="4" required placeholder="Deskripsi singkat tentang event">{{ old('description') }}</textarea>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="registration_open" checked>
+                                    <label class="form-check-label" for="registration_open">Buka pendaftaran</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <input type="hidden" name="status" value="approved">
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="ufo-kboard-btn primary">Tambah Event</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection

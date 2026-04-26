@@ -30,6 +30,43 @@
     };
 @endphp
 
+@push('styles')
+<style>
+    /* Modal Tab Styling */
+    #proposalReportModal .nav-tabs {
+        border-bottom: 2px solid #e9ecef;
+    }
+
+    #proposalReportModal .nav-tabs .nav-link {
+        color: #6c757d;
+        border: none;
+        border-bottom: 3px solid transparent;
+        font-weight: 500;
+        transition: all 0.3s ease;
+        padding-bottom: 12px;
+    }
+
+    #proposalReportModal .nav-tabs .nav-link:hover {
+        color: #495057;
+        border-bottom-color: #dee2e6;
+    }
+
+    #proposalReportModal .nav-tabs .nav-link.active {
+        color: #312e81;
+        border-bottom-color: #312e81;
+        background-color: transparent;
+    }
+
+    #proposalReportModal .tab-content {
+        padding-top: 0;
+    }
+
+    #proposalReportModal .modal-body {
+        padding-top: 1.5rem;
+    }
+</style>
+@endpush
+
 @section('content')
 <div class="ufo-kboard-page">
     <section class="ufo-kboard-section">
@@ -40,13 +77,13 @@
             </div>
 
             <div class="ufo-kboard-item-actions mt-0">
-                <button class="ufo-kboard-btn primary" type="button" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Ajukan Kegiatan" data-modal-message="Modal ini membuka ringkasan form pengajuan kegiatan.">
+                <button class="ufo-kboard-btn primary" type="button" data-bs-toggle="modal" data-bs-target="#proposalReportModal" data-bs-tab="pengajuan">
                     <i class="bi bi-plus-lg"></i>
-                    Ajukan Kegiatan
+                    Ajukan Proposal Baru
                 </button>
-                    <button class="ufo-kboard-btn gold" type="button" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Kirim Laporan" data-modal-message="Modal ini membuka ringkasan form laporan kegiatan.">
+                <button class="ufo-kboard-btn gold" type="button" data-bs-toggle="modal" data-bs-target="#proposalReportModal" data-bs-tab="laporan">
                     <i class="bi bi-file-earmark-arrow-up"></i>
-                    Kirim Laporan
+                    Upload Laporan Baru
                 </button>
             </div>
         </div>
@@ -82,122 +119,6 @@
                 <h3>{{ $jadwalCount }}</h3>
                 <p>Jadwal Terkait</p>
             </article>
-        </div>
-    </section>
-
-    <section class="ufo-kboard-section collapse" id="pengajuanForm">
-        <h3 class="ufo-kboard-item-title mb-3">Form Pengajuan Kegiatan</h3>
-
-        <form method="POST" action="{{ route('portal.pengurus.proposals.store') }}" class="ufo-kboard-row two">
-            @csrf
-            <label class="ufo-kboard-span-full">
-                <span class="ufo-kboard-item-meta">Nama Kegiatan</span>
-                <input type="text" name="title" class="ufo-kboard-field" placeholder="{{ $proposalTitlePlaceholder ?? '' }}" required @disabled(!($hasPengurusContext ?? false))>
-            </label>
-
-            <label>
-                <span class="ufo-kboard-item-meta">Jenis Kegiatan</span>
-                <select name="type" class="ufo-kboard-select" required @disabled(!($hasPengurusContext ?? false))>
-                    <option value="proposal">Proposal</option>
-                    <option value="budget">Budget</option>
-                    <option value="activity_plan">Activity Plan</option>
-                </select>
-            </label>
-
-            <label>
-                <span class="ufo-kboard-item-meta">Penanggung Jawab</span>
-                <input type="text" class="ufo-kboard-field" value="{{ $pengurusOrganizationName ?? '' }}" disabled>
-            </label>
-
-            <label class="ufo-kboard-span-full">
-                <span class="ufo-kboard-item-meta">Deskripsi Kegiatan</span>
-                <textarea name="description" class="ufo-kboard-textarea" placeholder="{{ $proposalDescriptionPlaceholder ?? '' }}" required @disabled(!($hasPengurusContext ?? false))></textarea>
-            </label>
-
-            <div class="ufo-kboard-span-full">
-                <label class="ufo-kboard-item-meta mb-2 d-block">Lampiran Proposal (PDF)</label>
-                <div class="ufo-pg-upload-box">
-                    <i class="bi bi-cloud-upload"></i>
-                    <p class="mb-0">Klik untuk upload proposal</p>
-                    <small>PDF (maks. 10MB)</small>
-                </div>
-            </div>
-
-            <div class="ufo-kboard-item-actions mt-2 ufo-kboard-span-full">
-                <button type="submit" class="ufo-kboard-btn primary" @disabled(!($hasPengurusContext ?? false))>
-                    Ajukan Kegiatan ke Kemahasiswaan
-                </button>
-                    <button type="button" class="ufo-kboard-btn ghost" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Batal Ajukan Kegiatan" data-modal-message="Aksi batal dibuka sebagai modal konfirmasi.">
-                    Batal
-                </button>
-            </div>
-        </form>
-
-        <div class="alert alert-info mt-3 mb-0" role="alert">
-            Pastikan informasi kegiatan lengkap sebelum diajukan agar proses review berjalan lebih cepat.
-        </div>
-    </section>
-
-    <section class="ufo-kboard-section collapse" id="laporanForm">
-        <h3 class="ufo-kboard-item-title mb-3">Form Laporan Kegiatan</h3>
-
-        <form method="POST" action="{{ route('portal.pengurus.reports.store') }}" class="ufo-kboard-row two">
-            @csrf
-            <label class="ufo-kboard-span-full">
-                <span class="ufo-kboard-item-meta">Nama Kegiatan</span>
-                <input type="text" name="title" class="ufo-kboard-field" placeholder="{{ $reportTitlePlaceholder ?? '' }}" required @disabled(!($hasPengurusContext ?? false))>
-            </label>
-
-            <label>
-                <span class="ufo-kboard-item-meta">Tipe Laporan</span>
-                <select name="report_type" class="ufo-kboard-select" required @disabled(!($hasPengurusContext ?? false))>
-                    <option value="activity">Activity</option>
-                    <option value="financial">Financial</option>
-                    <option value="semester">Semester</option>
-                </select>
-            </label>
-
-            <label>
-                <span class="ufo-kboard-item-meta">Jumlah Peserta (Real)</span>
-                <input type="number" min="0" name="participants" class="ufo-kboard-field" value="0" required @disabled(!($hasPengurusContext ?? false))>
-            </label>
-
-            <label class="ufo-kboard-span-full">
-                <span class="ufo-kboard-item-meta">Event Terkait (Opsional)</span>
-                <select name="event_id" class="ufo-kboard-select" @disabled(!($hasPengurusContext ?? false))>
-                    <option value="">Tanpa event</option>
-                    @foreach(($eventOptions ?? []) as $event)
-                        <option value="{{ $event['id'] }}">{{ $event['name'] }}</option>
-                    @endforeach
-                </select>
-            </label>
-
-            <label class="ufo-kboard-span-full">
-                <span class="ufo-kboard-item-meta">Ringkasan Laporan</span>
-                <textarea name="content" class="ufo-kboard-textarea" placeholder="{{ $reportContentPlaceholder ?? '' }}" required @disabled(!($hasPengurusContext ?? false))></textarea>
-            </label>
-
-            <div class="ufo-kboard-span-full">
-                <label class="ufo-kboard-item-meta mb-2 d-block">Dokumentasi / Lampiran</label>
-                <div class="ufo-pg-upload-box">
-                    <i class="bi bi-images"></i>
-                    <p class="mb-0">Upload dokumentasi kegiatan</p>
-                    <small>JPG, PNG, PDF</small>
-                </div>
-            </div>
-
-            <div class="ufo-kboard-item-actions mt-2 ufo-kboard-span-full">
-                <button type="submit" class="ufo-kboard-btn gold" @disabled(!($hasPengurusContext ?? false))>
-                    Kirim Laporan ke Kemahasiswaan
-                </button>
-                <button type="button" class="ufo-kboard-btn ghost" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Batal Kirim Laporan" data-modal-message="Aksi batal dibuka sebagai modal konfirmasi.">
-                    Batal
-                </button>
-            </div>
-        </form>
-
-        <div class="alert alert-warning mt-3 mb-0" role="alert">
-            Laporan dikirim maksimal 7 hari setelah kegiatan selesai.
         </div>
     </section>
 
@@ -241,7 +162,7 @@
                             @endif
 
                             <div class="ufo-kboard-item-actions">
-                                <button class="ufo-kboard-btn ghost" type="button" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Detail Pengajuan" data-modal-message="Modal ini menampilkan detail pengajuan kegiatan.">Lihat Detail</button>
+                                <button class="ufo-kboard-btn ghost" type="button" data-bs-toggle="modal" data-bs-target="#proposalDetailModal" data-proposal-detail='@json($item)'>Lihat Detail</button>
 
                                 @if(in_array($status, ['Draft', 'Revisi'], true))
                                     <form method="POST" action="{{ route('portal.pengurus.proposals.submit', ['id' => $item['id']]) }}">
@@ -251,7 +172,7 @@
                                 @endif
 
                                 @if($status === 'Disetujui')
-                                    <button class="ufo-kboard-btn primary" type="button" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Kirim Laporan" data-modal-message="Modal ini menampilkan form kirim laporan untuk pengajuan yang disetujui.">Kirim Laporan</button>
+                                    <button class="ufo-kboard-btn primary" type="button" data-bs-toggle="modal" data-bs-target="#reportCreateModal">Kirim Laporan</button>
                                 @endif
                             </div>
                         </article>
@@ -286,7 +207,7 @@
                             @endif
 
                             <div class="ufo-kboard-item-actions">
-                                <button class="ufo-kboard-btn ghost" type="button" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Detail Laporan" data-modal-message="Modal ini menampilkan detail laporan kegiatan.">Lihat Laporan</button>
+                                <button class="ufo-kboard-btn ghost" type="button" data-bs-toggle="modal" data-bs-target="#reportDetailModal" data-report-detail='@json($item)'>Lihat Laporan</button>
 
                                 @if(in_array($status, ['Draft', 'Revisi'], true))
                                     <form method="POST" action="{{ route('portal.pengurus.reports.submit', ['id' => $item['id']]) }}">
@@ -371,5 +292,270 @@
             </div>
         </section>
     </div>
+
+    <!-- Combined Proposal & Report Modal with Tabs -->
+    <div class="modal fade" id="proposalReportModal" tabindex="-1" aria-labelledby="proposalReportModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header border-bottom-0 pb-0">
+                    <div>
+                        <h5 class="modal-title" id="proposalReportModalLabel">Ajukan Proposal Baru</h5>
+                        <small class="text-muted">Kirim izin kegiatan ke Kemahasiswaan.</small>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                
+                <!-- Tab Navigation -->
+                <ul class="nav nav-tabs ps-3 pe-3 pt-2" id="proposalReportTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="pengajuan-form-tab" data-bs-toggle="tab" data-bs-target="#pengajuan-form-pane" type="button" role="tab" aria-controls="pengajuan-form-pane" aria-selected="true">
+                            Ajukan Proposal
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="laporan-form-tab" data-bs-toggle="tab" data-bs-target="#laporan-form-pane" type="button" role="tab" aria-controls="laporan-form-pane" aria-selected="false">
+                            Upload Laporan
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="proposalReportTabContent">
+                    <!-- Pengajuan Tab -->
+                    <div class="tab-pane fade show active" id="pengajuan-form-pane" role="tabpanel" aria-labelledby="pengajuan-form-tab">
+                        <form method="POST" action="{{ route('portal.pengurus.proposals.store') }}" id="proposalForm">
+                            @csrf
+                            <div class="modal-body">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Judul Kegiatan <span class="text-danger">*</span></label>
+                                        <input type="text" name="title" class="form-control" maxlength="180" placeholder="Contoh: Workshop Web Development 2024" required @disabled(!($hasPengurusContext ?? false))>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Jenis Kegiatan <span class="text-danger">*</span></label>
+                                        <select name="type" class="form-select" required @disabled(!($hasPengurusContext ?? false))>
+                                            <option value="proposal">Proposal</option>
+                                            <option value="budget">Budget</option>
+                                            <option value="activity_plan">Activity Plan</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Penanggung Jawab</label>
+                                        <input type="text" class="form-control" value="{{ $pengurusOrganizationName ?? '' }}" disabled>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Deskripsi Kegiatan <span class="text-danger">*</span></label>
+                                        <textarea name="description" class="form-control" rows="5" maxlength="3000" placeholder="Jelaskan tujuan, lokasi, dan manfaat kegiatan" required @disabled(!($hasPengurusContext ?? false))>{{ old('description') }}</textarea>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-info mt-3 mb-0" role="alert">
+                                    Pastikan informasi lengkap sebelum mengajukan agar proses review lebih cepat.
+                                </div>
+                            </div>
+                            <div class="modal-footer border-top-0 pt-0 mt-3">
+                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="ufo-kboard-btn primary" @disabled(!($hasPengurusContext ?? false))>Submit</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Laporan Tab -->
+                    <div class="tab-pane fade" id="laporan-form-pane" role="tabpanel" aria-labelledby="laporan-form-tab">
+                        <form method="POST" action="{{ route('portal.pengurus.reports.store') }}" id="reportForm">
+                            @csrf
+                            <div class="modal-body">
+                                <div class="row g-3">
+                                    <div class="col-12">
+                                        <label class="form-label">Judul Laporan <span class="text-danger">*</span></label>
+                                        <input type="text" name="title" class="form-control" maxlength="180" placeholder="Contoh: LPJ Workshop Web Development" required @disabled(!($hasPengurusContext ?? false))>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Tipe Laporan <span class="text-danger">*</span></label>
+                                        <select name="report_type" class="form-select" required @disabled(!($hasPengurusContext ?? false))>
+                                            <option value="activity">Activity</option>
+                                            <option value="financial">Financial</option>
+                                            <option value="semester">Semester</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Jumlah Peserta <span class="text-danger">*</span></label>
+                                        <input type="number" min="0" name="participants" class="form-control" value="0" required @disabled(!($hasPengurusContext ?? false))>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Event Terkait (Opsional)</label>
+                                        <select name="event_id" class="form-select" @disabled(!($hasPengurusContext ?? false))>
+                                            <option value="">Tanpa event</option>
+                                            @foreach(($eventOptions ?? []) as $event)
+                                                <option value="{{ $event['id'] }}">{{ $event['name'] }}</option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label class="form-label">Ringkasan Laporan <span class="text-danger">*</span></label>
+                                        <textarea name="content" class="form-control" rows="5" maxlength="5000" placeholder="Tuliskan ringkasan hasil kegiatan" required @disabled(!($hasPengurusContext ?? false))>{{ old('content') }}</textarea>
+                                    </div>
+                                </div>
+
+                                <div class="alert alert-warning mt-3 mb-0" role="alert">
+                                    Laporan dikirim maksimal 7 hari setelah kegiatan selesai.
+                                </div>
+                            </div>
+                            <div class="modal-footer border-top-0 pt-0 mt-3">
+                                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Batal</button>
+                                <button type="submit" class="ufo-kboard-btn gold" @disabled(!($hasPengurusContext ?? false))>Submit</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="proposalDetailModal" tabindex="-1" aria-labelledby="proposalDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title" id="proposalDetailModalLabel">Detail Pengajuan</h5>
+                        <small class="text-muted">Ringkasan proposal yang dipilih.</small>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body" id="proposalDetailModalBody"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="reportDetailModal" tabindex="-1" aria-labelledby="reportDetailModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title" id="reportDetailModalLabel">Detail Laporan</h5>
+                        <small class="text-muted">Ringkasan laporan yang dipilih.</small>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body" id="reportDetailModalBody"></div>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    var proposalModal = document.getElementById('proposalDetailModal');
+    var reportModal = document.getElementById('reportDetailModal');
+    var proposalReportModal = document.getElementById('proposalReportModal');
+
+    function renderDetail(targetBody, data, isReport) {
+        if (!targetBody) {
+            return;
+        }
+
+        var title = data.judul || data.title || '-';
+        var org = data.organisasi || data.organization || '-';
+        var date = data.tanggal_kegiatan || data.tanggal_laporan || data.date || '-';
+        var status = data.status || '-';
+        var note = data.catatan_departemen || data.department_review_note || '-';
+        var extra = isReport ? (data.tipe_laporan || data.report_type || '-') : (data.type || '-');
+
+        targetBody.innerHTML = ''
+            + '<dl class="row mb-0">'
+            + '<dt class="col-sm-4">Judul</dt><dd class="col-sm-8">' + title + '</dd>'
+            + '<dt class="col-sm-4">Organisasi</dt><dd class="col-sm-8">' + org + '</dd>'
+            + '<dt class="col-sm-4">Tanggal</dt><dd class="col-sm-8">' + date + '</dd>'
+            + '<dt class="col-sm-4">Status</dt><dd class="col-sm-8">' + status + '</dd>'
+            + '<dt class="col-sm-4">Keterangan</dt><dd class="col-sm-8">' + (note || '-') + '</dd>'
+            + '<dt class="col-sm-4">' + (isReport ? 'Tipe Laporan' : 'Jenis Proposal') + '</dt><dd class="col-sm-8">' + extra + '</dd>'
+            + '</dl>';
+    }
+
+    if (proposalModal) {
+        proposalModal.addEventListener('show.bs.modal', function (event) {
+            var trigger = event.relatedTarget;
+            var data = {};
+
+            try {
+                data = trigger && trigger.getAttribute('data-proposal-detail') ? JSON.parse(trigger.getAttribute('data-proposal-detail')) : {};
+            } catch (error) {
+                data = {};
+            }
+
+            renderDetail(document.getElementById('proposalDetailModalBody'), data, false);
+        });
+    }
+
+    if (reportModal) {
+        reportModal.addEventListener('show.bs.modal', function (event) {
+            var trigger = event.relatedTarget;
+            var data = {};
+
+            try {
+                data = trigger && trigger.getAttribute('data-report-detail') ? JSON.parse(trigger.getAttribute('data-report-detail')) : {};
+            } catch (error) {
+                data = {};
+            }
+
+            renderDetail(document.getElementById('reportDetailModalBody'), data, true);
+        });
+    }
+
+    // Handle Proposal/Report Modal Tab Switching
+    if (proposalReportModal) {
+        proposalReportModal.addEventListener('show.bs.modal', function (event) {
+            var trigger = event.relatedTarget;
+            var tab = trigger ? trigger.getAttribute('data-bs-tab') : 'pengajuan';
+
+            // Reset forms when modal opens
+            var proposalForm = document.getElementById('proposalForm');
+            var reportForm = document.getElementById('reportForm');
+            if (proposalForm) proposalForm.reset();
+            if (reportForm) reportForm.reset();
+
+            // Switch to appropriate tab
+            if (tab === 'laporan') {
+                var laporanTab = document.getElementById('laporan-form-tab');
+                if (laporanTab) {
+                    var tabInstance = new bootstrap.Tab(laporanTab);
+                    tabInstance.show();
+                    updateModalTitle('Upload Laporan Baru', 'Kirim LPJ kegiatan yang sudah selesai.');
+                }
+            } else {
+                var pengajuanTab = document.getElementById('pengajuan-form-tab');
+                if (pengajuanTab) {
+                    var tabInstance = new bootstrap.Tab(pengajuanTab);
+                    tabInstance.show();
+                    updateModalTitle('Ajukan Proposal Baru', 'Kirim izin kegiatan ke Kemahasiswaan.');
+                }
+            }
+        });
+
+        // Update title when tabs are clicked
+        var pengajuanFormTab = document.getElementById('pengajuan-form-tab');
+        var laporanFormTab = document.getElementById('laporan-form-tab');
+
+        if (pengajuanFormTab) {
+            pengajuanFormTab.addEventListener('shown.bs.tab', function () {
+                updateModalTitle('Ajukan Proposal Baru', 'Kirim izin kegiatan ke Kemahasiswaan.');
+            });
+        }
+
+        if (laporanFormTab) {
+            laporanFormTab.addEventListener('shown.bs.tab', function () {
+                updateModalTitle('Upload Laporan Baru', 'Kirim LPJ kegiatan yang sudah selesai.');
+            });
+        }
+
+        function updateModalTitle(title, subtitle) {
+            var modalTitle = document.getElementById('proposalReportModalLabel');
+            var modalSubtitle = document.querySelector('#proposalReportModal .modal-header small');
+            if (modalTitle) modalTitle.textContent = title;
+            if (modalSubtitle) modalSubtitle.textContent = subtitle;
+        }
+    }
+});
+</script>
+@endpush

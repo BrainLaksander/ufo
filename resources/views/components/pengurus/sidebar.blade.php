@@ -39,11 +39,13 @@
                 <i class="bi bi-clipboard-list"></i> Pendaftaran Organisasi
             </a>
         </li>
-        <li>
-            <a href="{{ route('portal.pengurus.lostandfound') }}" class="nav-link {{ request()->routeIs('portal.pengurus.lostandfound') ? 'active' : '' }}" data-close>
-                <i class="bi bi-search"></i> Lost & Found
-            </a>
-        </li>
+        @if($canAccessLostFound ?? false)
+            <li>
+                <a href="{{ route('portal.pengurus.lostandfound') }}" class="nav-link {{ request()->routeIs('portal.pengurus.lostandfound') ? 'active' : '' }}" data-close>
+                    <i class="bi bi-search"></i> Lost & Found
+                </a>
+            </li>
+        @endif
         <li>
             <a href="#" class="nav-link" data-close>
                 <i class="bi bi-chat-dots-fill"></i> Chat & Konsultasi
