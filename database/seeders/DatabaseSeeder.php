@@ -14,6 +14,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        // Intentionally empty: no default/demo data is seeded from source code.
+        $this->call(DemoDataSeeder::class);
     }
 }
