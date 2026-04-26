@@ -51,10 +51,6 @@ class KemahasiswaanWorkflowController extends Controller
             'description' => 'required|string|max:1000',
             'email' => 'nullable|email|max:120',
             'phone' => 'nullable|string|max:30',
-            'pengurus_name' => 'nullable|string|max:100|required_with:pengurus_email,pengurus_position',
-            'pengurus_email' => 'nullable|email|max:120|unique:kemahasiswaan_ukm_accounts,email|required_with:pengurus_name,pengurus_position',
-            'pengurus_position' => 'nullable|string|max:80|required_with:pengurus_name,pengurus_email',
-            'pengurus_password' => 'nullable|string|min:8|max:120',
         ]);
 
         $resolvedProfile = $this->resolveOrganizationProfile($validated['name'], [
@@ -98,62 +94,9 @@ class KemahasiswaanWorkflowController extends Controller
             $insertPayload['field'] = $resolvedProfile['field'];
         }
 
-        $accountCreated = false;
-        $temporaryPassword = '';
+        DB::table('organizations')->insert($insertPayload);
 
-        DB::transaction(function () use (
-            $insertPayload,
-            $validated,
-            &$accountCreated,
-            &$temporaryPassword
-        ) {
-            $organizationId = DB::table('organizations')->insertGetId($insertPayload);
-
-            if (empty($validated['pengurus_email']) || empty($validated['pengurus_name'])) {
-                return;
-            }
-
-            $temporaryPassword = trim((string) ($validated['pengurus_password'] ?? ''));
-            if ($temporaryPassword === '') {
-                $temporaryPassword = Str::upper(Str::random(10));
-            }
-
-            $accountPayload = [
-                'organization_id' => $organizationId,
-                'user_id' => null,
-                'name' => (string) $validated['pengurus_name'],
-                'email' => (string) $validated['pengurus_email'],
-                'position' => (string) ($validated['pengurus_position'] ?? 'Ketua'),
-                'status' => $this->defaultAccountStatus(),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-
-            if (Schema::hasColumn('kemahasiswaan_ukm_accounts', 'password_hash')) {
-                $accountPayload['password_hash'] = Hash::make($temporaryPassword);
-            }
-
-            $accountId = DB::table('kemahasiswaan_ukm_accounts')->insertGetId($accountPayload);
-            $accountCreated = true;
-
-            $account = $this->findAkunUKM($accountId);
-            $this->appendActivityLog([
-                'ukm_account_id' => $account['id'] ?? null,
-                'organization_id' => $account['organization_id'] ?? null,
-                'action' => 'Tambah Organisasi + Akun Pengurus',
-                'description' => 'Organisasi baru dan akun pengurus berhasil dibuat dari modal manajemen organisasi.',
-            ]);
-        });
-
-        $success = 'Organisasi baru berhasil ditambahkan.';
-        if ($accountCreated) {
-            $success .= ' Akun pengurus berhasil dibuat.';
-            if ($temporaryPassword !== '') {
-                $success .= ' Password sementara: ' . $temporaryPassword;
-            }
-        }
-
-        return back()->with('success', $success);
+        return back()->with('success', 'Organisasi baru berhasil ditambahkan.');
     }
 
     private function resolveOrganizationProfile(string $name, array $input = []): array
@@ -346,6 +289,7 @@ class KemahasiswaanWorkflowController extends Controller
             'workflowPengumuman' => $pengumuman,
             'emailReviewQueue' => $reviewQueue,
             'ukmAccounts' => $this->getAkunUKM(),
+            'ui' => $this->buildPengumumanUiText(),
             'headerNotificationCount' => $this->getNotificationCounter(),
         ]);
     }
@@ -435,6 +379,7 @@ class KemahasiswaanWorkflowController extends Controller
             'upcomingEvents' => $this->getUpcomingEvents(),
             'chartMax' => $chartMax,
             'recentAnnouncements' => $recentAnnouncements,
+            'ui' => $this->buildDashboardUiText(),
             'headerNotificationCount' => $this->getNotificationCounter(),
         ]);
     }
@@ -489,6 +434,7 @@ class KemahasiswaanWorkflowController extends Controller
                     ->where('status', 'belum_dibaca')
                     ->count(),
             ],
+            'ui' => $this->buildNotifikasiUiText(),
             'headerNotificationCount' => $this->getNotificationCounter(),
         ]);
     }
@@ -513,6 +459,7 @@ class KemahasiswaanWorkflowController extends Controller
                     ->unique()
                     ->count(),
             ],
+            'ui' => $this->buildKontakUiText(),
             'headerNotificationCount' => $this->getNotificationCounter(),
         ]);
     }
@@ -520,36 +467,43 @@ class KemahasiswaanWorkflowController extends Controller
     public function kalenderKegiatanIndex(): View
     {
         $kalenderKegiatan = $this->getKalenderKegiatanKampus();
+        $now = now();
 
         return view('portal.kemahasiswaan.kalender', [
             'kalenderKegiatan' => $kalenderKegiatan,
+            'organizations' => $this->getOrganizations(),
             'kalenderSummary' => [
                 'total' => count($kalenderKegiatan),
                 'bulan_ini' => collect($kalenderKegiatan)
-                    ->filter(function (array $item) {
+                    ->filter(function (array $item) use ($now) {
                         if (empty($item['tanggal_raw'])) {
                             return false;
                         }
 
-                        $date = Carbon::parse((string) $item['tanggal_raw']);
+                        $start = Carbon::parse((string) $item['tanggal_raw'])->startOfDay();
+                        $end = Carbon::parse((string) ($item['tanggal_selesai_raw'] ?? $item['tanggal_raw']))->endOfDay();
+                        $monthStart = $now->copy()->startOfMonth()->startOfDay();
+                        $monthEnd = $now->copy()->endOfMonth()->endOfDay();
 
-                        return $date->year === now()->year && $date->month === now()->month;
+                        return $start->lte($monthEnd) && $end->gte($monthStart);
                     })
                     ->count(),
                 '7_hari' => collect($kalenderKegiatan)
-                    ->filter(function (array $item) {
+                    ->filter(function (array $item) use ($now) {
                         if (empty($item['tanggal_raw'])) {
                             return false;
                         }
 
-                        $date = Carbon::parse((string) $item['tanggal_raw'])->startOfDay();
-                        $start = now()->startOfDay();
-                        $end = now()->copy()->addDays(7)->endOfDay();
+                        $start = Carbon::parse((string) $item['tanggal_raw'])->startOfDay();
+                        $end = Carbon::parse((string) ($item['tanggal_selesai_raw'] ?? $item['tanggal_raw']))->endOfDay();
+                        $rangeStart = $now->copy()->startOfDay();
+                        $rangeEnd = $now->copy()->addDays(7)->endOfDay();
 
-                        return $date->betweenIncluded($start, $end);
+                        return $start->lte($rangeEnd) && $end->gte($rangeStart);
                     })
                     ->count(),
             ],
+            'ui' => $this->buildKalenderUiText(),
             'headerNotificationCount' => $this->getNotificationCounter(),
         ]);
     }
@@ -563,10 +517,21 @@ class KemahasiswaanWorkflowController extends Controller
             'jabatan' => 'required|string|max:80',
         ]);
 
+        $organizationId = (int) $validated['organization_id'];
+        $organizationAlreadyHasAccount = DB::table('kemahasiswaan_ukm_accounts')
+            ->where('organization_id', $organizationId)
+            ->exists();
+
+        if ($organizationAlreadyHasAccount) {
+            return back()
+                ->withErrors(['organization_id' => 'Setiap organisasi hanya boleh memiliki satu akun utama.'])
+                ->withInput();
+        }
+
         $temporaryPassword = Str::upper(Str::random(10));
 
         $insertPayload = [
-            'organization_id' => (int) $validated['organization_id'],
+            'organization_id' => $organizationId,
             'user_id' => null,
             'name' => $validated['nama'],
             'email' => $validated['email'],
@@ -610,10 +575,22 @@ class KemahasiswaanWorkflowController extends Controller
             return back()->with('error', 'Akun UKM tidak ditemukan.');
         }
 
+        $organizationId = (int) $validated['organization_id'];
+        $organizationAlreadyHasAnotherAccount = DB::table('kemahasiswaan_ukm_accounts')
+            ->where('organization_id', $organizationId)
+            ->where('id', '!=', $id)
+            ->exists();
+
+        if ($organizationAlreadyHasAnotherAccount) {
+            return back()
+                ->withErrors(['organization_id' => 'Setiap organisasi hanya boleh memiliki satu akun utama.'])
+                ->withInput();
+        }
+
         DB::table('kemahasiswaan_ukm_accounts')
             ->where('id', $id)
             ->update([
-                'organization_id' => (int) $validated['organization_id'],
+                'organization_id' => $organizationId,
                 'name' => $validated['nama'],
                 'email' => $validated['email'],
                 'position' => $validated['jabatan'],
@@ -696,30 +673,54 @@ class KemahasiswaanWorkflowController extends Controller
             'judul' => 'required|string|max:140',
             'kategori' => 'required|string|max:60',
             'target' => 'required|string|max:100',
-            'ringkasan' => 'required|string|max:240',
+            'konten' => 'required|string|max:10000',
             'publish_at' => 'nullable|date',
-            'ukm_account_id' => 'required|integer|exists:kemahasiswaan_ukm_accounts,id',
+            'ukm_account_id' => 'nullable|integer|exists:kemahasiswaan_ukm_accounts,id',
+            'submit_action' => 'required|in:draft,publish_now',
         ]);
 
         $publishAt = !empty($validated['publish_at'])
-            ? Carbon::parse($validated['publish_at'])->startOfDay()
+            ? Carbon::parse($validated['publish_at'])
             : null;
 
-        $publishStatus = $publishAt ? 'scheduled' : 'draft';
+        $submitAction = (string) ($validated['submit_action'] ?? 'draft');
+        $publishStatus = 'draft';
+        $emailReviewStatus = $this->defaultPendingEmailReviewStatus();
+        $reviewedBy = null;
+        $reviewedAt = null;
+
+        if ($submitAction === 'publish_now') {
+            $publishStatus = ($publishAt && $publishAt->isFuture()) ? 'scheduled' : 'published';
+            $emailReviewStatus = 'approved';
+            $reviewedBy = $this->resolveSessionUserId($request);
+            $reviewedAt = now();
+        }
+
+        $rawContent = trim((string) ($validated['konten'] ?? ''));
+        $normalizedContent = preg_replace('/\s+/u', ' ', strip_tags($rawContent)) ?? $rawContent;
+        $summary = Str::limit(trim($normalizedContent), 240, '...');
+
+        $accountId = !empty($validated['ukm_account_id'])
+            ? (int) $validated['ukm_account_id']
+            : (int) (DB::table('kemahasiswaan_ukm_accounts')
+                ->where('status', $this->defaultAccountStatus())
+                ->orderBy('id')
+                ->value('id') ?? 0);
 
         $announcementId = DB::table('kemahasiswaan_announcements')->insertGetId([
-            'ukm_account_id' => (int) $validated['ukm_account_id'],
+            'ukm_account_id' => $accountId > 0 ? $accountId : null,
             'title' => $validated['judul'],
             'category' => $validated['kategori'],
             'target_audience' => $validated['target'],
-            'summary' => $validated['ringkasan'],
-            'content' => null,
+            'summary' => $summary,
+            'content' => $rawContent,
             'publish_at' => $publishAt,
             'publish_status' => $publishStatus,
-            'email_review_status' => 'pending',
+            'submit_action' => $submitAction,
+            'email_review_status' => $emailReviewStatus,
             'email_review_note' => null,
-            'reviewed_by' => null,
-            'reviewed_at' => null,
+            'reviewed_by' => $reviewedBy,
+            'reviewed_at' => $reviewedAt,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -731,10 +732,12 @@ class KemahasiswaanWorkflowController extends Controller
             'ukm_account_id' => $account['id'] ?? null,
             'organization_id' => $account['organization_id'] ?? null,
             'action' => 'Membuat Pengumuman',
-            'description' => 'Draft pengumuman "' . $validated['judul'] . '" dibuat dan menunggu review email.',
+            'description' => $submitAction === 'publish_now'
+                ? 'Pengumuman "' . $validated['judul'] . '" dipublikasikan dari modal Kemahasiswaan.'
+                : 'Draft pengumuman "' . $validated['judul'] . '" disimpan dari modal Kemahasiswaan.',
         ]);
 
-        return back()->with('success', 'Pengumuman berhasil dibuat.');
+        return back()->with('success', 'Pengumuman berhasil disimpan.');
     }
 
     public function reviewIzinPengumumanEmail(Request $request, int $id): RedirectResponse
@@ -1299,19 +1302,36 @@ class KemahasiswaanWorkflowController extends Controller
     private function getKalenderKegiatanKampus(): array
     {
         if (Schema::hasTable('kemahasiswaan_schedules')) {
-            $rows = DB::table('kemahasiswaan_schedules as sch')
+            $hasCategory = Schema::hasColumn('kemahasiswaan_schedules', 'category');
+            $hasDescription = Schema::hasColumn('kemahasiswaan_schedules', 'description');
+
+            $query = DB::table('kemahasiswaan_schedules as sch')
                 ->leftJoin('organizations as org', 'org.id', '=', 'sch.organization_id')
                 ->select([
                     'sch.id',
                     'sch.title',
                     'sch.start_at',
+                    'sch.end_at',
                     'sch.location',
                     'sch.status',
                     'org.name as organization_name',
                 ])
                 ->orderBy('sch.start_at')
-                ->limit(200)
-                ->get();
+                ->limit(200);
+
+            if ($hasCategory) {
+                $query->addSelect('sch.category');
+            } else {
+                $query->selectRaw('NULL as category');
+            }
+
+            if ($hasDescription) {
+                $query->addSelect('sch.description');
+            } else {
+                $query->selectRaw('NULL as description');
+            }
+
+            $rows = $query->get();
 
             return $rows->map(function ($row) {
                 $statusCode = Str::lower((string) ($row->status ?? 'planned'));
@@ -1322,14 +1342,23 @@ class KemahasiswaanWorkflowController extends Controller
                     default => Str::title(str_replace('_', ' ', $statusCode)),
                 };
 
+                $startDate = $row->start_at ? Carbon::parse((string) $row->start_at) : null;
+                $endDate = $row->end_at ? Carbon::parse((string) $row->end_at) : $startDate;
+                $category = trim((string) ($row->category ?? ''));
+
+                if ($category === '') {
+                    $category = 'org';
+                }
+
                 return [
                     'id' => (int) $row->id,
                     'judul' => (string) ($row->title ?? '-'),
+                    'kategori' => $category,
+                    'deskripsi' => (string) ($row->description ?? ''),
                     'organisasi' => (string) ($row->organization_name ?? '-'),
-                    'tanggal' => $row->start_at
-                        ? Carbon::parse((string) $row->start_at)->translatedFormat('d F Y')
-                        : '-',
-                    'tanggal_raw' => $row->start_at,
+                    'tanggal' => $startDate ? $startDate->translatedFormat('d F Y') : '-',
+                    'tanggal_raw' => $startDate?->toDateString(),
+                    'tanggal_selesai_raw' => $endDate?->toDateString(),
                     'lokasi' => (string) ($row->location ?? '-'),
                     'status_code' => $statusCode,
                     'status_label' => $statusLabel,
@@ -1347,6 +1376,7 @@ class KemahasiswaanWorkflowController extends Controller
                 'evt.id',
                 'evt.name',
                 'evt.start_date',
+                'evt.end_date',
                 'evt.location',
                 'evt.status',
                 'org.name as organization_name',
@@ -1358,15 +1388,17 @@ class KemahasiswaanWorkflowController extends Controller
         return $rows->map(function ($row) {
             $statusCode = Str::lower((string) ($row->status ?? 'planned'));
             [$statusLabel] = $this->eventDashboardStatus($statusCode);
+            $startDate = $row->start_date ? Carbon::parse((string) $row->start_date) : null;
+            $endDate = $row->end_date ? Carbon::parse((string) $row->end_date) : $startDate;
 
             return [
                 'id' => (int) $row->id,
                 'judul' => (string) ($row->name ?? '-'),
+                'kategori' => 'org',
                 'organisasi' => (string) ($row->organization_name ?? '-'),
-                'tanggal' => $row->start_date
-                    ? Carbon::parse((string) $row->start_date)->translatedFormat('d F Y')
-                    : '-',
-                'tanggal_raw' => $row->start_date,
+                'tanggal' => $startDate ? $startDate->translatedFormat('d F Y') : '-',
+                'tanggal_raw' => $startDate?->toDateString(),
+                'tanggal_selesai_raw' => $endDate?->toDateString(),
                 'lokasi' => (string) ($row->location ?? '-'),
                 'status_code' => $statusCode,
                 'status_label' => $statusLabel,
@@ -1952,6 +1984,163 @@ class KemahasiswaanWorkflowController extends Controller
         $map = $this->getReferenceMap($domain);
 
         return (string) (($map[$code]['label'] ?? ''));
+    }
+
+    private function uiText(string $code): string
+    {
+        return $this->refLabel('ui_text', $code);
+    }
+
+    private function uiTextMap(array $keyCodeMap): array
+    {
+        $labels = [];
+
+        foreach ($keyCodeMap as $key => $code) {
+            $labels[$key] = $this->uiText((string) $code);
+        }
+
+        return $labels;
+    }
+
+    private function buildDashboardUiText(): array
+    {
+        return $this->uiTextMap([
+            'chart_title' => 'kmh_dashboard_chart_title',
+            'quick_actions_title' => 'kmh_dashboard_quick_actions_title',
+            'quick_action_review' => 'kmh_dashboard_quick_action_review',
+            'quick_action_announcement' => 'kmh_dashboard_quick_action_announcement',
+            'upcoming_events_title' => 'kmh_dashboard_upcoming_events_title',
+            'upcoming_empty_title' => 'kmh_dashboard_upcoming_empty_title',
+            'upcoming_empty_message' => 'kmh_dashboard_upcoming_empty_message',
+            'recent_announcements_title' => 'kmh_dashboard_recent_announcements_title',
+            'view_all_label' => 'kmh_common_view_all',
+            'table_col_title' => 'kmh_dashboard_table_col_title',
+            'table_col_date' => 'kmh_dashboard_table_col_date',
+            'table_col_status' => 'kmh_dashboard_table_col_status',
+            'recent_empty' => 'kmh_dashboard_recent_empty',
+        ]);
+    }
+
+    private function buildNotifikasiUiText(): array
+    {
+        return $this->uiTextMap([
+            'total_notifications' => 'kmh_notification_total',
+            'unread_notifications' => 'kmh_notification_unread',
+            'filter_title' => 'kmh_notification_filter_title',
+            'filter_showing_items' => 'kmh_notification_filter_showing_items',
+            'summary_prefix' => 'kmh_notification_summary_prefix',
+            'summary_suffix' => 'kmh_notification_summary_suffix',
+            'reset_filter' => 'kmh_notification_reset_filter',
+            'open_submission_review' => 'kmh_notification_open_submission_review',
+            'detail_button' => 'kmh_notification_detail_button',
+            'empty_state' => 'kmh_notification_empty_state',
+        ]);
+    }
+
+    private function buildKontakUiText(): array
+    {
+        return $this->uiTextMap([
+            'hero_title' => 'kmh_contact_hero_title',
+            'hero_subtitle' => 'kmh_contact_hero_subtitle',
+            'search_placeholder' => 'kmh_contact_search_placeholder',
+            'search_aria' => 'kmh_contact_search_aria',
+            'total_org_label' => 'kmh_contact_total_org_label',
+            'bem_label' => 'kmh_contact_bem_label',
+            'ukm_label' => 'kmh_contact_ukm_label',
+            'contact_unavailable' => 'kmh_contact_unavailable',
+            'email_unavailable' => 'kmh_email_unavailable',
+            'empty_state' => 'kmh_contact_empty_state',
+            'search_empty_state' => 'kmh_contact_search_empty_state',
+        ]);
+    }
+
+    private function buildKalenderUiText(): array
+    {
+        return $this->uiTextMap([
+            'calendar_title' => 'kmh_calendar_title',
+            'calendar_subtitle' => 'kmh_calendar_subtitle',
+            'add_activity' => 'kmh_calendar_add_activity',
+            'modal_title' => 'kmh_calendar_modal_title',
+            'modal_subtitle' => 'kmh_calendar_modal_subtitle',
+            'field_title' => 'kmh_calendar_field_title',
+            'field_start_date' => 'kmh_calendar_field_start_date',
+            'field_end_date' => 'kmh_calendar_field_end_date',
+            'field_category' => 'kmh_calendar_field_category',
+            'field_organization' => 'kmh_calendar_field_organization',
+            'field_location' => 'kmh_calendar_field_location',
+            'field_description' => 'kmh_calendar_field_description',
+            'field_title_placeholder' => 'kmh_calendar_field_title_placeholder',
+            'field_location_placeholder' => 'kmh_calendar_field_location_placeholder',
+            'field_description_placeholder' => 'kmh_calendar_field_description_placeholder',
+            'schedule_form_warning' => 'kmh_schedule_form_warning',
+            'schedule_org_placeholder' => 'kmh_schedule_org_placeholder',
+            'save_button' => 'kmh_calendar_save_button',
+            'cancel_button' => 'kmh_calendar_cancel_button',
+            'filter_category' => 'kmh_calendar_filter_category',
+            'search_label' => 'kmh_calendar_search_label',
+            'search_placeholder' => 'kmh_calendar_search_placeholder',
+            'legend_label' => 'kmh_calendar_legend_label',
+            'all_activities' => 'kmh_calendar_all_activities',
+            'month_view' => 'kmh_calendar_month_view',
+            'list_view' => 'kmh_calendar_list_view',
+            'more_suffix' => 'kmh_calendar_more_suffix',
+            'table_col_title' => 'kmh_calendar_table_col_title',
+            'table_col_org' => 'kmh_calendar_table_col_org',
+            'table_col_date' => 'kmh_calendar_table_col_date',
+            'table_col_location' => 'kmh_calendar_table_col_location',
+            'table_col_category' => 'kmh_calendar_table_col_category',
+            'empty_state' => 'kmh_calendar_empty_state',
+            'category_akademik' => 'kmh_calendar_category_akademik',
+            'category_organisasi' => 'kmh_calendar_category_organisasi',
+            'category_masa_tenang' => 'kmh_calendar_category_masa_tenang',
+            'category_libur' => 'kmh_calendar_category_libur',
+            'category_event_besar' => 'kmh_calendar_category_event_besar',
+        ]);
+    }
+
+    private function buildPengumumanUiText(): array
+    {
+        return $this->uiTextMap([
+            'total_label' => 'kmh_announcement_total_label',
+            'published_label' => 'kmh_announcement_published_label',
+            'scheduled_label' => 'kmh_announcement_scheduled_label',
+            'draft_label' => 'kmh_announcement_draft_label',
+            'search_placeholder' => 'kmh_announcement_search_placeholder',
+            'search_aria' => 'kmh_announcement_search_aria',
+            'all_statuses' => 'kmh_common_all_statuses',
+            'create_new_button' => 'kmh_announcement_create_new_button',
+            'create_new_title' => 'kmh_announcement_create_new_title',
+            'create_new_subtitle' => 'kmh_announcement_create_new_subtitle',
+            'modal_title' => 'kmh_announcement_modal_title',
+            'modal_subtitle' => 'kmh_announcement_modal_subtitle',
+            'account_missing_warning' => 'kmh_announcement_account_missing_warning',
+            'field_title' => 'kmh_announcement_field_title',
+            'field_category' => 'kmh_announcement_field_category',
+            'field_category_placeholder' => 'kmh_announcement_field_category_placeholder',
+            'field_target' => 'kmh_announcement_field_target',
+            'field_target_placeholder' => 'kmh_announcement_field_target_placeholder',
+            'field_content' => 'kmh_announcement_field_content',
+            'field_content_placeholder' => 'kmh_announcement_field_content_placeholder',
+            'field_publish_date' => 'kmh_announcement_field_publish_datetime',
+            'field_publish_placeholder' => 'kmh_announcement_field_publish_datetime_placeholder',
+            'field_account' => 'kmh_announcement_field_account',
+            'field_account_placeholder' => 'kmh_announcement_field_account_placeholder',
+            'field_summary' => 'kmh_announcement_field_summary',
+            'save_button' => 'kmh_common_save_button',
+            'cancel_button' => 'kmh_common_cancel_button',
+            'save_draft_button' => 'kmh_announcement_save_draft_button',
+            'publish_now_button' => 'kmh_announcement_publish_now_button',
+            'distribution_info_title' => 'kmh_announcement_distribution_info_title',
+            'distribution_info_body' => 'kmh_announcement_distribution_info_body',
+            'review_email_title' => 'kmh_announcement_review_email_title',
+            'review_email_count_suffix' => 'kmh_announcement_review_email_count_suffix',
+            'list_title' => 'kmh_announcement_list_title',
+            'list_count_suffix' => 'kmh_announcement_list_count_suffix',
+            'review_queue_empty' => 'kmh_announcement_review_queue_empty',
+            'list_empty' => 'kmh_announcement_list_empty',
+            'list_filter_empty' => 'kmh_announcement_list_filter_empty',
+            'note_placeholder' => 'kmh_common_review_note_placeholder',
+        ]);
     }
 
     private function getReferencePayload(string $domain, string $code): array

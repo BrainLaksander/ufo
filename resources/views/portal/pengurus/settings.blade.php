@@ -37,7 +37,7 @@
 <article class="ufo-pg-settings-card">
     <div class="ufo-pg-card-head">
         <h2>Kategori Organisasi</h2>
-        <button type="button" class="ufo-pg-edit-btn" disabled aria-disabled="true">
+        <button type="button" class="ufo-pg-edit-btn" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Edit Kategori Organisasi" data-modal-message="Modal ini menampilkan pengaturan kategori organisasi.">
             <i class="bi bi-pencil-square" aria-hidden="true"></i>
             <span>Edit</span>
         </button>
@@ -48,7 +48,7 @@
 <article class="ufo-pg-settings-card">
     <div class="ufo-pg-card-head">
         <h2>Logo &amp; Banner</h2>
-        <button type="button" class="ufo-pg-edit-btn" disabled aria-disabled="true">
+        <button type="button" class="ufo-pg-edit-btn" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Edit Media" data-modal-message="Modal ini menampilkan pengaturan logo dan banner organisasi.">
             <i class="bi bi-pencil-square" aria-hidden="true"></i>
             <span>Edit</span>
         </button>
@@ -99,7 +99,7 @@
         <article class="ufo-pg-settings-card">
             <div class="ufo-pg-card-head">
                 <h2>Visi &amp; Misi</h2>
-                <button type="button" class="ufo-pg-edit-btn" disabled aria-disabled="true">
+                <button type="button" class="ufo-pg-edit-btn" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Edit Visi & Misi" data-modal-message="Modal ini menampilkan form pengeditan visi dan misi.">
                     <i class="bi bi-pencil-square" aria-hidden="true"></i>
                     <span>Edit</span>
                 </button>
@@ -141,7 +141,7 @@
             </div>
 
             <div class="ufo-pg-settings-actions">
-                <button type="submit" class="btn-primary-org" @disabled(!($hasOrganizationContext ?? false))>Simpan Perubahan</button>
+                    <button type="submit" class="btn-primary-org" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Simpan Perubahan" data-modal-message="Aksi simpan dibuka sebagai modal konfirmasi." @disabled(!($hasOrganizationContext ?? false))>Simpan Perubahan</button>
                 <a href="{{ route('portal.pengurus.settings') }}" class="btn-secondary-org">Muat Ulang</a>
             </div>
         </article>

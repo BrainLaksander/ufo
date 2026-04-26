@@ -5,7 +5,7 @@
 @php
     $eventDate = \Carbon\Carbon::parse($event['date']);
     $eventDateTime = \Carbon\Carbon::parse($event['date'] . ' ' . $event['time']);
-    $statusRaw = (string) ($event['status'] ?? 'Draft');
+    $statusRaw = (string) ($event['status'] ?? '');
     $statusText = strtolower($statusRaw);
     $statusPill = 'draft';
 

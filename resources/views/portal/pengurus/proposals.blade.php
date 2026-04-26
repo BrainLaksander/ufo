@@ -40,11 +40,11 @@
             </div>
 
             <div class="ufo-kboard-item-actions mt-0">
-                <button class="ufo-kboard-btn primary" type="button" data-bs-toggle="collapse" data-bs-target="#pengajuanForm">
+                <button class="ufo-kboard-btn primary" type="button" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Ajukan Kegiatan" data-modal-message="Modal ini membuka ringkasan form pengajuan kegiatan.">
                     <i class="bi bi-plus-lg"></i>
                     Ajukan Kegiatan
                 </button>
-                <button class="ufo-kboard-btn gold" type="button" data-bs-toggle="collapse" data-bs-target="#laporanForm">
+                    <button class="ufo-kboard-btn gold" type="button" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Kirim Laporan" data-modal-message="Modal ini membuka ringkasan form laporan kegiatan.">
                     <i class="bi bi-file-earmark-arrow-up"></i>
                     Kirim Laporan
                 </button>
@@ -92,7 +92,7 @@
             @csrf
             <label class="ufo-kboard-span-full">
                 <span class="ufo-kboard-item-meta">Nama Kegiatan</span>
-                <input type="text" name="title" class="ufo-kboard-field" placeholder="{{ $proposalTitlePlaceholder ?? 'Proposal Kegiatan Organisasi' }}" required @disabled(!($hasPengurusContext ?? false))>
+                <input type="text" name="title" class="ufo-kboard-field" placeholder="{{ $proposalTitlePlaceholder ?? '' }}" required @disabled(!($hasPengurusContext ?? false))>
             </label>
 
             <label>
@@ -106,12 +106,12 @@
 
             <label>
                 <span class="ufo-kboard-item-meta">Penanggung Jawab</span>
-                <input type="text" class="ufo-kboard-field" value="{{ $pengurusOrganizationName ?? 'Pengurus Organisasi' }}" disabled>
+                <input type="text" class="ufo-kboard-field" value="{{ $pengurusOrganizationName ?? '' }}" disabled>
             </label>
 
             <label class="ufo-kboard-span-full">
                 <span class="ufo-kboard-item-meta">Deskripsi Kegiatan</span>
-                <textarea name="description" class="ufo-kboard-textarea" placeholder="{{ $proposalDescriptionPlaceholder ?? 'Jelaskan detail kegiatan yang akan diajukan.' }}" required @disabled(!($hasPengurusContext ?? false))></textarea>
+                <textarea name="description" class="ufo-kboard-textarea" placeholder="{{ $proposalDescriptionPlaceholder ?? '' }}" required @disabled(!($hasPengurusContext ?? false))></textarea>
             </label>
 
             <div class="ufo-kboard-span-full">
@@ -127,7 +127,7 @@
                 <button type="submit" class="ufo-kboard-btn primary" @disabled(!($hasPengurusContext ?? false))>
                     Ajukan Kegiatan ke Kemahasiswaan
                 </button>
-                <button type="button" class="ufo-kboard-btn ghost" data-bs-toggle="collapse" data-bs-target="#pengajuanForm">
+                    <button type="button" class="ufo-kboard-btn ghost" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Batal Ajukan Kegiatan" data-modal-message="Aksi batal dibuka sebagai modal konfirmasi.">
                     Batal
                 </button>
             </div>
@@ -145,7 +145,7 @@
             @csrf
             <label class="ufo-kboard-span-full">
                 <span class="ufo-kboard-item-meta">Nama Kegiatan</span>
-                <input type="text" name="title" class="ufo-kboard-field" placeholder="{{ $reportTitlePlaceholder ?? 'Laporan Kegiatan Organisasi' }}" required @disabled(!($hasPengurusContext ?? false))>
+                <input type="text" name="title" class="ufo-kboard-field" placeholder="{{ $reportTitlePlaceholder ?? '' }}" required @disabled(!($hasPengurusContext ?? false))>
             </label>
 
             <label>
@@ -174,7 +174,7 @@
 
             <label class="ufo-kboard-span-full">
                 <span class="ufo-kboard-item-meta">Ringkasan Laporan</span>
-                <textarea name="content" class="ufo-kboard-textarea" placeholder="{{ $reportContentPlaceholder ?? 'Ceritakan hasil kegiatan, evaluasi, dan dampak program.' }}" required @disabled(!($hasPengurusContext ?? false))></textarea>
+                <textarea name="content" class="ufo-kboard-textarea" placeholder="{{ $reportContentPlaceholder ?? '' }}" required @disabled(!($hasPengurusContext ?? false))></textarea>
             </label>
 
             <div class="ufo-kboard-span-full">
@@ -190,7 +190,7 @@
                 <button type="submit" class="ufo-kboard-btn gold" @disabled(!($hasPengurusContext ?? false))>
                     Kirim Laporan ke Kemahasiswaan
                 </button>
-                <button type="button" class="ufo-kboard-btn ghost" data-bs-toggle="collapse" data-bs-target="#laporanForm">
+                <button type="button" class="ufo-kboard-btn ghost" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Batal Kirim Laporan" data-modal-message="Aksi batal dibuka sebagai modal konfirmasi.">
                     Batal
                 </button>
             </div>
@@ -241,7 +241,7 @@
                             @endif
 
                             <div class="ufo-kboard-item-actions">
-                                <button class="ufo-kboard-btn ghost" type="button">Lihat Detail</button>
+                                <button class="ufo-kboard-btn ghost" type="button" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Detail Pengajuan" data-modal-message="Modal ini menampilkan detail pengajuan kegiatan.">Lihat Detail</button>
 
                                 @if(in_array($status, ['Draft', 'Revisi'], true))
                                     <form method="POST" action="{{ route('portal.pengurus.proposals.submit', ['id' => $item['id']]) }}">
@@ -251,7 +251,7 @@
                                 @endif
 
                                 @if($status === 'Disetujui')
-                                    <button class="ufo-kboard-btn primary" type="button" data-bs-toggle="collapse" data-bs-target="#laporanForm">Kirim Laporan</button>
+                                    <button class="ufo-kboard-btn primary" type="button" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Kirim Laporan" data-modal-message="Modal ini menampilkan form kirim laporan untuk pengajuan yang disetujui.">Kirim Laporan</button>
                                 @endif
                             </div>
                         </article>
@@ -286,7 +286,7 @@
                             @endif
 
                             <div class="ufo-kboard-item-actions">
-                                <button class="ufo-kboard-btn ghost" type="button">Lihat Laporan</button>
+                                <button class="ufo-kboard-btn ghost" type="button" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Detail Laporan" data-modal-message="Modal ini menampilkan detail laporan kegiatan.">Lihat Laporan</button>
 
                                 @if(in_array($status, ['Draft', 'Revisi'], true))
                                     <form method="POST" action="{{ route('portal.pengurus.reports.submit', ['id' => $item['id']]) }}">
@@ -354,7 +354,12 @@
                                 <h4 class="ufo-kboard-item-title">{{ $kontak['nama'] }}</h4>
                                 <p class="ufo-kboard-item-meta">{{ $kontak['jabatan'] }} • {{ $kontak['organisasi'] }}</p>
                             </div>
-                            <span class="ufo-kboard-pill approved">Aktif</span>
+                            @php
+                                $contactStatus = (string) ($kontak['status'] ?? '');
+                            @endphp
+                            @if($contactStatus !== '')
+                                <span class="ufo-kboard-pill approved">{{ $contactStatus }}</span>
+                            @endif
                         </div>
 
                         <p class="ufo-kboard-item-text"><i class="bi bi-telephone"></i> {{ $kontak['kontak'] }}</p>

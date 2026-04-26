@@ -1,13 +1,13 @@
 @php
-    $pageTitle = trim($__env->yieldContent('page_title', 'Dashboard'));
-    $pageSubtitle = trim($__env->yieldContent('page_subtitle', 'Sistem Administrasi & Kontrol Organisasi Mahasiswa'));
+    $pageTitle = html_entity_decode(trim($__env->yieldContent('page_title', 'Dashboard')), ENT_QUOTES, 'UTF-8');
+    $pageSubtitle = html_entity_decode(trim($__env->yieldContent('page_subtitle', 'Sistem Administrasi & Kontrol Organisasi Mahasiswa')), ENT_QUOTES, 'UTF-8');
     $notificationCount = (int) ($headerNotificationCount ?? 0);
 @endphp
 
 <header class="header kemahasiswaan-header">
     <div class="header-container kmh-shell-header-container">
         <div class="kmh-shell-header-left">
-            <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Buka sidebar">
+            <button type="button" class="sidebar-toggle" data-kmh-sidebar-toggle aria-controls="sidebar" aria-expanded="true" aria-label="Minimize sidebar">
                 <i class="bi bi-list"></i>
             </button>
             <div class="kmh-shell-heading">

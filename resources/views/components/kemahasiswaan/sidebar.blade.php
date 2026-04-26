@@ -1,4 +1,3 @@
-<div id="sidebar-overlay" class="sidebar-overlay hidden"></div>
 <aside id="sidebar" class="sidebar kemahasiswaan-sidebar" aria-hidden="false">
     @php
         $notificationCount = (int) ($headerNotificationCount ?? 0);

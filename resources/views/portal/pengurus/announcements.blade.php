@@ -17,7 +17,7 @@
                 <p class="ufo-kboard-lead">Kelola pengumuman event organisasi Anda dengan mudah.</p>
             </div>
 
-            <button class="ufo-kboard-btn primary" data-bs-toggle="collapse" data-bs-target="#announcementCreateForm" type="button">
+            <button class="ufo-kboard-btn primary" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Buat Pengumuman" data-modal-message="Modal ini membuka konteks pembuatan pengumuman baru." type="button">
                 <i class="bi bi-plus-lg"></i>
                 Buat Pengumuman
             </button>
@@ -30,12 +30,12 @@
         <div class="ufo-kboard-row two">
             <label class="ufo-kboard-span-full">
                 <span class="ufo-kboard-item-meta">Judul Pengumuman</span>
-                <input type="text" class="ufo-kboard-field" placeholder="{{ $announcementTitlePlaceholder ?? 'Pengumuman Organisasi' }}">
+                <input type="text" class="ufo-kboard-field" placeholder="{{ $announcementTitlePlaceholder ?? '' }}">
             </label>
 
             <label class="ufo-kboard-span-full">
                 <span class="ufo-kboard-item-meta">Deskripsi</span>
-                <textarea class="ufo-kboard-textarea" placeholder="{{ $announcementDescriptionPlaceholder ?? 'Jelaskan isi pengumuman di sini.' }}"></textarea>
+                <textarea class="ufo-kboard-textarea" placeholder="{{ $announcementDescriptionPlaceholder ?? '' }}"></textarea>
             </label>
 
             <label>
@@ -61,8 +61,8 @@
         </div>
 
         <div class="ufo-kboard-item-actions mt-3">
-            <button class="ufo-kboard-btn primary" type="button">Publikasikan</button>
-            <button class="ufo-kboard-btn ghost" type="button" data-bs-toggle="collapse" data-bs-target="#announcementCreateForm">Batal</button>
+            <button class="ufo-kboard-btn primary" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Publikasikan Pengumuman" data-modal-message="Aksi publikasi pengumuman dibuka sebagai modal konfirmasi." type="button">Publikasikan</button>
+            <button class="ufo-kboard-btn ghost" type="button" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Batal Buat Pengumuman" data-modal-message="Aksi batal dibuka sebagai modal konfirmasi.">Batal</button>
         </div>
     </section>
 
@@ -96,8 +96,8 @@
                             <p class="ufo-kboard-item-text">{{ $item['description'] }}</p>
 
                             <div class="ufo-kboard-item-actions">
-                                <button class="ufo-kboard-btn primary" type="button">Edit</button>
-                                <button class="ufo-kboard-btn ghost" type="button">Lihat</button>
+                                <button class="ufo-kboard-btn primary" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Edit Pengumuman" data-modal-message="Modal ini menampilkan form edit pengumuman." type="button">Edit</button>
+                                <button class="ufo-kboard-btn ghost" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Lihat Pengumuman" data-modal-message="Modal ini menampilkan detail pengumuman." type="button">Lihat</button>
                             </div>
                         </article>
                     @endforeach
@@ -119,9 +119,9 @@
                             <p class="ufo-kboard-item-text">{{ $item['description'] }}</p>
 
                             <div class="ufo-kboard-item-actions">
-                                <button class="ufo-kboard-btn ghost" type="button">Lihat</button>
+                                <button class="ufo-kboard-btn ghost" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Lihat Pengumuman" data-modal-message="Modal ini menampilkan detail pengumuman." type="button">Lihat</button>
                                 @if($item['status'] === 'Aktif')
-                                    <button class="ufo-kboard-btn primary" type="button">Edit</button>
+                                    <button class="ufo-kboard-btn primary" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Edit Pengumuman" data-modal-message="Modal ini menampilkan form edit pengumuman." type="button">Edit</button>
                                 @endif
                             </div>
                         </article>

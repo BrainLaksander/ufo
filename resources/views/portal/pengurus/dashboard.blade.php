@@ -9,6 +9,10 @@
     $calendarDays = $calendarDays ?? [];
     $pendingTasks = $pendingTasks ?? [];
     $monthLabel = $monthLabel ?? \Carbon\Carbon::now()->translatedFormat('F Y');
+    $prevMonth = $prevMonth ?? \Carbon\Carbon::now()->subMonth()->format('Y-m');
+    $nextMonth = $nextMonth ?? \Carbon\Carbon::now()->addMonth()->format('Y-m');
+    $profileStatusValue = $profileStatusValue ?? '';
+    $profileStatusLabel = $profileStatusLabel ?? '';
 @endphp
 
 @section('content')
@@ -29,18 +33,18 @@
 
             <div class="ufo-pg-calendar-legend">
                 @foreach($legendItems as $legend)
-                    <span>{{ $legend['emoji'] }} {{ $legend['label'] }}</span>
+                    <span>{{ $legend['label'] }}</span>
                 @endforeach
             </div>
 
             <div class="ufo-pg-calendar-nav">
-                <button type="button" class="ufo-kboard-btn ghost" disabled>
+                <a href="{{ route('dashboard.pengurus', ['bulan' => $prevMonth]) }}" class="ufo-kboard-btn ghost" aria-label="Bulan sebelumnya">
                     <i class="bi bi-chevron-left"></i>
-                </button>
+                </a>
                 <h3>{{ $monthLabel }}</h3>
-                <button type="button" class="ufo-kboard-btn ghost" disabled>
+                <a href="{{ route('dashboard.pengurus', ['bulan' => $nextMonth]) }}" class="ufo-kboard-btn ghost" aria-label="Bulan berikutnya">
                     <i class="bi bi-chevron-right"></i>
-                </button>
+                </a>
             </div>
 
             <div class="ufo-pg-calendar-grid">
@@ -60,7 +64,7 @@
                             <span class="ufo-pg-calendar-date {{ $day['is_today'] ? 'today' : '' }}">{{ $day['day'] }}</span>
 
                             @foreach($day['events'] as $event)
-                                <span class="ufo-pg-event-badge {{ $event['badge'] }}">{{ $event['emoji'] }} {{ $event['name'] }}</span>
+                                <span class="ufo-pg-event-badge {{ $event['badge'] }}">{{ $event['name'] }}</span>
                             @endforeach
 
                             @if($day['overflow'] > 0)
@@ -76,8 +80,8 @@
     <section class="ufo-kboard-section">
         <div class="ufo-kboard-row two">
             <article class="ufo-kboard-stat green">
-                <h3>Lengkap</h3>
-                <p>Status Profil</p>
+                <h3>{{ $profileStatusValue }}</h3>
+                <p>{{ $profileStatusLabel }}</p>
             </article>
 
             <article class="ufo-kboard-stat gold">

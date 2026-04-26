@@ -16,7 +16,7 @@
 
         <div class="d-flex flex-wrap justify-content-center gap-2 mt-3">
             @foreach(($hero['actions'] ?? []) as $action)
-                <a href="{{ $action['url'] ?? '#' }}" class="{{ $action['style'] ?? 'figma-btn-primary' }}">
+                <a href="{{ $action['url'] ?? '' }}" class="{{ $action['style'] ?? '' }}">
                     @if(!empty($action['icon']))
                         <i class="{{ $action['icon'] }}"></i>
                     @endif
@@ -30,7 +30,7 @@
         <h2>{{ $homeContent['quick_links_title'] ?? '' }}</h2>
         <div class="figma-grid-3">
             @foreach($quickLinks as $link)
-                <a href="{{ $link['url'] ?? '#' }}" class="figma-event-item">
+                <a href="{{ $link['url'] ?? '' }}" class="figma-event-item">
                     {{ $link['label'] ?? '' }}
                     <i class="bi bi-arrow-up-right"></i>
                 </a>

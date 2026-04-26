@@ -48,6 +48,7 @@
 <script>
 (function () {
     var announcements = @json($announcements);
+    var allCategory = @json($categories[0] ?? '');
 
     var searchInput = document.getElementById('ann-search');
     var categoryButtons = Array.from(document.querySelectorAll('[data-ann-category]'));
@@ -58,7 +59,7 @@
     var count = document.getElementById('ann-count');
     var empty = document.getElementById('ann-empty');
 
-    var currentCategory = 'Semua';
+    var currentCategory = allCategory;
 
     function renderPriority(item) {
         return `
@@ -101,7 +102,7 @@
         var filtered = announcements.filter(function (item) {
             var matchSearch = (item.title || '').toLowerCase().includes(query) ||
                 (item.source || '').toLowerCase().includes(query);
-            var matchCategory = currentCategory === 'Semua' || item.category === currentCategory;
+            var matchCategory = currentCategory === allCategory || item.category === currentCategory;
             return matchSearch && matchCategory;
         });
 
@@ -118,7 +119,7 @@
 
     categoryButtons.forEach(function (button) {
         button.addEventListener('click', function () {
-            currentCategory = button.getAttribute('data-ann-category') || 'Semua';
+            currentCategory = button.getAttribute('data-ann-category') || allCategory;
             categoryButtons.forEach(function (item) { item.classList.remove('is-active'); });
             button.classList.add('is-active');
             render();

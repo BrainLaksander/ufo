@@ -15,6 +15,8 @@ use Throwable;
 
 class MahasiswaController extends Controller
 {
+    private array $referenceCache = [];
+
     public function beranda(): View
     {
         $data = $this->data();
@@ -164,7 +166,7 @@ class MahasiswaController extends Controller
     public function reportLostFound(Request $request): RedirectResponse
     {
         if (!Schema::hasTable('lost_found_items')) {
-            return back()->with('error', 'Tabel Lost & Found belum tersedia.');
+            return back()->with('error', $this->uiText('mahasiswa_lost_found_table_missing'));
         }
 
         $validated = $request->validate([
@@ -189,7 +191,7 @@ class MahasiswaController extends Controller
         $reporterColumn = $hasColumn('reported_by') ? 'reported_by' : ($hasColumn('reporter_id') ? 'reporter_id' : null);
 
         if ($nameColumn === null || $locationColumn === null) {
-            return back()->with('error', 'Struktur tabel Lost & Found belum mendukung input publik.');
+            return back()->with('error', $this->uiText('mahasiswa_lost_found_schema_unsupported'));
         }
 
         $payload = [];
@@ -237,7 +239,7 @@ class MahasiswaController extends Controller
 
         DB::table('lost_found_items')->insert($payload);
 
-        return redirect()->route('mahasiswa.lost-found')->with('success', 'Laporan Lost & Found berhasil disimpan.');
+        return redirect()->route('mahasiswa.lost-found')->with('success', $this->uiText('mahasiswa_lost_found_saved'));
     }
 
     public function tentang(): View
@@ -299,11 +301,16 @@ class MahasiswaController extends Controller
      */
     private function loadReferenceDomain(string $domain): array
     {
+        if (array_key_exists($domain, $this->referenceCache)) {
+            return $this->referenceCache[$domain];
+        }
+
         if (!Schema::hasTable('workflow_reference_values')) {
+            $this->referenceCache[$domain] = [];
             return [];
         }
 
-        return DB::table('workflow_reference_values')
+        $map = DB::table('workflow_reference_values')
             ->select(['code', 'label', 'payload'])
             ->where('domain', $domain)
             ->where('is_active', true)
@@ -326,6 +333,10 @@ class MahasiswaController extends Controller
                 ];
             })
             ->all();
+
+            $this->referenceCache[$domain] = $map;
+
+            return $map;
     }
 
     /**
@@ -375,14 +386,14 @@ class MahasiswaController extends Controller
 
             return [
                 'carousel_images' => [],
-                'organization_categories' => ['Semua'],
+                'organization_categories' => $this->withAllCategory([]),
                 'organizations' => [],
                 'events' => [],
-                'event_categories' => ['Semua'],
+                'event_categories' => $this->withAllCategory([]),
                 'announcements' => [],
-                'announcement_categories' => ['Semua'],
+                'announcement_categories' => $this->withAllCategory([]),
                 'lost_found' => ['urgent' => [], 'items' => []],
-                'lost_found_categories' => ['Semua'],
+                'lost_found_categories' => $this->withAllCategory([]),
                 'notifications' => [],
             ];
         }
@@ -394,8 +405,10 @@ class MahasiswaController extends Controller
      */
     private function withAllCategory(array $categories): array
     {
+        $allLabel = trim($this->uiText('mahasiswa_category_all_label'));
+
         return array_values(array_merge(
-            ['Semua'],
+            [$allLabel],
             collect($categories)->filter(fn ($item) => trim((string) $item) !== '')->unique()->values()->all()
         ));
     }
@@ -417,6 +430,7 @@ class MahasiswaController extends Controller
                 'description',
                 'vision',
                 'mission',
+                'logo',
                 'email',
                 'phone',
                 'banner',
@@ -508,6 +522,8 @@ class MahasiswaController extends Controller
             $mission = $this->splitListText($row->mission);
             $activeMembers = (int) ($activeMembersByOrganization[$orgId] ?? 0);
             $category = $this->inferOrganizationCategory($row->name, $row->shortname);
+            $logoUrl = $this->resolveMediaUrl($row->logo);
+            $bannerUrl = $this->resolveMediaUrl($row->banner);
 
             $programs = collect($orgEvents)
                 ->take(3)
@@ -565,8 +581,9 @@ class MahasiswaController extends Controller
                 'name' => $row->name,
                 'category' => $category,
                 'logo_text' => $this->acronym($row->shortname, $row->name),
+                'logo' => $logoUrl,
                 'tagline' => $row->description ? Str::limit((string) $row->description, 110, '...') : ($row->shortname ?: null),
-                'banner' => $row->banner,
+                'banner' => $bannerUrl ?: $this->placeholderImage((string) $row->name),
                 'visi' => $row->vision ?: $row->description,
                 'misi' => $mission,
                 'culture' => $row->description,
@@ -600,11 +617,61 @@ class MahasiswaController extends Controller
      */
     private function loadEvents(array $organizations): array
     {
+        $organizationLookup = collect($organizations)->keyBy('id');
+
+        if (Schema::hasTable('kemahasiswaan_schedules')) {
+            $hasCategory = Schema::hasColumn('kemahasiswaan_schedules', 'category');
+            $hasDescription = Schema::hasColumn('kemahasiswaan_schedules', 'description');
+
+            $query = DB::table('kemahasiswaan_schedules as sch')
+                ->leftJoin('organizations as org', 'org.id', '=', 'sch.organization_id')
+                ->select([
+                    'sch.id',
+                    'sch.organization_id',
+                    'sch.title as name',
+                    'sch.start_at as start_date',
+                    'sch.end_at as end_date',
+                    'sch.location',
+                    'sch.status',
+                    'org.name as organization_name',
+                    'org.banner as banner',
+                ])
+                ->selectRaw('0 as current_participants')
+                ->orderByDesc('sch.start_at')
+                ->limit(500);
+
+            if ($hasCategory) {
+                $query->addSelect('sch.category as schedule_category');
+            } else {
+                $query->selectRaw('NULL as schedule_category');
+            }
+
+            if ($hasDescription) {
+                $query->addSelect('sch.description');
+            } else {
+                $query->selectRaw('NULL as description');
+            }
+
+            $rows = $query->get();
+
+            $legendMap = $this->loadReferenceDomain('dashboard_legend');
+
+            return $rows->map(function ($row) use ($organizationLookup, $legendMap) {
+                $organization = $organizationLookup->get((int) $row->organization_id, []);
+                $rawCategory = Str::lower((string) ($row->schedule_category ?? ''));
+                $categoryLabel = (string) data_get($legendMap, $rawCategory . '.label', '');
+
+                if ($categoryLabel === '') {
+                    $categoryLabel = (string) ($organization['category'] ?? $this->uiText('mahasiswa_org_category_default'));
+                }
+
+                return $this->mapCampusEvent($row, $categoryLabel);
+            })->values()->all();
+        }
+
         if (!Schema::hasTable('events')) {
             return [];
         }
-
-        $organizationLookup = collect($organizations)->keyBy('id');
 
         $rows = DB::table('events as ev')
             ->leftJoin('organizations as org', 'org.id', '=', 'ev.organization_id')
@@ -627,7 +694,7 @@ class MahasiswaController extends Controller
 
         return $rows->map(function ($row) use ($organizationLookup) {
             $organization = $organizationLookup->get((int) $row->organization_id, []);
-            $category = (string) ($organization['category'] ?? 'Organisasi Umum');
+            $category = (string) ($organization['category'] ?? $this->uiText('mahasiswa_org_category_default'));
 
             return $this->mapCampusEvent($row, $category);
         })->values()->all();
@@ -701,7 +768,7 @@ class MahasiswaController extends Controller
                 'category' => $category,
                 'source' => $source,
                 'date' => $date,
-                'image' => $row->organization_banner ?: $this->placeholderImage($title),
+                'image' => $this->resolveMediaUrl($row->organization_banner) ?: $this->placeholderImage($title),
                 'summary' => $summary,
                 'priority' => $isHighPriority ? 'high' : 'normal',
                 'content_html' => $contentHtml,
@@ -844,8 +911,8 @@ class MahasiswaController extends Controller
             return $rows->map(function ($row) {
                 return [
                     'title' => Str::limit((string) ($row->description ?: $row->action), 90, '...'),
-                    'category' => $row->organization_name ?: 'Sistem',
-                    'timestamp' => $this->parseDate($row->created_at)?->diffForHumans() ?? '-',
+                    'category' => $row->organization_name ?: $this->uiText('mahasiswa_notification_system_category'),
+                    'timestamp' => $this->parseDate($row->created_at)?->diffForHumans() ?? $this->uiText('mahasiswa_placeholder_dash'),
                     'icon' => $this->inferNotificationIcon((string) $row->action),
                 ];
             })->values()->all();
@@ -855,18 +922,18 @@ class MahasiswaController extends Controller
 
         foreach (array_slice($announcements, 0, 3) as $item) {
             $fallback[] = [
-                'title' => (string) ($item['title'] ?? 'Pengumuman baru'),
-                'category' => (string) ($item['source'] ?? 'Pengumuman'),
-                'timestamp' => (string) ($item['date'] ?? '-'),
+                'title' => (string) ($item['title'] ?? $this->uiText('mahasiswa_notification_announcement_default_title')),
+                'category' => (string) ($item['source'] ?? $this->uiText('mahasiswa_notification_announcement_default_category')),
+                'timestamp' => (string) ($item['date'] ?? $this->uiText('mahasiswa_placeholder_dash')),
                 'icon' => 'megaphone',
             ];
         }
 
         foreach (array_slice($events, 0, 3) as $item) {
             $fallback[] = [
-                'title' => (string) ($item['title'] ?? 'Event kampus'),
-                'category' => (string) ($item['organizer'] ?? 'Event'),
-                'timestamp' => (string) ($item['date'] ?? '-'),
+                'title' => (string) ($item['title'] ?? $this->uiText('mahasiswa_notification_event_default_title')),
+                'category' => (string) ($item['organizer'] ?? $this->uiText('mahasiswa_notification_event_default_category')),
+                'timestamp' => (string) ($item['date'] ?? $this->uiText('mahasiswa_placeholder_dash')),
                 'icon' => 'calendar-event',
             ];
         }
@@ -874,9 +941,9 @@ class MahasiswaController extends Controller
         if (!empty($lostFoundItems)) {
             $latestItem = $lostFoundItems[0];
             $fallback[] = [
-                'title' => 'Update Lost & Found: ' . ($latestItem['name'] ?? 'Barang baru'),
-                'category' => 'Lost and Found',
-                'timestamp' => (string) ($latestItem['date'] ?? '-'),
+                'title' => $this->uiText('mahasiswa_notification_lostfound_prefix') . ': ' . ($latestItem['name'] ?? $this->uiText('mahasiswa_notification_lostfound_default_name')),
+                'category' => $this->uiText('mahasiswa_notification_lostfound_category'),
+                'timestamp' => (string) ($latestItem['date'] ?? $this->uiText('mahasiswa_placeholder_dash')),
                 'icon' => 'search',
             ];
         }
@@ -896,12 +963,12 @@ class MahasiswaController extends Controller
             ? ($endDate && !$startDate->isSameDay($endDate)
                 ? $startDate->format('d M Y') . ' - ' . $endDate->format('d M Y')
                 : $startDate->format('d M Y'))
-            : '-';
+            : $this->uiText('mahasiswa_placeholder_dash');
 
         return [
             'id' => (int) $row->id,
             'name' => (string) $row->name,
-            'date' => $startDate ? $startDate->format('d M Y') : '-',
+            'date' => $startDate ? $startDate->format('d M Y') : $this->uiText('mahasiswa_placeholder_dash'),
             'full_date' => $fullDate,
             'description' => (string) ($row->description ?: ''),
             'activities' => array_filter([
@@ -961,13 +1028,13 @@ class MahasiswaController extends Controller
 
     private function formatDate(mixed $value): string
     {
-        return $this->parseDate($value)?->format('d M Y') ?? '-';
+        return $this->parseDate($value)?->format('d M Y') ?? $this->uiText('mahasiswa_placeholder_dash');
     }
 
     private function formatTimeRange(?Carbon $startDate, ?Carbon $endDate): string
     {
         if (!$startDate && !$endDate) {
-            return '-';
+            return $this->uiText('mahasiswa_placeholder_dash');
         }
 
         if ($startDate && $endDate) {
@@ -979,13 +1046,16 @@ class MahasiswaController extends Controller
 
     private function mapEventStatusLabel(string $status): string
     {
-        return [
-            'draft' => 'Draft',
-            'approved' => 'Pendaftaran Dibuka',
-            'ongoing' => 'Sedang Berlangsung',
-            'completed' => 'Selesai',
-            'cancelled' => 'Dibatalkan',
-        ][$status] ?? Str::title(str_replace('_', ' ', $status));
+        $normalized = Str::lower($status);
+        $references = $this->loadReferenceDomain('event_status_map');
+
+        $label = (string) data_get($references, $normalized . '.label', '');
+
+        if ($label !== '') {
+            return $label;
+        }
+
+        return Str::title(str_replace('_', ' ', $status));
     }
 
     /**
@@ -1046,6 +1116,52 @@ class MahasiswaController extends Controller
         return 'https://wa.me/' . $number;
     }
 
+    private function resolveMediaUrl(mixed $value): ?string
+    {
+        $raw = trim((string) $value);
+
+        if ($raw === '') {
+            return null;
+        }
+
+        if (Str::startsWith($raw, ['data:image/', 'http://', 'https://'])) {
+            return $raw;
+        }
+
+        if (Str::startsWith($raw, '/storage/')) {
+            return $raw;
+        }
+
+        if (Str::startsWith($raw, 'storage/')) {
+            return '/' . ltrim($raw, '/');
+        }
+
+        $publicRelativePath = ltrim($raw, '/');
+
+        if (Str::startsWith($publicRelativePath, 'public/')) {
+            $storageRelativePath = Str::after($publicRelativePath, 'public/');
+
+            if ($storageRelativePath !== '' && Storage::disk('public')->exists($storageRelativePath)) {
+                return Storage::url($storageRelativePath);
+            }
+        }
+
+        if (Storage::disk('public')->exists($publicRelativePath)) {
+            return Storage::url($publicRelativePath);
+        }
+
+        if (file_exists(public_path($publicRelativePath))) {
+            return '/' . $publicRelativePath;
+        }
+
+        // Reject plain labels like "LOGO BEM" that are not file paths.
+        if (!Str::contains($raw, ['/', '.'])) {
+            return null;
+        }
+
+        return null;
+    }
+
     private function acronym(?string $shortname, ?string $name): string
     {
         $shortname = trim((string) $shortname);
@@ -1062,7 +1178,7 @@ class MahasiswaController extends Controller
 
         $acronym = Str::upper(Str::limit($acronym, 4, ''));
 
-        return $acronym !== '' ? $acronym : 'ORG';
+        return $acronym !== '' ? $acronym : $this->uiText('mahasiswa_org_acronym_default');
     }
 
     private function inferOrganizationCategory(?string $name, ?string $shortname): string
@@ -1070,30 +1186,30 @@ class MahasiswaController extends Controller
         $text = Str::lower(trim((string) $name . ' ' . (string) $shortname));
 
         if ($text === '') {
-            return 'Organisasi Umum';
+            return $this->uiText('mahasiswa_org_category_default');
         }
 
         if (Str::contains($text, ['bem'])) {
-            return 'BEM';
+            return $this->uiText('mahasiswa_org_category_bem');
         }
 
         if (Str::contains($text, ['choir', 'paduan suara'])) {
-            return 'Choir';
+            return $this->uiText('mahasiswa_org_category_choir');
         }
 
         if (Str::contains($text, ['creative', 'cinema', 'sinema', 'media'])) {
-            return 'Creative Club';
+            return $this->uiText('mahasiswa_org_category_creative');
         }
 
         if (Str::contains($text, ['ikatan', 'daerah'])) {
-            return 'Ikatan Daerah';
+            return $this->uiText('mahasiswa_org_category_regional');
         }
 
         if (Str::contains($text, ['ministry', 'rohis', 'kerohanian'])) {
-            return 'Ministries';
+            return $this->uiText('mahasiswa_org_category_ministry');
         }
 
-        return 'Organisasi Umum';
+        return $this->uiText('mahasiswa_org_category_default');
     }
 
     private function inferLostFoundCategory(string $name): string
@@ -1101,30 +1217,30 @@ class MahasiswaController extends Controller
         $text = Str::lower($name);
 
         if (Str::contains($text, ['dompet', 'wallet', 'uang'])) {
-            return 'Dompet';
+            return $this->uiText('mahasiswa_lf_category_wallet');
         }
 
         if (Str::contains($text, ['kunci', 'key'])) {
-            return 'Kunci';
+            return $this->uiText('mahasiswa_lf_category_key');
         }
 
         if (Str::contains($text, ['ktm', 'id', 'kartu', 'card'])) {
-            return 'Kartu';
+            return $this->uiText('mahasiswa_lf_category_card');
         }
 
         if (Str::contains($text, ['laptop', 'hp', 'handphone', 'headset', 'earphone'])) {
-            return 'Elektronik';
+            return $this->uiText('mahasiswa_lf_category_electronic');
         }
 
-        return 'Lainnya';
+        return $this->uiText('mahasiswa_lf_category_other');
     }
 
     private function mapLostFoundStatus(string $status): string
     {
         return match (Str::lower($status)) {
-            'active', 'pending', 'approved' => 'Belum ditemukan',
-            'claimed', 'closed', 'resolved', 'found' => 'Selesai',
-            default => 'Menunggu verifikasi',
+            'active', 'pending', 'approved' => $this->uiText('mahasiswa_lf_status_active'),
+            'claimed', 'closed', 'resolved', 'found' => $this->uiText('mahasiswa_lf_status_completed'),
+            default => $this->uiText('mahasiswa_lf_status_pending'),
         };
     }
 
@@ -1153,5 +1269,13 @@ class MahasiswaController extends Controller
         $svg = '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="675" viewBox="0 0 1200 675"><rect width="1200" height="675" fill="#E6EEF4"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="#44576D" font-size="44" font-family="Arial, sans-serif">' . e($text) . '</text></svg>';
 
         return 'data:image/svg+xml;charset=UTF-8,' . rawurlencode($svg);
+    }
+
+    private function uiText(string $code): string
+    {
+        $map = $this->loadReferenceDomain('ui_text');
+        $label = trim((string) data_get($map, $code . '.label', ''));
+
+        return $label;
     }
 }

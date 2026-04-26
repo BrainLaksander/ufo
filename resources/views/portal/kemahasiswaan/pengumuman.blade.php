@@ -6,6 +6,7 @@
 @section('page_class', 'kmh-page-pengumuman')
 
 @php
+    $ui = $ui ?? [];
     $workflowPengumuman = $workflowPengumuman ?? [];
     $emailReviewQueue = $emailReviewQueue ?? [];
     $ukmAccounts = $ukmAccounts ?? [];
@@ -14,6 +15,27 @@
     $scheduledCount = collect($workflowPengumuman)->where('status_code', 'scheduled')->count();
     $draftCount = collect($workflowPengumuman)->where('status_code', 'draft')->count();
     $hasAccounts = !empty($ukmAccounts);
+    $defaultAnnouncementAccountId = $ukmAccounts[0]['id'] ?? null;
+    $hasCreateAnnouncementErrors = $errors->has('judul')
+        || $errors->has('kategori')
+        || $errors->has('target')
+        || $errors->has('konten')
+        || $errors->has('publish_at')
+        || $errors->has('submit_action');
+
+    $announcementCategoryOptions = [
+        'Informasi Akademik',
+        'Pengumuman Penting',
+        'Reminder',
+        'Ucapan',
+    ];
+
+    $announcementTargetOptions = [
+        'Semua Organisasi',
+        'Organisasi Tertentu',
+        'Semua Mahasiswa',
+        'Mahasiswa Tertentu',
+    ];
 
     $statusClass = function (string $status): string {
         return match ($status) {
@@ -52,7 +74,7 @@
     <section class="kmh-stats-grid">
         <article class="kmh-stat-card tone-primary">
             <div>
-                <p>Total Pengumuman</p>
+                <p>{{ $ui['total_label'] ?? '' }}</p>
                 <strong class="kmh-stat-value">{{ count($workflowPengumuman) }}</strong>
             </div>
             <span class="kmh-stat-icon"><i class="bi bi-megaphone-fill"></i></span>
@@ -60,7 +82,7 @@
 
         <article class="kmh-stat-card tone-success">
             <div>
-                <p>Terpublikasi</p>
+                <p>{{ $ui['published_label'] ?? '' }}</p>
                 <strong class="kmh-stat-value">{{ $publishedCount }}</strong>
             </div>
             <span class="kmh-stat-icon"><i class="bi bi-check-circle-fill"></i></span>
@@ -68,7 +90,7 @@
 
         <article class="kmh-stat-card tone-info">
             <div>
-                <p>Terjadwal</p>
+                <p>{{ $ui['scheduled_label'] ?? '' }}</p>
                 <strong class="kmh-stat-value">{{ $scheduledCount }}</strong>
             </div>
             <span class="kmh-stat-icon"><i class="bi bi-calendar2-check-fill"></i></span>
@@ -76,7 +98,7 @@
 
         <article class="kmh-stat-card tone-muted">
             <div>
-                <p>Draft</p>
+                <p>{{ $ui['draft_label'] ?? '' }}</p>
                 <strong class="kmh-stat-value">{{ $draftCount }}</strong>
             </div>
             <span class="kmh-stat-icon"><i class="bi bi-pencil-square"></i></span>
@@ -93,15 +115,15 @@
                             id="kmh-pengumuman-search"
                             type="search"
                             class="kmh-toolbar-input"
-                            placeholder="Cari judul, kategori, target, atau organisasi..."
-                            aria-label="Cari pengumuman"
+                            placeholder="{{ $ui['search_placeholder'] ?? '' }}"
+                            aria-label="{{ $ui['search_aria'] ?? '' }}"
                         >
                     </label>
 
                     <label class="kmh-toolbar-field mb-0" for="kmh-pengumuman-status">
                         <i class="bi bi-funnel kmh-toolbar-icon"></i>
                         <select id="kmh-pengumuman-status" class="kmh-toolbar-select" aria-label="Filter status pengumuman">
-                            <option value="semua">Semua Status</option>
+                            <option value="semua">{{ $ui['all_statuses'] ?? '' }}</option>
                             <option value="published">Terpublikasi</option>
                             <option value="scheduled">Terjadwal</option>
                             <option value="draft">Draft</option>
@@ -111,76 +133,120 @@
                 </div>
 
                 <div class="kmh-toolbar-end">
-                    <a href="#kmh-form-pengumuman" class="kmh-quick-btn is-primary kmh-pengumuman-cta">
+                    <button type="button" class="kmh-quick-btn is-primary kmh-pengumuman-cta" data-bs-toggle="modal" data-bs-target="#kmh-pengumuman-modal">
                         <i class="bi bi-plus-circle"></i>
-                        <span>Buat Pengumuman Baru</span>
-                    </a>
+                        <span>{{ $ui['create_new_button'] ?? '' }}</span>
+                    </button>
                 </div>
             </div>
         </div>
     </section>
 
-    <section id="kmh-form-pengumuman" class="kmh-card">
-        <header class="kmh-card-head">
-            <h2>Buat Pengumuman Baru</h2>
-            <small>Pengumuman baru akan masuk antrean review email</small>
-        </header>
-        <div class="kmh-card-body">
-            @unless($hasAccounts)
-                <div class="alert alert-warning" role="alert">
-                    Belum ada akun UKM aktif. Tambahkan akun UKM terlebih dahulu pada menu Manajemen Organisasi.
+    <div class="modal fade" id="kmh-pengumuman-modal" tabindex="-1" aria-labelledby="kmh-pengumuman-modal-label" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title" id="kmh-pengumuman-modal-label">{{ $ui['modal_title'] ?? ($ui['create_new_title'] ?? 'Buat Pengumuman Baru') }}</h5>
+                        <small class="text-muted">{{ $ui['modal_subtitle'] ?? ($ui['create_new_subtitle'] ?? '') }}</small>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
                 </div>
-            @endunless
+                <form method="POST" action="{{ route('portal.kemahasiswaan.pengumuman.store') }}">
+                    @csrf
+                    @if(!empty($defaultAnnouncementAccountId))
+                        <input type="hidden" name="ukm_account_id" value="{{ $defaultAnnouncementAccountId }}">
+                    @endif
 
-            <form method="POST" action="{{ route('portal.kemahasiswaan.pengumuman.store') }}" class="row g-3">
-                @csrf
-                <div class="col-lg-4 col-md-6">
-                    <label class="form-label">Judul Pengumuman</label>
-                    <input type="text" name="judul" class="form-control" maxlength="140" required>
-                </div>
-                <div class="col-lg-2 col-md-6">
-                    <label class="form-label">Kategori</label>
-                    <input type="text" name="kategori" class="form-control" required>
-                </div>
-                <div class="col-lg-2 col-md-6">
-                    <label class="form-label">Target</label>
-                    <input type="text" name="target" class="form-control" required>
-                </div>
-                <div class="col-lg-2 col-md-6">
-                    <label class="form-label">Tanggal Publish</label>
-                    <input type="date" name="publish_at" class="form-control">
-                </div>
-                <div class="col-lg-2 col-md-6">
-                    <label class="form-label">Akun UKM</label>
-                    <select name="ukm_account_id" class="form-select" required @disabled(!$hasAccounts)>
-                        <option value="">Pilih akun</option>
-                        @foreach($ukmAccounts as $akun)
-                            <option value="{{ $akun['id'] }}">{{ $akun['organisasi'] }} - {{ $akun['nama'] }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-lg-10 col-md-8">
-                    <label class="form-label">Ringkasan</label>
-                    <input type="text" name="ringkasan" class="form-control" maxlength="240" required>
-                </div>
-                <div class="col-lg-2 col-md-4 d-grid">
-                    <label class="form-label">&nbsp;</label>
-                    <button type="submit" class="btn btn-primary kmh-form-action-btn" @disabled(!$hasAccounts)>Simpan</button>
-                </div>
-            </form>
+                    <div class="modal-body">
+                        @unless($hasAccounts)
+                            <div class="alert alert-warning" role="alert">
+                                {{ $ui['account_missing_warning'] ?? '' }}
+                            </div>
+                        @endunless
+
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="form-label">{{ $ui['field_title'] ?? 'Judul Pengumuman' }} <span class="text-danger">*</span></label>
+                                <input
+                                    type="text"
+                                    name="judul"
+                                    class="form-control"
+                                    maxlength="140"
+                                    value="{{ old('judul') }}"
+                                    placeholder="Masukkan judul pengumuman..."
+                                    required
+                                >
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">{{ $ui['field_category'] ?? 'Kategori' }} <span class="text-danger">*</span></label>
+                                <select name="kategori" class="form-select" required>
+                                    <option value="">{{ $ui['field_category_placeholder'] ?? 'Pilih Kategori' }}</option>
+                                    @foreach($announcementCategoryOptions as $category)
+                                        <option value="{{ $category }}" @selected(old('kategori') === $category)>{{ $category }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-12">
+                                <label class="form-label">{{ $ui['field_content'] ?? 'Konten Pengumuman' }} <span class="text-danger">*</span></label>
+                                <textarea
+                                    name="konten"
+                                    class="form-control"
+                                    rows="5"
+                                    maxlength="10000"
+                                    placeholder="{{ $ui['field_content_placeholder'] ?? 'Tulis konten pengumuman di sini...' }}"
+                                    required
+                                >{{ old('konten') }}</textarea>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">{{ $ui['field_target'] ?? 'Target Distribusi' }} <span class="text-danger">*</span></label>
+                                <select name="target" class="form-select" required>
+                                    <option value="">{{ $ui['field_target_placeholder'] ?? 'Pilih target distribusi' }}</option>
+                                    @foreach($announcementTargetOptions as $target)
+                                        <option value="{{ $target }}" @selected(old('target') === $target)>{{ $target }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <div class="col-md-6">
+                                <label class="form-label">{{ $ui['field_publish_date'] ?? 'Jadwal Publish (Opsional)' }}</label>
+                                <input
+                                    type="datetime-local"
+                                    name="publish_at"
+                                    class="form-control"
+                                    value="{{ old('publish_at') }}"
+                                    placeholder="{{ $ui['field_publish_placeholder'] ?? 'dd/mm/yyyy --:--' }}"
+                                >
+                            </div>
+                        </div>
+
+                        <div class="alert alert-warning mt-3 mb-0" role="alert">
+                            <strong>{{ $ui['distribution_info_title'] ?? '' }}</strong> {{ $ui['distribution_info_body'] ?? '' }}
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ $ui['cancel_button'] ?? 'Batal' }}</button>
+                        <button type="submit" name="submit_action" value="draft" class="btn btn-secondary" @disabled(!$hasAccounts)>{{ $ui['save_draft_button'] ?? 'Simpan sebagai Draft' }}</button>
+                        <button type="submit" name="submit_action" value="publish_now" class="btn btn-primary kmh-form-action-btn" @disabled(!$hasAccounts)>{{ $ui['publish_now_button'] ?? 'Publikasikan Sekarang' }}</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </section>
+    </div>
 
     <div class="kmh-info-banner">
-        <strong>Sistem Distribusi Email:</strong>
-        Semua pengumuman yang disetujui akan dikirim otomatis ke email resmi organisasi yang ditargetkan.
-        Pastikan target distribusi dan ringkasan sudah benar sebelum dipublikasikan.
+        <strong>{{ $ui['distribution_info_title'] ?? '' }}</strong>
+        {{ $ui['distribution_info_body'] ?? '' }}
     </div>
 
     <section class="kmh-card">
         <header class="kmh-card-head">
-            <h2>Review Izin Pengumuman ke Email</h2>
-            <small>{{ count($emailReviewQueue) }} item menunggu review</small>
+            <h2>{{ $ui['review_email_title'] ?? '' }}</h2>
+            <small>{{ count($emailReviewQueue) }} {{ $ui['review_email_count_suffix'] ?? '' }}</small>
         </header>
         <div class="kmh-card-body pt-0">
             <div class="table-responsive">
@@ -218,14 +284,14 @@
                                             <option value="tolak">Tolak</option>
                                             <option value="revisi">Revisi</option>
                                         </select>
-                                        <input type="text" name="catatan" class="form-control form-control-sm" placeholder="Catatan (wajib jika tolak/revisi)">
-                                        <button type="submit" class="btn btn-sm btn-primary kmh-form-action-btn">Simpan</button>
+                                        <input type="text" name="catatan" class="form-control form-control-sm" placeholder="{{ $ui['note_placeholder'] ?? '' }}">
+                                        <button type="submit" class="btn btn-sm btn-primary kmh-form-action-btn">{{ $ui['save_button'] ?? '' }}</button>
                                     </form>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="kmh-empty-row">Tidak ada antrean review email.</td>
+                                <td colspan="6" class="kmh-empty-row">{{ $ui['review_queue_empty'] ?? '' }}</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -236,8 +302,8 @@
 
     <section class="kmh-card">
         <header class="kmh-card-head">
-            <h2>Daftar Pengumuman</h2>
-            <small>{{ count($workflowPengumuman) }} total data</small>
+            <h2>{{ $ui['list_title'] ?? '' }}</h2>
+            <small>{{ count($workflowPengumuman) }} {{ $ui['list_count_suffix'] ?? '' }}</small>
         </header>
         <div class="kmh-card-body pt-0">
             <div class="table-responsive">
@@ -277,7 +343,7 @@
                                     @if(!empty($item['publish_at']))
                                         {{ \Carbon\Carbon::parse($item['publish_at'])->format('d M Y') }}
                                     @else
-                                        -
+                                        
                                     @endif
                                 </td>
                                 <td>
@@ -294,13 +360,13 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="kmh-empty-row">Belum ada pengumuman.</td>
+                                <td colspan="7" class="kmh-empty-row">{{ $ui['list_empty'] ?? '' }}</td>
                             </tr>
                         @endforelse
 
                         @if(count($workflowPengumuman) > 0)
                             <tr class="kmh-filter-empty-row d-none" data-pengumuman-empty>
-                                <td colspan="7" class="kmh-empty-row">Tidak ada pengumuman yang cocok dengan filter.</td>
+                                <td colspan="7" class="kmh-empty-row">{{ $ui['list_filter_empty'] ?? '' }}</td>
                             </tr>
                         @endif
                     </tbody>
@@ -349,6 +415,13 @@ document.addEventListener('DOMContentLoaded', function () {
     searchInput.addEventListener('input', applyFilter);
     statusSelect.addEventListener('change', applyFilter);
     applyFilter();
+
+    @if($hasCreateAnnouncementErrors)
+        var modalElement = document.getElementById('kmh-pengumuman-modal');
+        if (modalElement && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            bootstrap.Modal.getOrCreateInstance(modalElement).show();
+        }
+    @endif
 });
 </script>
 @endpush

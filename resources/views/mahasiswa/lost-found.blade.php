@@ -28,9 +28,9 @@
                 @foreach($urgentItems as $urgent)
                     <div class="figma-lf-slide">
                         <article class="figma-lf-urgent-card">
-                            <img src="{{ $urgent['image'] ?? '' }}" alt="{{ $urgent['name'] ?? 'Barang penting' }}">
+                            <img src="{{ $urgent['image'] ?? '' }}" alt="{{ $urgent['name'] ?? '' }}">
                             <div>
-                                <h4>{{ $urgent['name'] ?? '-' }}</h4>
+                                <h4>{{ $urgent['name'] ?? '' }}</h4>
                                 <p>{{ $ui['urgent_subtitle'] ?? '' }}</p>
                             </div>
                             <button type="button">{{ $ui['urgent_contact_button'] ?? '' }}</button>

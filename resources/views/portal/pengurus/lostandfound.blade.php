@@ -125,11 +125,11 @@
                                 @endif
 
                                 @if($isBem && $item['status'] === 'approved')
-                                    <button class="ufo-kboard-btn gold" type="button">{{ $item['priority'] ? 'Prioritas Aktif' : 'Set Prioritas' }}</button>
-                                    <button class="ufo-kboard-btn ghost" type="button">Kelola Status</button>
+                                        <button class="ufo-kboard-btn gold" type="button" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Prioritas Aktif" data-modal-message="Modal ini menampilkan detail prioritas barang.">{{ $item['priority'] ? 'Prioritas Aktif' : 'Set Prioritas' }}</button>
+                                        <button class="ufo-kboard-btn ghost" type="button" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Kelola Status" data-modal-message="Modal ini menampilkan pengaturan status barang.">Kelola Status</button>
                                 @endif
 
-                                <button class="ufo-kboard-btn ghost" type="button">Lihat Detail</button>
+                                    <button class="ufo-kboard-btn ghost" type="button" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Detail Item" data-modal-message="Modal ini menampilkan detail laporan Lost & Found.">Lihat Detail</button>
                             </div>
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 @extends('layouts.public.mahasiswa')
 
-@section('title', 'UNKLAB Forum Organization')
+@section('title', (($pageContent['title'] ?? '') !== '' ? $pageContent['title'] : 'Organisasi') . ' - UFO')
 
 @section('content')
 @php
@@ -76,11 +76,6 @@
     var currentCategory = categoryButtons.length > 0
         ? String(categoryButtons[0].getAttribute('data-org-category') || '')
         : '';
-
-    function logoText(value) {
-        if (!value) return 'ORG';
-        return String(value).toUpperCase();
-    }
 
     function categoryIcon(org) {
         var category = String(org.category || '').toLowerCase();

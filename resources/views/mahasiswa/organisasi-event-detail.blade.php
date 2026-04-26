@@ -1,6 +1,6 @@
 @extends('layouts.public.mahasiswa')
 
-@section('title', ($event['name'] ?? 'Detail Event Organisasi') . ' - UFO')
+@section('title', ($event['name'] ?? '') . ' - UFO')
 
 @section('content')
 @php
@@ -13,21 +13,21 @@
     </a>
 
     <article class="figma-article-cover">
-        <img id="org-event-cover" src="{{ $event['images'][0] ?? '' }}" alt="{{ $event['name'] ?? 'Event' }}">
+        <img id="org-event-cover" src="{{ $event['images'][0] ?? '' }}" alt="{{ $event['name'] ?? '' }}">
 
         <div class="figma-article-cover-content">
             <span class="figma-badge-danger">{{ $ui['badge'] ?? '' }}</span>
-            <h1>{{ $event['name'] ?? '-' }}</h1>
+            <h1>{{ $event['name'] ?? '' }}</h1>
             <div class="figma-article-meta">
-                <span><i class="bi bi-calendar-event"></i> {{ $event['full_date'] ?? '-' }}</span>
-                <span><i class="bi bi-people"></i> {{ $event['organizer'] ?? '-' }}</span>
+                <span><i class="bi bi-calendar-event"></i> {{ $event['full_date'] ?? '' }}</span>
+                <span><i class="bi bi-people"></i> {{ $event['organizer'] ?? '' }}</span>
             </div>
         </div>
     </article>
 
     <article class="figma-article-content">
         <h2>{{ $ui['about_title'] ?? '' }}</h2>
-        <p>{{ $event['description'] ?? '-' }}</p>
+        <p>{{ $event['description'] ?? '' }}</p>
 
         <h2 class="mt-4">{{ $ui['activities_title'] ?? '' }}</h2>
         <div class="figma-step-list">
@@ -41,7 +41,7 @@
 
         <div class="figma-highlight-box mt-4">
             <h3>{{ $ui['highlight_title'] ?? '' }}</h3>
-            <p class="mb-0">{{ $event['highlights'] ?? '-' }}</p>
+            <p class="mb-0">{{ $event['highlights'] ?? '' }}</p>
         </div>
 
         <h2 class="mt-4">{{ $ui['gallery_title'] ?? '' }}</h2>

@@ -6,6 +6,7 @@
 @section('page_class', 'kmh-page-kalender')
 
 @php
+    $ui = $ui ?? [];
     $weekdays = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
     $kalenderKegiatan = $kalenderKegiatan ?? [];
     $kalenderSummary = $kalenderSummary ?? [
@@ -13,6 +14,7 @@
         'bulan_ini' => 0,
         '7_hari' => 0,
     ];
+    $organizations = $organizations ?? [];
 
     $selectedMonth = request('bulan', now()->format('Y-m'));
     if (!preg_match('/^\d{4}-\d{2}$/', $selectedMonth)) {
@@ -20,7 +22,14 @@
     }
 
     $viewMode = request('view', 'bulan') === 'list' ? 'list' : 'bulan';
-    $selectedKategori = (string) request('kategori', 'semua');
+    $selectedKategori = (string) request('kategori', '');
+    $selectedKategori = [
+        'akademik' => 'acad',
+        'organisasi' => 'org',
+        'masa_tenang' => 'restricted',
+        'libur' => 'holiday',
+        'event_besar' => 'campus',
+    ][$selectedKategori] ?? $selectedKategori;
     $searchQuery = trim((string) request('q', ''));
 
     $monthStart = \Carbon\Carbon::createFromFormat('Y-m', $selectedMonth)->startOfMonth();
@@ -31,50 +40,68 @@
     $calendarStart = $monthStart->copy()->startOfWeek(\Carbon\Carbon::SUNDAY);
     $calendarEnd = $monthEnd->copy()->endOfWeek(\Carbon\Carbon::SATURDAY);
 
+    $parseScheduleDate = function ($value): ?\Carbon\Carbon {
+        if (empty($value)) {
+            return null;
+        }
+
+        try {
+            return \Carbon\Carbon::parse((string) $value);
+        } catch (\Throwable) {
+            return null;
+        }
+    };
+
     $inferKategori = function (array $item): string {
         $judul = \Illuminate\Support\Str::lower((string) ($item['judul'] ?? ''));
         $organisasi = \Illuminate\Support\Str::lower((string) ($item['organisasi'] ?? ''));
 
         if (\Illuminate\Support\Str::contains($judul, ['ujian', 'seminar', 'kuliah', 'akademik'])) {
-            return 'akademik';
+            return 'acad';
         }
 
         if (\Illuminate\Support\Str::contains($judul, ['libur', 'holiday'])) {
-            return 'libur';
+            return 'holiday';
         }
 
         if (\Illuminate\Support\Str::contains($judul, ['masa tenang', 'pembatasan'])) {
-            return 'masa_tenang';
+            return 'restricted';
         }
 
-        if ($organisasi === '-' || $organisasi === '' || \Illuminate\Support\Str::contains($judul, ['kampus', 'universitas'])) {
-            return 'event_besar';
+        if ($organisasi === '' || \Illuminate\Support\Str::contains($judul, ['kampus', 'universitas'])) {
+            return 'campus';
         }
 
-        return 'organisasi';
+        return 'org';
     };
 
     $filteredKegiatan = collect($kalenderKegiatan)
-        ->map(function (array $item) use ($inferKategori) {
-            $rawDate = $item['tanggal_raw'] ?? null;
-            $parsedDate = null;
+        ->map(function (array $item) use ($inferKategori, $parseScheduleDate) {
+            $startRaw = $item['tanggal_raw'] ?? null;
+            $endRaw = $item['tanggal_selesai_raw'] ?? $startRaw;
+            $startDate = $parseScheduleDate($startRaw);
+            $endDate = $parseScheduleDate($endRaw) ?? $startDate;
 
-            if (!empty($rawDate)) {
-                try {
-                    $parsedDate = \Carbon\Carbon::parse((string) $rawDate);
-                } catch (\Throwable) {
-                    $parsedDate = null;
-                }
+            $kategori = trim((string) ($item['kategori'] ?? ''));
+            if ($kategori === '') {
+                $kategori = $inferKategori($item);
             }
 
-            $item['kategori'] = $item['kategori'] ?? $inferKategori($item);
-            $item['tanggal_obj'] = $parsedDate;
-            $item['tanggal_key'] = $parsedDate ? $parsedDate->toDateString() : null;
+            $item['kategori'] = $kategori !== '' ? $kategori : 'org';
+            $item['tanggal_mulai_obj'] = $startDate;
+            $item['tanggal_selesai_obj'] = $endDate;
+            $item['tanggal_obj'] = $startDate;
+            $item['tanggal_key'] = $startDate ? $startDate->toDateString() : null;
+            $item['tanggal_range_label'] = $startDate
+                ? (($endDate && !$startDate->isSameDay($endDate))
+                    ? $startDate->translatedFormat('d M Y') . ' - ' . $endDate->translatedFormat('d M Y')
+                    : $startDate->translatedFormat('d M Y'))
+                : '-';
 
             return $item;
         })
-        ->filter(function (array $item) use ($selectedKategori, $searchQuery, $monthStart) {
-            if ($selectedKategori !== 'semua' && (string) ($item['kategori'] ?? '') !== $selectedKategori) {
+        ->filter(function (array $item) use ($selectedKategori, $searchQuery, $monthStart, $monthEnd) {
+            if ($selectedKategori !== '' && (string) ($item['kategori'] ?? '') !== $selectedKategori) {
                 return false;
             }
 
@@ -83,6 +110,7 @@
                     (string) ($item['judul'] ?? ''),
                     (string) ($item['organisasi'] ?? ''),
                     (string) ($item['lokasi'] ?? ''),
+                    (string) ($item['deskripsi'] ?? ''),
                 ]));
 
                 if (!\Illuminate\Support\Str::contains($blob, \Illuminate\Support\Str::lower($searchQuery))) {
@@ -90,20 +118,46 @@
                 }
             }
 
-            if (($item['tanggal_obj'] ?? null) instanceof \Carbon\Carbon && $monthStart) {
-                return $item['tanggal_obj']->year === $monthStart->year
-                    && $item['tanggal_obj']->month === $monthStart->month;
+            $startDate = $item['tanggal_mulai_obj'] ?? null;
+            $endDate = $item['tanggal_selesai_obj'] ?? null;
+
+            if (!$startDate instanceof \Carbon\Carbon) {
+                return false;
             }
 
-            return false;
+            $endDate = $endDate instanceof \Carbon\Carbon ? $endDate : $startDate;
+
+            return $startDate->lte($monthEnd) && $endDate->gte($monthStart);
         })
-        ->sortBy('tanggal_obj')
+        ->sortBy('tanggal_mulai_obj')
         ->values();
 
-    $eventsByDate = $filteredKegiatan
-        ->groupBy('tanggal_key')
-        ->map(fn ($items) => $items->values()->all())
-        ->all();
+    $eventsByDate = [];
+    foreach ($filteredKegiatan as $item) {
+        $startDate = $item['tanggal_mulai_obj'] ?? null;
+        $endDate = $item['tanggal_selesai_obj'] ?? null;
+
+        if (!$startDate instanceof \Carbon\Carbon) {
+            continue;
+        }
+
+        $endDate = $endDate instanceof \Carbon\Carbon ? $endDate->copy() : $startDate->copy();
+        $cursor = $startDate->copy();
+
+        if ($cursor->lt($calendarStart)) {
+            $cursor = $calendarStart->copy();
+        }
+
+        if ($endDate->gt($calendarEnd)) {
+            $endDate = $calendarEnd->copy();
+        }
+
+        while ($cursor->lte($endDate)) {
+            $dateKey = $cursor->toDateString();
+            $eventsByDate[$dateKey][] = $item;
+            $cursor->addDay();
+        }
+    }
 
     $calendarDays = collect();
     for ($cursor = $calendarStart->copy(); $cursor->lte($calendarEnd); $cursor->addDay()) {
@@ -134,11 +188,11 @@
     };
 
     $kategoriLabelMap = [
-        'akademik' => 'Kegiatan Akademik',
-        'organisasi' => 'Kegiatan Organisasi',
-        'masa_tenang' => 'Masa Tidak Boleh Berorganisasi',
-        'libur' => 'Libur Akademik',
-        'event_besar' => 'Event Kampus Besar',
+        'acad' => $ui['category_akademik'] ?? '',
+        'org' => $ui['category_organisasi'] ?? '',
+        'restricted' => $ui['category_masa_tenang'] ?? '',
+        'holiday' => $ui['category_libur'] ?? '',
+        'campus' => $ui['category_event_besar'] ?? '',
     ];
 @endphp
 
@@ -148,13 +202,13 @@
         <div class="kmh-card-body">
             <div class="kmh-calendar-top-head">
                 <div>
-                    <h2>Kalender Kegiatan Kampus</h2>
-                    <p>Kelola dan pantau semua kegiatan akademik &amp; non-akademik</p>
+                    <h2>{{ $ui['calendar_title'] ?? '' }}</h2>
+                    <p>{{ $ui['calendar_subtitle'] ?? '' }}</p>
                 </div>
-                <a href="{{ route('portal.kemahasiswaan.pengajuan') }}#bagian-jadwal" class="kmh-calendar-add-btn">
+                <button type="button" class="kmh-calendar-add-btn" data-bs-toggle="modal" data-bs-target="#kmh-calendar-modal">
                     <i class="bi bi-plus-lg" aria-hidden="true"></i>
-                    <span>Tambah Kegiatan</span>
-                </a>
+                    <span>{{ $ui['add_activity'] ?? '' }}</span>
+                </button>
             </div>
 
             <form method="GET" action="{{ route('portal.kemahasiswaan.kalender') }}" class="kmh-calendar-filter-grid">
@@ -162,19 +216,19 @@
                 <input type="hidden" name="view" value="{{ $viewMode }}">
 
                 <div>
-                    <label class="kmh-calendar-label" for="kmh-kalender-kategori">Filter Kategori</label>
+                    <label class="kmh-calendar-label" for="kmh-kalender-kategori">{{ $ui['filter_category'] ?? '' }}</label>
                     <select id="kmh-kalender-kategori" name="kategori" class="kmh-calendar-select" onchange="this.form.submit()">
-                        <option value="semua" @selected($selectedKategori === 'semua')>Semua Kegiatan</option>
-                        <option value="akademik" @selected($selectedKategori === 'akademik')>Kegiatan Akademik</option>
-                        <option value="organisasi" @selected($selectedKategori === 'organisasi')>Kegiatan Organisasi</option>
-                        <option value="masa_tenang" @selected($selectedKategori === 'masa_tenang')>Masa Tidak Boleh Berorganisasi</option>
-                        <option value="libur" @selected($selectedKategori === 'libur')>Libur Akademik</option>
-                        <option value="event_besar" @selected($selectedKategori === 'event_besar')>Event Kampus Besar</option>
+                        <option value="" @selected($selectedKategori === '')>{{ $ui['all_activities'] ?? '' }}</option>
+                        <option value="acad" @selected($selectedKategori === 'acad')>{{ $ui['category_akademik'] ?? '' }}</option>
+                        <option value="org" @selected($selectedKategori === 'org')>{{ $ui['category_organisasi'] ?? '' }}</option>
+                        <option value="restricted" @selected($selectedKategori === 'restricted')>{{ $ui['category_masa_tenang'] ?? '' }}</option>
+                        <option value="holiday" @selected($selectedKategori === 'holiday')>{{ $ui['category_libur'] ?? '' }}</option>
+                        <option value="campus" @selected($selectedKategori === 'campus')>{{ $ui['category_event_besar'] ?? '' }}</option>
                     </select>
                 </div>
 
                 <div>
-                    <label class="kmh-calendar-label" for="kmh-kalender-search">Cari Kegiatan</label>
+                    <label class="kmh-calendar-label" for="kmh-kalender-search">{{ $ui['search_label'] ?? '' }}</label>
                     <label class="kmh-calendar-search-wrap" for="kmh-kalender-search">
                         <i class="bi bi-search" aria-hidden="true"></i>
                         <input
@@ -182,14 +236,14 @@
                             type="search"
                             name="q"
                             value="{{ $searchQuery }}"
-                            placeholder="Cari nama kegiatan..."
+                            placeholder="{{ $ui['search_placeholder'] ?? '' }}"
                         >
                     </label>
                 </div>
             </form>
 
             <div class="kmh-calendar-legend">
-                <span class="kmh-calendar-label">Legend:</span>
+                <span class="kmh-calendar-label">{{ $ui['legend_label'] ?? '' }}</span>
                 @foreach($kategoriLabelMap as $key => $label)
                     <span class="kmh-calendar-legend-item">
                         <span class="kmh-calendar-dot is-{{ $key }}"></span>
@@ -214,11 +268,11 @@
                 <div class="kmh-calendar-view-toggle" role="tablist" aria-label="Pilih mode tampilan">
                     <a href="{{ $buildUrl(['view' => 'bulan']) }}" class="kmh-calendar-view-btn {{ $viewMode === 'bulan' ? 'is-active' : '' }}" role="tab" aria-selected="{{ $viewMode === 'bulan' ? 'true' : 'false' }}">
                         <i class="bi bi-calendar3"></i>
-                        <span>Bulan</span>
+                        <span>{{ $ui['month_view'] ?? '' }}</span>
                     </a>
                     <a href="{{ $buildUrl(['view' => 'list']) }}" class="kmh-calendar-view-btn {{ $viewMode === 'list' ? 'is-active' : '' }}" role="tab" aria-selected="{{ $viewMode === 'list' ? 'true' : 'false' }}">
                         <i class="bi bi-list-ul"></i>
-                        <span>List</span>
+                        <span>{{ $ui['list_view'] ?? '' }}</span>
                     </a>
                 </div>
             </div>
@@ -238,15 +292,15 @@
 
                                 <div class="kmh-calendar-events">
                                     @forelse(collect($day['events'])->take(2) as $event)
-                                        <span class="kmh-calendar-pill is-{{ $event['kategori'] ?? 'organisasi' }}" title="{{ $event['judul'] ?? '-' }}">
-                                            {{ \Illuminate\Support\Str::limit((string) ($event['judul'] ?? '-'), 16) }}
+                                        <span class="kmh-calendar-pill is-{{ $event['kategori'] ?? '' }}" title="{{ $event['judul'] ?? '' }}">
+                                            {{ \Illuminate\Support\Str::limit((string) ($event['judul'] ?? ''), 16) }}
                                         </span>
                                     @empty
                                         <span class="kmh-calendar-empty">&nbsp;</span>
                                     @endforelse
 
                                     @if(count($day['events']) > 2)
-                                        <span class="kmh-calendar-more">+{{ count($day['events']) - 2 }} lainnya</span>
+                                        <span class="kmh-calendar-more">+{{ count($day['events']) - 2 }} {{ $ui['more_suffix'] ?? '' }}</span>
                                     @endif
                                 </div>
                             </article>
@@ -258,29 +312,31 @@
                     <table class="table kmh-table">
                         <thead>
                             <tr>
-                                <th>Judul Kegiatan</th>
-                                <th>Organisasi</th>
-                                <th>Tanggal</th>
-                                <th>Lokasi</th>
-                                <th>Kategori</th>
+                                <th>{{ $ui['table_col_title'] ?? '' }}</th>
+                                <th>{{ $ui['table_col_org'] ?? '' }}</th>
+                                <th>{{ $ui['table_col_date'] ?? '' }}</th>
+                                <th>{{ $ui['table_col_location'] ?? '' }}</th>
+                                <th>{{ $ui['table_col_category'] ?? '' }}</th>
                             </tr>
                         </thead>
                         <tbody>
                             @forelse($filteredKegiatan as $item)
                                 <tr>
-                                    <td>{{ $item['judul'] ?? '-' }}</td>
-                                    <td>{{ $item['organisasi'] ?? '-' }}</td>
-                                    <td>{{ $item['tanggal'] ?? '-' }}</td>
-                                    <td>{{ $item['lokasi'] ?? '-' }}</td>
+                                    <td>{{ $item['judul'] ?? '' }}</td>
+                                    <td>{{ $item['organisasi'] ?? '' }}</td>
                                     <td>
-                                        <span class="kmh-calendar-pill is-{{ $item['kategori'] ?? 'organisasi' }}">
-                                            {{ $kategoriLabelMap[$item['kategori'] ?? 'organisasi'] ?? 'Kegiatan Organisasi' }}
+                                        <div>{{ $item['tanggal_range_label'] ?? ($item['tanggal'] ?? '') }}</div>
+                                    </td>
+                                    <td>{{ $item['lokasi'] ?? '' }}</td>
+                                    <td>
+                                        <span class="kmh-calendar-pill is-{{ $item['kategori'] ?? '' }}">
+                                            {{ $kategoriLabelMap[$item['kategori'] ?? ''] ?? '' }}
                                         </span>
                                     </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="kmh-empty-row">Tidak ada agenda untuk filter bulan ini.</td>
+                                    <td colspan="5" class="kmh-empty-row">{{ $ui['empty_state'] ?? '' }}</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -289,5 +345,93 @@
             @endif
         </div>
     </section>
+</div>
+
+<div class="modal fade" id="kmh-calendar-modal" tabindex="-1" aria-labelledby="kmh-calendar-modal-title" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable kmh-calendar-modal-dialog">
+        <div class="modal-content kmh-calendar-modal-content">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title" id="kmh-calendar-modal-title">{{ $ui['modal_title'] ?? '' }}</h5>
+                    <p class="modal-subtitle mb-0">{{ $ui['modal_subtitle'] ?? '' }}</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body">
+                @unless(count($organizations) > 0)
+                    <div class="alert alert-warning" role="alert">
+                        {{ $ui['schedule_form_warning'] ?? '' }}
+                    </div>
+                @endunless
+
+                <form method="POST" action="{{ route('portal.kemahasiswaan.jadwal.store') }}" class="row g-3">
+                    @csrf
+                    <div class="col-12">
+                        <label class="form-label" for="kmh-calendar-title">{{ $ui['field_title'] ?? '' }}</label>
+                        <input
+                            type="text"
+                            id="kmh-calendar-title"
+                            name="judul"
+                            class="form-control"
+                            placeholder="{{ $ui['field_title_placeholder'] ?? '' }}"
+                            required
+                        >
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="kmh-calendar-start">{{ $ui['field_start_date'] ?? '' }}</label>
+                        <input type="date" id="kmh-calendar-start" name="tanggal_mulai" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="kmh-calendar-end">{{ $ui['field_end_date'] ?? '' }}</label>
+                        <input type="date" id="kmh-calendar-end" name="tanggal_selesai" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="kmh-calendar-category">{{ $ui['field_category'] ?? '' }}</label>
+                        <select id="kmh-calendar-category" name="kategori" class="form-select" required>
+                            <option value="acad">{{ $ui['category_akademik'] ?? '' }}</option>
+                            <option value="org" selected>{{ $ui['category_organisasi'] ?? '' }}</option>
+                            <option value="restricted">{{ $ui['category_masa_tenang'] ?? '' }}</option>
+                            <option value="holiday">{{ $ui['category_libur'] ?? '' }}</option>
+                            <option value="campus">{{ $ui['category_event_besar'] ?? '' }}</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="kmh-calendar-organization">{{ $ui['field_organization'] ?? '' }}</label>
+                        <select id="kmh-calendar-organization" name="organization_id" class="form-select" required @disabled(count($organizations) === 0)>
+                            <option value="">{{ $ui['schedule_org_placeholder'] ?? '' }}</option>
+                            @foreach($organizations as $organization)
+                                <option value="{{ $organization['id'] }}">{{ $organization['name'] }}</option>
+                            @endforeach
+                        </select>
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="kmh-calendar-location">{{ $ui['field_location'] ?? '' }}</label>
+                        <input
+                            type="text"
+                            id="kmh-calendar-location"
+                            name="lokasi"
+                            class="form-control"
+                            placeholder="{{ $ui['field_location_placeholder'] ?? '' }}"
+                            required
+                        >
+                    </div>
+                    <div class="col-12">
+                        <label class="form-label" for="kmh-calendar-description">{{ $ui['field_description'] ?? '' }}</label>
+                        <textarea
+                            id="kmh-calendar-description"
+                            name="deskripsi"
+                            class="form-control"
+                            rows="4"
+                            placeholder="{{ $ui['field_description_placeholder'] ?? '' }}"
+                        ></textarea>
+                    </div>
+                    <div class="col-12 d-flex flex-wrap justify-content-end gap-2 pt-1">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">{{ $ui['cancel_button'] ?? '' }}</button>
+                        <button type="submit" class="btn btn-primary" @disabled(count($organizations) === 0)>{{ $ui['save_button'] ?? '' }}</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 </div>
 @endsection

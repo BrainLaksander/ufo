@@ -53,9 +53,47 @@
         @yield('content')
     </main>
 
+    <div class="modal fade" id="ufoActionModal" tabindex="-1" aria-labelledby="ufoActionModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <div>
+                        <h5 class="modal-title" id="ufoActionModalLabel">Aksi</h5>
+                        <small class="text-muted">Ringkasan aksi yang dipilih.</small>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                </div>
+                <div class="modal-body" id="ufoActionModalBody"></div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('js/core/utils.js') }}"></script>
     <script src="{{ asset('js/core/pengurus-shell.js') }}"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var modalEl = document.getElementById('ufoActionModal');
+        var titleEl = document.getElementById('ufoActionModalLabel');
+        var bodyEl = document.getElementById('ufoActionModalBody');
+
+        if (!modalEl || !titleEl || !bodyEl) {
+            return;
+        }
+
+        modalEl.addEventListener('show.bs.modal', function (event) {
+            var trigger = event.relatedTarget;
+            var title = trigger && trigger.getAttribute('data-modal-title') ? trigger.getAttribute('data-modal-title') : (trigger ? trigger.textContent.trim() : 'Aksi');
+            var message = trigger && trigger.getAttribute('data-modal-message') ? trigger.getAttribute('data-modal-message') : 'Aksi ini dibuka sebagai modal.';
+
+            titleEl.textContent = title || 'Aksi';
+            bodyEl.textContent = message || 'Aksi ini dibuka sebagai modal.';
+        });
+    });
+    </script>
     @stack('scripts')
 </body>
 </html>

@@ -4,6 +4,7 @@
 
 @php
     $contacts = $contacts ?? [];
+    $supportInfo = $supportInfo ?? [];
 @endphp
 
 @section('content')
@@ -62,11 +63,18 @@
         </div>
     </section>
 
-    <section class="ufo-kboard-section ufo-pg-info-banner">
-        <h2>Informasi Tambahan</h2>
-        <p><span>📍</span> Kantor Kemahasiswaan UNKLAB, Gedung Administrasi Lantai 2</p>
-        <p><span>🕐</span> Jam Operasional: Senin - Jumat, 08:00 - 16:00 WITA</p>
-        <p><span>💡</span> Untuk konsultasi mendalam, disarankan membuat janji terlebih dahulu melalui WhatsApp.</p>
-    </section>
+    @if(!empty($supportInfo))
+        <section class="ufo-kboard-section ufo-pg-info-banner">
+            <h2>{{ $supportInfo['title'] ?? '' }}</h2>
+            @foreach(($supportInfo['items'] ?? []) as $info)
+                <p>
+                    @if(!empty($info['icon']))
+                        <span>{{ $info['icon'] }}</span>
+                    @endif
+                    {{ $info['text'] ?? '' }}
+                </p>
+            @endforeach
+        </section>
+    @endif
 </div>
 @endsection

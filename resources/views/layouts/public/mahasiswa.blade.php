@@ -35,7 +35,7 @@
                         'calendar-event' => 'bi-calendar-event',
                         'search' => 'bi-search',
                         'megaphone' => 'bi-megaphone',
-                        default => 'bi-info-circle',
+                        default => '',
                     };
                 @endphp
                 <article class="figma-ufo-notification-item">
@@ -43,10 +43,10 @@
                         <i class="bi {{ $icon }}"></i>
                     </div>
                     <div>
-                        <h6>{{ $item['title'] ?? '-' }}</h6>
+                        <h6>{{ $item['title'] ?? '' }}</h6>
                         <div class="figma-ufo-notification-meta">
-                            <span>{{ $item['category'] ?? '-' }}</span>
-                            <small>{{ $item['timestamp'] ?? '-' }}</small>
+                            <span>{{ $item['category'] ?? '' }}</span>
+                            <small>{{ $item['timestamp'] ?? '' }}</small>
                         </div>
                     </div>
                 </article>
