@@ -8,11 +8,18 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\View\View;
 
 class AuthController extends Controller
 {
-    public function showLogin()
+    public function showLogin(Request $request): View
     {
+        // Jika user sudah login tapi mengakses halaman login lagi, 
+        // kita bersihkan sesinya agar tidak terjadi konflik role (mencegah 403).
+        if ($request->session()->has('user')) {
+            $request->session()->forget('user');
+        }
+
         return view('auth.login');
     }
 

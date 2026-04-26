@@ -618,7 +618,9 @@ class MahasiswaController extends Controller
     private function loadEvents(array $organizations): array
     {
         $organizationLookup = collect($organizations)->keyBy('id');
+        $allEvents = collect();
 
+        // 1. Load from kemahasiswaan_schedules
         if (Schema::hasTable('kemahasiswaan_schedules')) {
             $hasCategory = Schema::hasColumn('kemahasiswaan_schedules', 'category');
             $hasDescription = Schema::hasColumn('kemahasiswaan_schedules', 'description');
@@ -636,9 +638,7 @@ class MahasiswaController extends Controller
                     'org.name as organization_name',
                     'org.banner as banner',
                 ])
-                ->selectRaw('0 as current_participants')
-                ->orderByDesc('sch.start_at')
-                ->limit(500);
+                ->selectRaw('0 as current_participants');
 
             if ($hasCategory) {
                 $query->addSelect('sch.category as schedule_category');
@@ -652,11 +652,9 @@ class MahasiswaController extends Controller
                 $query->selectRaw('NULL as description');
             }
 
-            $rows = $query->get();
-
             $legendMap = $this->loadReferenceDomain('dashboard_legend');
-
-            return $rows->map(function ($row) use ($organizationLookup, $legendMap) {
+            
+            $schRows = $query->get()->map(function ($row) use ($organizationLookup, $legendMap) {
                 $organization = $organizationLookup->get((int) $row->organization_id, []);
                 $rawCategory = Str::lower((string) ($row->schedule_category ?? ''));
                 $categoryLabel = (string) data_get($legendMap, $rawCategory . '.label', '');
@@ -666,38 +664,45 @@ class MahasiswaController extends Controller
                 }
 
                 return $this->mapCampusEvent($row, $categoryLabel);
-            })->values()->all();
+            });
+            
+            $allEvents = $allEvents->concat($schRows);
         }
 
-        if (!Schema::hasTable('events')) {
-            return [];
+        // 2. Load from events table
+        if (Schema::hasTable('events')) {
+            $evRows = DB::table('events as ev')
+                ->leftJoin('organizations as org', 'org.id', '=', 'ev.organization_id')
+                ->select([
+                    'ev.id',
+                    'ev.organization_id',
+                    'ev.name',
+                    'ev.description',
+                    'ev.start_date',
+                    'ev.end_date',
+                    'ev.location',
+                    'ev.current_participants',
+                    'ev.banner',
+                    'ev.status',
+                    'org.name as organization_name',
+                ])
+                ->whereIn('ev.status', ['approved', 'ongoing', 'completed'])
+                ->get()
+                ->map(function ($row) use ($organizationLookup) {
+                    $organization = $organizationLookup->get((int) $row->organization_id, []);
+                    $category = (string) ($organization['category'] ?? $this->uiText('mahasiswa_org_category_default'));
+
+                    return $this->mapCampusEvent($row, $category);
+                });
+            
+            $allEvents = $allEvents->concat($evRows);
         }
 
-        $rows = DB::table('events as ev')
-            ->leftJoin('organizations as org', 'org.id', '=', 'ev.organization_id')
-            ->select([
-                'ev.id',
-                'ev.organization_id',
-                'ev.name',
-                'ev.description',
-                'ev.start_date',
-                'ev.end_date',
-                'ev.location',
-                'ev.current_participants',
-                'ev.banner',
-                'ev.status',
-                'org.name as organization_name',
-            ])
-            ->orderByDesc('ev.start_date')
-            ->limit(500)
-            ->get();
-
-        return $rows->map(function ($row) use ($organizationLookup) {
-            $organization = $organizationLookup->get((int) $row->organization_id, []);
-            $category = (string) ($organization['category'] ?? $this->uiText('mahasiswa_org_category_default'));
-
-            return $this->mapCampusEvent($row, $category);
-        })->values()->all();
+        return $allEvents
+            ->unique(fn($item) => $item['title'] . $item['date']) // Prevent exact duplicates if they exist in both tables
+            ->sortByDesc('date')
+            ->values()
+            ->all();
     }
 
     /**
@@ -756,8 +761,8 @@ class MahasiswaController extends Controller
                 ? nl2br(e($content))
                 : '<p>' . e((string) $summary) . '</p>';
 
-            $source = $row->organization_name ?: ($row->account_name ?: null);
-            $category = $row->category ?: null;
+            $source = $row->organization_name ?: ($row->account_name ?: 'Kemahasiswaan');
+            $category = $row->category ?: 'Umum';
             $title = (string) $row->title;
 
             $isHighPriority = Str::contains(Str::lower($title . ' ' . $category), ['penting', 'urgent', 'darurat']);
@@ -1193,19 +1198,19 @@ class MahasiswaController extends Controller
             return $this->uiText('mahasiswa_org_category_bem');
         }
 
-        if (Str::contains($text, ['choir', 'paduan suara'])) {
+        if (Str::contains($text, ['choir', 'paduan suara', 'vocal', 'echo'])) {
             return $this->uiText('mahasiswa_org_category_choir');
         }
 
-        if (Str::contains($text, ['creative', 'cinema', 'sinema', 'media'])) {
+        if (Str::contains($text, ['creative', 'cinema', 'sinema', 'media', 'event', 'organizer', 'computer', 'science', 'cssa', 'uvics'])) {
             return $this->uiText('mahasiswa_org_category_creative');
         }
 
-        if (Str::contains($text, ['ikatan', 'daerah'])) {
+        if (Str::contains($text, ['ikatan', 'daerah', 'papua', 'minahasa', 'maluku', 'ikmapap', 'ikmamalut'])) {
             return $this->uiText('mahasiswa_org_category_regional');
         }
 
-        if (Str::contains($text, ['ministry', 'rohis', 'kerohanian'])) {
+        if (Str::contains($text, ['ministry', 'rohis', 'kerohanian', 'pilgrims', 'penginjilan', 'mission'])) {
             return $this->uiText('mahasiswa_org_category_ministry');
         }
 

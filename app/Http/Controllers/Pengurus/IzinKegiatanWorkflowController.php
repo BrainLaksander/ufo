@@ -10,6 +10,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -266,15 +267,17 @@ class IzinKegiatanWorkflowController extends Controller
                 ->select([
                     'evt.id',
                     'evt.name',
+                    'evt.description',
                     'evt.start_date',
                     'evt.end_date',
                     'evt.location',
                     'evt.current_participants',
                     'evt.quota',
                     'evt.status',
+                    'evt.banner',
                     'org.name as organization_name',
                 ])
-                ->orderByDesc('evt.start_date')
+                ->orderByDesc('evt.id')
                 ->limit(200);
 
             if ($organizationId) {
@@ -316,15 +319,20 @@ class IzinKegiatanWorkflowController extends Controller
             return [
                 'id' => (int) $row->id,
                 'title' => (string) $row->name,
+                'description' => (string) ($row->description ?? ''),
                 'date' => $startDate ? $startDate->translatedFormat('d F Y') : '',
+                'raw_date' => $startDate ? $startDate->toDateString() : '',
                 'time' => $startDate
                     ? $startDate->format('H:i') . ' - ' . ($endDate ? $endDate->format('H:i') : $startDate->format('H:i'))
                     : '',
                 'location' => (string) ($row->location ?? ''),
                 'registrants' => (int) ($row->current_participants ?? 0),
                 'participants' => (int) ($row->current_participants ?? 0),
+                'quota' => (int) ($row->quota ?? 0),
                 'status' => $statusLabel,
+                'raw_status' => (string) $row->status,
                 'pill' => $pill,
+                'banner' => $row->banner ? Storage::url($row->banner) : null,
                 'has_news' => $hasNews,
             ];
         });
@@ -391,9 +399,13 @@ class IzinKegiatanWorkflowController extends Controller
                 'id' => (int) $row->id,
                 'title' => (string) $row->title,
                 'description' => (string) ($row->summary ?: Str::limit(strip_tags((string) $row->content), 180)),
+                'full_content' => (string) $row->content,
                 'start_date' => $start->translatedFormat('d M Y'),
+                'raw_start_date' => $start->toDateString(),
                 'end_date' => $start->copy()->addDays(7)->translatedFormat('d M Y'),
+                'raw_end_date' => $start->copy()->addDays(7)->toDateString(),
                 'status' => $statusLabel,
+                'raw_status' => (string) $row->publish_status,
                 'pill' => $pill,
             ];
         })->values()->all();
@@ -815,48 +827,214 @@ class IzinKegiatanWorkflowController extends Controller
     public function storeEvent(Request $request): RedirectResponse
     {
         $context = $this->resolvePengurusContext($request);
-
-        if (!$context['organization_id'] || !$context['member_id']) {
-            return back()->with('error', $this->refLabel('flash_message', 'pengurus_data_incomplete'));
+        if (!$context['organization_id']) {
+            return back()->with('error', 'Konteks organisasi tidak ditemukan.');
         }
 
-        $hasApprovedIzin = DB::table('submissions')
-            ->where('organization_id', $context['organization_id'])
-            ->where('status', 'approved')
-            ->exists();
+        // Safety check: only allow publishing if there's at least one approved submission
+        if ($request->input('status') === 'approved') {
+            $hasApprovedIzin = DB::table('submissions')
+                ->where('organization_id', $context['organization_id'])
+                ->where('status', 'approved')
+                ->exists();
 
-        if (!$hasApprovedIzin) {
-            return back()->with('error', $this->refLabel('flash_message', 'event_requires_approved_submission'));
+            if (!$hasApprovedIzin) {
+                return back()->with('error', 'Anda harus memiliki izin kegiatan yang sudah disetujui (Approved) sebelum dapat mempublikasikan event secara publik.');
+            }
         }
 
         $validated = $request->validate([
-            'name' => 'required|string|max:150',
+            'name' => 'required|string|max:200',
+            'description' => 'required|string',
             'start_date' => 'required|date',
-            'end_date' => 'nullable|date|after_or_equal:start_date',
-            'location' => 'required|string|max:160',
+            'location' => 'required|string|max:200',
             'quota' => 'required|integer|min:1',
-            'description' => 'required|string|max:3000',
             'status' => 'required|in:draft,approved',
+            'banner' => 'nullable|image|max:5120',
         ]);
+
+        $bannerPath = null;
+        if ($request->hasFile('banner')) {
+            $bannerPath = $this->storeOrganizationMedia($request->file('banner'), (int)$context['organization_id'], 'event');
+        }
 
         DB::table('events')->insert([
             'organization_id' => $context['organization_id'],
-            'created_by' => $context['member_id'],
+            'created_by' => $this->resolveSessionUserId($request),
             'name' => $validated['name'],
             'description' => $validated['description'],
-            'start_date' => Carbon::parse($validated['start_date']),
-            'end_date' => !empty($validated['end_date']) ? Carbon::parse($validated['end_date']) : Carbon::parse($validated['start_date']),
+            'start_date' => $validated['start_date'],
+            'end_date' => $validated['start_date'],
             'location' => $validated['location'],
-            'quota' => (int) $validated['quota'],
-            'current_participants' => 0,
-            'banner' => null,
+            'quota' => $validated['quota'],
             'status' => $validated['status'],
-            'internal_notes' => null,
+            'banner' => $bannerPath,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
 
-        return back()->with('success', $this->refLabel('flash_message', 'event_created'));
+        return back()->with('success', 'Event berhasil disimpan!');
+    }
+
+    public function storeNews(Request $request): RedirectResponse
+    {
+        $context = $this->resolvePengurusContext($request);
+        
+        $validated = $request->validate([
+            'title' => 'required|string|max:200',
+            'content' => 'required|string',
+            'image' => 'nullable|image|max:5120',
+        ]);
+
+        $ukmAccountId = DB::table('kemahasiswaan_ukm_accounts')
+            ->where('organization_id', $context['organization_id'])
+            ->value('id');
+
+        DB::table('kemahasiswaan_announcements')->insert([
+            'ukm_account_id' => $ukmAccountId,
+            'title' => $validated['title'],
+            'category' => 'event',
+            'content' => $validated['content'],
+            'summary' => Str::limit(strip_tags($validated['content']), 150),
+            'publish_at' => now(),
+            'publish_status' => 'published',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return back()->with('success', 'Berita event berhasil dipublikasikan!');
+    }
+
+    public function storeAnnouncement(Request $request): RedirectResponse
+    {
+        $context = $this->resolvePengurusContext($request);
+
+        $validated = $request->validate([
+            'title' => 'required|string|max:200',
+            'description' => 'required|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+            'event_id' => 'nullable|integer',
+        ]);
+
+        $ukmAccountId = DB::table('kemahasiswaan_ukm_accounts')
+            ->where('organization_id', $context['organization_id'])
+            ->value('id');
+
+        DB::table('kemahasiswaan_announcements')->insert([
+            'ukm_account_id' => $ukmAccountId,
+            'title' => $validated['title'],
+            'category' => 'announcement',
+            'content' => $validated['description'],
+            'summary' => Str::limit(strip_tags($validated['description']), 150),
+            'publish_at' => $validated['start_date'],
+            'publish_status' => 'published',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return back()->with('success', 'Pengumuman berhasil dipublikasikan!');
+    }
+
+    public function updateEvent(Request $request, int $id): RedirectResponse
+    {
+        $context = $this->resolvePengurusContext($request);
+        if (!$context['organization_id']) {
+            return back()->with('error', 'Konteks organisasi tidak ditemukan.');
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:200',
+            'description' => 'required|string',
+            'start_date' => 'required|date',
+            'location' => 'required|string|max:200',
+            'quota' => 'required|integer|min:1',
+            'status' => 'required|in:draft,approved',
+            'banner' => 'nullable|image|max:5120',
+        ]);
+
+        $payload = [
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'start_date' => $validated['start_date'],
+            'end_date' => $validated['start_date'],
+            'location' => $validated['location'],
+            'quota' => $validated['quota'],
+            'status' => $validated['status'],
+            'updated_at' => now(),
+        ];
+
+        if ($request->hasFile('banner')) {
+            $payload['banner'] = $this->storeOrganizationMedia($request->file('banner'), (int)$context['organization_id'], 'event');
+        }
+
+        DB::table('events')
+            ->where('id', $id)
+            ->where('organization_id', $context['organization_id'])
+            ->update($payload);
+
+        return back()->with('success', 'Event berhasil diperbarui!');
+    }
+
+    public function updateAnnouncement(Request $request, int $id): RedirectResponse
+    {
+        $context = $this->resolvePengurusContext($request);
+        
+        $validated = $request->validate([
+            'title' => 'required|string|max:200',
+            'description' => 'required|string',
+            'start_date' => 'required|date',
+            'end_date' => 'required|date',
+        ]);
+
+        DB::table('kemahasiswaan_announcements')
+            ->where('id', $id)
+            ->update([
+                'title' => $validated['title'],
+                'content' => $validated['description'],
+                'summary' => Str::limit(strip_tags($validated['description']), 150),
+                'publish_at' => $validated['start_date'],
+                'updated_at' => now(),
+            ]);
+
+        return back()->with('success', 'Pengumuman berhasil diperbarui!');
+    }
+
+
+    public function storeLostFound(Request $request): RedirectResponse
+    {
+        $context = $this->resolvePengurusContext($request);
+        if (!$context['organization_id']) {
+            return back()->with('error', 'Konteks organisasi tidak ditemukan.');
+        }
+
+        $validated = $request->validate([
+            'item_name' => 'required|string|max:200',
+            'type' => 'required|in:lost,found',
+            'location_found' => 'required|string|max:200',
+            'description' => 'required|string',
+            'image' => 'nullable|image|max:5120',
+        ]);
+
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $imagePath = Storage::url($request->file('image')->store('lost-found', 'public'));
+        }
+
+        DB::table('lost_found_items')->insert([
+            'organization_id' => $context['organization_id'],
+            'reported_by' => $this->resolveSessionUserId($request),
+            'item_name' => $validated['item_name'],
+            'type' => $validated['type'],
+            'location_found' => $validated['location_found'],
+            'description' => $validated['description'],
+            'image' => $imagePath,
+            'status' => 'active', // Use 'active' code from reference map
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+
+        return back()->with('success', 'Laporan Lost & Found berhasil disimpan!');
     }
 
     public function storePengajuan(Request $request): RedirectResponse
@@ -871,7 +1049,13 @@ class IzinKegiatanWorkflowController extends Controller
             'title' => 'required|string|max:180',
             'description' => 'required|string|max:3000',
             'type' => 'required|in:proposal,budget,activity_plan',
+            'proposal_file' => 'nullable|file|mimes:pdf|max:10240',
         ]);
+
+        $filePath = null;
+        if ($request->hasFile('proposal_file')) {
+            $filePath = $request->file('proposal_file')->store('proposals', 'public');
+        }
 
         DB::table('submissions')->insert([
             'organization_id' => $context['organization_id'],
@@ -880,14 +1064,14 @@ class IzinKegiatanWorkflowController extends Controller
             'title' => $validated['title'],
             'description' => $validated['description'],
             'type' => $validated['type'],
-            'status' => 'submitted',
+            'status' => 'draft',
             'feedback' => null,
             'department_review_note' => null,
             'revision_count' => 0,
-            'submitted_date' => now()->toDateString(),
+            'submitted_date' => null,
             'approved_date' => null,
             'reviewed_at' => null,
-            'file_path' => null,
+            'file_path' => $filePath,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -909,7 +1093,13 @@ class IzinKegiatanWorkflowController extends Controller
             'participants' => 'required|integer|min:0',
             'report_type' => 'required|in:activity,financial,semester',
             'event_id' => 'nullable|integer|exists:events,id',
+            'report_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:10240',
         ]);
+
+        $attachmentPath = null;
+        if ($request->hasFile('report_file')) {
+            $attachmentPath = $request->file('report_file')->store('reports', 'public');
+        }
 
         if (!empty($validated['event_id'])) {
             $event = DB::table('events')
@@ -937,7 +1127,7 @@ class IzinKegiatanWorkflowController extends Controller
             'submitted_date' => null,
             'approved_date' => null,
             'reviewed_at' => null,
-            'attachment' => null,
+            'attachment' => $attachmentPath,
             'created_at' => now(),
             'updated_at' => now(),
         ]);
@@ -1769,7 +1959,10 @@ class IzinKegiatanWorkflowController extends Controller
             ->select([
                 'sub.id',
                 'sub.title',
+                'sub.description',
+                'sub.type',
                 'sub.status',
+                'sub.file_path',
                 'sub.submitted_date',
                 'sub.created_at',
                 'sub.department_review_note',
@@ -1788,6 +1981,9 @@ class IzinKegiatanWorkflowController extends Controller
             return [
                 'id' => (int) $row->id,
                 'judul' => $row->title,
+                'deskripsi' => $row->description,
+                'tipe' => $row->type,
+                'file_path' => $row->file_path,
                 'organisasi' => (string) ($row->organization_name ?? ''),
                 'tanggal_kegiatan' => $this->normalizeDateField($row->submitted_date, $row->created_at),
                 'status' => $this->mapSubmissionStatus((string) $row->status),
@@ -1803,7 +1999,10 @@ class IzinKegiatanWorkflowController extends Controller
             ->select([
                 'rep.id',
                 'rep.title',
+                'rep.content',
+                'rep.report_type',
                 'rep.status',
+                'rep.attachment',
                 'rep.submitted_date',
                 'rep.created_at',
                 'rep.department_review_note',
@@ -1822,6 +2021,9 @@ class IzinKegiatanWorkflowController extends Controller
             return [
                 'id' => (int) $row->id,
                 'judul' => $row->title,
+                'konten' => $row->content,
+                'tipe' => $row->report_type,
+                'attachment' => $row->attachment,
                 'organisasi' => (string) ($row->organization_name ?? ''),
                 'tanggal_laporan' => $this->normalizeDateField($row->submitted_date, $row->created_at),
                 'status' => $this->mapReportStatus((string) $row->status),
