@@ -108,6 +108,7 @@ Route::prefix('pengurus')->name('portal.pengurus.')->middleware(['auth', 'role:p
     Route::post('/reports', [IzinKegiatanWorkflowController::class, 'storeLaporan'])->name('reports.store');
     Route::post('/reports/{id}/submit', [IzinKegiatanWorkflowController::class, 'submitLaporan'])->name('reports.submit');
     Route::get('/members', [IzinKegiatanWorkflowController::class, 'pengurusMembers'])->name('members');
+    Route::post('/members/profile', [IzinKegiatanWorkflowController::class, 'updatePengurusMembersProfile'])->name('members.profile.update');
     Route::get('/applications', [IzinKegiatanWorkflowController::class, 'pengurusApplications'])->name('applications');
 
     Route::get('/settings', [IzinKegiatanWorkflowController::class, 'pengurusSettings'])->name('settings');
@@ -393,6 +394,7 @@ Route::prefix('api')->group(function () {
                 'mission',
                 'email',
                 'phone',
+                'logo',
                 'banner',
                 'instagram',
                 'line',
@@ -423,6 +425,7 @@ Route::prefix('api')->group(function () {
             'mission' => $item->mission,
             'email' => $item->email,
             'phone' => $item->phone,
+            'logo' => $item->logo,
             'banner' => $item->banner,
             'instagram' => $item->instagram,
             'line' => $item->line,

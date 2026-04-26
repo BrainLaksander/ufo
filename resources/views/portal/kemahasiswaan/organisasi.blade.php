@@ -26,25 +26,43 @@
 
 @push('styles')
 <style>
-    .kmh-org-create-dialog {
-        width: min(1100px, calc(100vw - 2rem));
+    .kmh-org-modal .modal-dialog {
+        margin: 0.75rem auto;
     }
 
-    .kmh-org-create-dialog .modal-content {
-        max-height: calc(100vh - 1.5rem);
+    .kmh-org-modal .modal-content {
+        max-height: calc(100dvh - 1.5rem);
         border: 0;
         border-radius: 1rem;
         overflow: hidden;
     }
 
-    .kmh-org-create-dialog .modal-header,
-    .kmh-org-create-dialog .modal-footer {
+    .kmh-org-modal .modal-header,
+    .kmh-org-modal .modal-footer {
         flex: 0 0 auto;
     }
 
-    .kmh-org-create-dialog .modal-body {
+    .kmh-org-modal .modal-body {
+        flex: 1 1 auto;
+        min-height: 0;
         overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
         scrollbar-gutter: stable;
+    }
+
+    .kmh-org-modal form {
+        display: flex;
+        flex-direction: column;
+        min-height: 0;
+    }
+
+    .kmh-org-create-dialog {
+        width: min(1100px, calc(100vw - 2rem));
+    }
+
+    .kmh-org-create-dialog .modal-content {
+        max-height: calc(100dvh - 1.5rem);
     }
 
     .kmh-org-create-dialog .form-label {
@@ -62,8 +80,13 @@
             width: calc(100vw - 1rem);
         }
 
+        .kmh-org-modal .modal-dialog {
+            margin: 0.5rem;
+        }
+
+        .kmh-org-modal .modal-content,
         .kmh-org-create-dialog .modal-content {
-            max-height: calc(100vh - 0.75rem);
+            max-height: calc(100dvh - 1rem);
         }
     }
 </style>
@@ -264,7 +287,7 @@
         </div>
     </section>
 
-    <div class="modal fade" id="kmh-org-create-modal" tabindex="-1" aria-labelledby="kmh-org-create-modal-label" aria-hidden="true">
+    <div class="modal fade kmh-org-modal" id="kmh-org-create-modal" tabindex="-1" aria-labelledby="kmh-org-create-modal-label" aria-hidden="true">
         <div class="modal-dialog modal-xl modal-dialog-scrollable kmh-org-create-dialog">
             <div class="modal-content">
                 <div class="modal-header">
@@ -389,28 +412,6 @@
                                 >
                             </div>
                         </div>
-
-                        <hr class="my-4">
-
-                        <h6 class="mb-2">Buat Akun Pengurus (Opsional)</h6>
-                        <div class="row g-3">
-                            <div class="col-md-6">
-                                <label for="kmh-pengurus-name" class="form-label">Nama Pengurus</label>
-                                <input id="kmh-pengurus-name" type="text" name="pengurus_name" class="form-control" value="{{ old('pengurus_name') }}" maxlength="100" placeholder="Contoh: Ketua BEM">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="kmh-pengurus-email" class="form-label">Email Akun Pengurus</label>
-                                <input id="kmh-pengurus-email" type="email" name="pengurus_email" class="form-control" value="{{ old('pengurus_email') }}" maxlength="120" placeholder="nama@domain.com">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="kmh-pengurus-position" class="form-label">Jabatan</label>
-                                <input id="kmh-pengurus-position" type="text" name="pengurus_position" class="form-control" value="{{ old('pengurus_position', 'Ketua') }}" maxlength="80" placeholder="Contoh: Ketua">
-                            </div>
-                            <div class="col-md-6">
-                                <label for="kmh-pengurus-password" class="form-label">Password Sementara</label>
-                                <input id="kmh-pengurus-password" type="text" name="pengurus_password" class="form-control" value="{{ old('pengurus_password') }}" minlength="8" maxlength="120" placeholder="Kosongkan untuk auto-generate">
-                            </div>
-                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
@@ -421,7 +422,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="kmh-org-detail-modal" tabindex="-1" aria-labelledby="kmh-org-detail-modal-label" aria-hidden="true">
+    <div class="modal fade kmh-org-modal" id="kmh-org-detail-modal" tabindex="-1" aria-labelledby="kmh-org-detail-modal-label" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
@@ -486,7 +487,7 @@
         </div>
     </div>
 
-    <div class="modal fade" id="kmh-org-edit-modal" tabindex="-1" aria-labelledby="kmh-org-edit-modal-label" aria-hidden="true">
+    <div class="modal fade kmh-org-modal" id="kmh-org-edit-modal" tabindex="-1" aria-labelledby="kmh-org-edit-modal-label" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">

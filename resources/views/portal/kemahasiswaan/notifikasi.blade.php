@@ -6,8 +6,9 @@
 @section('page_class', 'kmh-page-notifikasi')
 
 @php
+    $ui = $ui ?? [];
     $notifikasiItems = $notifikasiItems ?? [];
-    $notifikasiFilter = $notifikasiFilter ?? 'semua';
+    $notifikasiFilter = $notifikasiFilter ?? '';
     $notifikasiTypes = $notifikasiTypes ?? [];
     $notifikasiSummary = $notifikasiSummary ?? ['total' => 0, 'belum_dibaca' => 0];
 
@@ -25,7 +26,7 @@
     <section class="kmh-stats-grid is-two">
         <article class="kmh-stat-card tone-primary">
             <div>
-                <p>Total Notifikasi</p>
+                <p>{{ $ui['total_notifications'] ?? '' }}</p>
                 <strong class="kmh-stat-value">{{ $notifikasiSummary['total'] ?? 0 }}</strong>
             </div>
             <span class="kmh-stat-icon"><i class="bi bi-bell-fill"></i></span>
@@ -33,7 +34,7 @@
 
         <article class="kmh-stat-card tone-warning">
             <div>
-                <p>Belum Dibaca</p>
+                <p>{{ $ui['unread_notifications'] ?? '' }}</p>
                 <strong class="kmh-stat-value">{{ $notifikasiSummary['belum_dibaca'] ?? 0 }}</strong>
             </div>
             <span class="kmh-stat-icon"><i class="bi bi-exclamation-circle-fill"></i></span>
@@ -42,8 +43,8 @@
 
     <section class="kmh-card">
         <header class="kmh-card-head">
-            <h2>Filter Notifikasi</h2>
-            <small>Menampilkan {{ count($notifikasiItems) }} item</small>
+            <h2>{{ $ui['filter_title'] ?? '' }}</h2>
+            <small>{{ $ui['filter_showing_items'] ?? '' }} {{ count($notifikasiItems) }}</small>
         </header>
         <div class="kmh-card-body">
             <div class="kmh-filter-chips">
@@ -64,16 +65,16 @@
         <div class="kmh-card-body">
             <div class="kmh-toolbar">
                 <p class="kmh-toolbar-caption mb-0">
-                    Menampilkan {{ count($notifikasiItems) }} notifikasi untuk filter
-                    <strong>{{ data_get(collect($notifikasiTypes)->firstWhere('value', $notifikasiFilter), 'label', 'Semua Notifikasi') }}</strong>.
+                    {{ $ui['summary_prefix'] ?? '' }} {{ count($notifikasiItems) }} {{ $ui['summary_suffix'] ?? '' }}
+                    <strong>{{ data_get(collect($notifikasiTypes)->firstWhere('value', $notifikasiFilter), 'label', '') }}</strong>.
                 </p>
 
                 <div class="kmh-toolbar-end">
                     @if($notifikasiFilter !== 'semua')
-                        <a href="{{ route('portal.kemahasiswaan.notifikasi') }}" class="kmh-action-link is-primary">Reset Filter</a>
+                        <a href="{{ route('portal.kemahasiswaan.notifikasi') }}" class="kmh-action-link is-primary">{{ $ui['reset_filter'] ?? '' }}</a>
                     @endif
 
-                    <a href="{{ route('portal.kemahasiswaan.pengajuan') }}" class="kmh-action-link is-primary">Buka Review Pengajuan</a>
+                    <a href="{{ route('portal.kemahasiswaan.pengajuan') }}" class="kmh-action-link is-primary">{{ $ui['open_submission_review'] ?? '' }}</a>
                 </div>
             </div>
         </div>
@@ -82,9 +83,9 @@
     <section class="kmh-notification-list" aria-label="Daftar notifikasi sistem">
         @forelse($notifikasiItems as $item)
             @php
-                $jenis = $item['jenis'] ?? 'jadwal';
-                $iconClass = $iconMap[$jenis] ?? 'bi-bell-fill';
-                $isUnread = ($item['status'] ?? 'sudah_dibaca') === 'belum_dibaca';
+                $jenis = $item['jenis'] ?? '';
+                $iconClass = $iconMap[$jenis] ?? '';
+                $isUnread = ($item['status'] ?? '') === 'belum_dibaca';
                 $metaClass = $isUnread ? 'is-warning' : 'is-muted';
                 $detailUrl = match ($jenis) {
                     'pengajuan', 'laporan', 'jadwal' => route('portal.kemahasiswaan.pengajuan'),
@@ -100,17 +101,17 @@
 
                 <div class="kmh-notification-content">
                     <div class="kmh-notification-head">
-                        <h3 class="kmh-notification-title">{{ $item['judul'] ?? '-' }}</h3>
-                        <span class="kmh-notification-time">{{ $item['waktu'] ?? '-' }}</span>
+                        <h3 class="kmh-notification-title">{{ $item['judul'] ?? '' }}</h3>
+                        <span class="kmh-notification-time">{{ $item['waktu'] ?? '' }}</span>
                     </div>
 
-                    <p class="kmh-notification-message">{{ $item['pesan'] ?? '-' }}</p>
+                    <p class="kmh-notification-message">{{ $item['pesan'] ?? '' }}</p>
 
                     <div class="kmh-notification-meta">
-                        <span class="kmh-status-pill {{ $metaClass }}">{{ $item['status_label'] ?? '-' }}</span>
+                        <span class="kmh-status-pill {{ $metaClass }}">{{ $item['status_label'] ?? '' }}</span>
                         <a href="{{ $detailUrl }}" class="kmh-notification-action" role="button">
                             <i class="bi bi-eye"></i>
-                            <span>Lihat Detail</span>
+                            <span>{{ $ui['detail_button'] ?? '' }}</span>
                         </a>
                     </div>
                 </div>
@@ -118,7 +119,7 @@
         @empty
             <article class="kmh-card">
                 <div class="kmh-card-body">
-                    <p class="mb-0 text-muted">Belum ada notifikasi untuk filter ini.</p>
+                    <p class="mb-0 text-muted">{{ $ui['empty_state'] ?? '' }}</p>
                 </div>
             </article>
         @endforelse

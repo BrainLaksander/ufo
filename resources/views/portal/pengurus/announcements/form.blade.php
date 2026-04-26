@@ -25,7 +25,7 @@
         <form class="ufo-kboard-row two">
             <label class="ufo-kboard-span-full">
                 <span class="ufo-kboard-item-meta">Judul Pengumuman</span>
-                <input type="text" class="ufo-kboard-field" placeholder="{{ $announcementTitlePlaceholder ?? 'Pengumuman Organisasi' }}" required>
+                <input type="text" class="ufo-kboard-field" placeholder="{{ $announcementTitlePlaceholder ?? '' }}" required>
             </label>
 
             <label>
@@ -51,7 +51,7 @@
 
             <label class="ufo-kboard-span-full">
                 <span class="ufo-kboard-item-meta">Konten Pengumuman</span>
-                <textarea class="ufo-kboard-textarea" placeholder="{{ $announcementDescriptionPlaceholder ?? 'Jelaskan isi pengumuman di sini.' }}" required></textarea>
+                <textarea class="ufo-kboard-textarea" placeholder="{{ $announcementDescriptionPlaceholder ?? '' }}" required></textarea>
             </label>
 
             <div class="ufo-kboard-span-full">

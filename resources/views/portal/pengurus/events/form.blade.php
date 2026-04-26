@@ -51,7 +51,7 @@
             <div class="ufo-pg-event-field-grid">
                 <div class="ufo-pg-field-group ufo-pg-col-span-6">
                     <label for="event-name">Nama Event</label>
-                    <input id="event-name" type="text" name="name" value="{{ old('name') }}" placeholder="{{ $eventNamePlaceholder ?? 'Workshop AI & Machine Learning' }}" required @disabled(!$canCreateEvent)>
+                    <input id="event-name" type="text" name="name" value="{{ old('name') }}" placeholder="{{ $eventNamePlaceholder ?? '' }}" required @disabled(!$canCreateEvent)>
                 </div>
 
                 <div class="ufo-pg-field-group ufo-pg-col-span-3">
@@ -66,7 +66,7 @@
 
                 <div class="ufo-pg-field-group ufo-pg-col-span-6">
                     <label for="event-location">Lokasi</label>
-                    <input id="event-location" type="text" name="location" value="{{ old('location') }}" placeholder="{{ $eventLocationPlaceholder ?? 'Aula Gedung A atau Zoom Meeting' }}" required @disabled(!$canCreateEvent)>
+                    <input id="event-location" type="text" name="location" value="{{ old('location') }}" placeholder="{{ $eventLocationPlaceholder ?? '' }}" required @disabled(!$canCreateEvent)>
                 </div>
 
                 <div class="ufo-pg-field-group ufo-pg-col-span-3">
@@ -84,7 +84,7 @@
 
                 <div class="ufo-pg-field-group ufo-pg-col-span-12">
                     <label for="event-description">Deskripsi Event</label>
-                    <textarea id="event-description" name="description" placeholder="{{ $eventDescriptionPlaceholder ?? 'Jelaskan tujuan, agenda, dan manfaat event.' }}" required @disabled(!$canCreateEvent)>{{ old('description') }}</textarea>
+                    <textarea id="event-description" name="description" placeholder="{{ $eventDescriptionPlaceholder ?? '' }}" required @disabled(!$canCreateEvent)>{{ old('description') }}</textarea>
                 </div>
             </div>
 

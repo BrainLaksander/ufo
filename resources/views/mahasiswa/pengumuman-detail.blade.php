@@ -1,6 +1,6 @@
 @extends('layouts.public.mahasiswa')
 
-@section('title', ($announcement['title'] ?? 'Detail Pengumuman') . ' - UFO')
+@section('title', ($announcement['title'] ?? '') . ' - UFO')
 
 @push('styles')
 <link rel="stylesheet" href="{{ asset('css/views/mahasiswa-pengumuman.css') }}">
@@ -17,16 +17,16 @@
     </a>
 
     <article class="figma-ann-detail-cover">
-        <img src="{{ $announcement['image'] ?? '' }}" alt="{{ $announcement['title'] ?? 'Pengumuman' }}">
+        <img src="{{ $announcement['image'] ?? '' }}" alt="{{ $announcement['title'] ?? '' }}">
     </article>
 
     <article class="figma-card p-3 figma-ann-detail-header mb-3">
-        <span class="figma-ann-badge">{{ $announcement['category'] ?? '-' }}</span>
-        <h1 class="h2 mb-3">{{ $announcement['title'] ?? '-' }}</h1>
+        <span class="figma-ann-badge">{{ $announcement['category'] ?? '' }}</span>
+        <h1 class="h2 mb-3">{{ $announcement['title'] ?? '' }}</h1>
 
         <div class="figma-ann-meta mb-3">
-            <span><i class="bi bi-building"></i> {{ $announcement['source'] ?? '-' }}</span>
-            <span><i class="bi bi-calendar-event"></i> {{ $announcement['date'] ?? '-' }}</span>
+            <span><i class="bi bi-building"></i> {{ $announcement['source'] ?? '' }}</span>
+            <span><i class="bi bi-calendar-event"></i> {{ $announcement['date'] ?? '' }}</span>
         </div>
 
         <div class="d-flex flex-wrap gap-2">
@@ -65,7 +65,7 @@
         shareButton.addEventListener('click', function () {
             if (navigator.share) {
                 navigator.share({
-                    title: @json($announcement['title'] ?? 'Pengumuman'),
+                    title: @json($announcement['title'] ?? ''),
                     text: @json($announcement['summary'] ?? ''),
                     url: window.location.href
                 }).catch(function () {

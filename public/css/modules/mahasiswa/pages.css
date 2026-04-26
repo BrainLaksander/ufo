@@ -885,6 +885,13 @@
     font-size: 1.25rem;
 }
 
+.figma-org-logo img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+}
+
 .figma-org-card h3 {
     margin: 0;
     text-align: center;

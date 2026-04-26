@@ -1,6 +1,6 @@
 @extends('layouts.public.mahasiswa')
 
-@section('title', ($org['name'] ?? 'Detail Organisasi') . ' - UFO')
+@section('title', ($org['name'] ?? '') . ' - UFO')
 
 @section('content')
 @php
@@ -13,19 +13,25 @@
     </a>
 
     <article class="figma-org-detail-hero">
-        <img src="{{ $org['banner'] ?? '' }}" alt="{{ $org['name'] ?? 'Organisasi' }}">
+        <img src="{{ $org['banner'] ?? '' }}" alt="{{ $org['name'] ?? '' }}">
         <div class="figma-org-detail-hero-content">
-            <div class="figma-org-logo">{{ strtoupper($org['logo_text'] ?? 'ORG') }}</div>
+            <div class="figma-org-logo">
+                @if(!empty($org['logo']))
+                    <img src="{{ $org['logo'] }}" alt="Logo {{ $org['name'] ?? '' }}" class="img-fluid rounded-circle">
+                @else
+                    {{ strtoupper($org['logo_text'] ?? '') }}
+                @endif
+            </div>
             <div>
-                <h1>{{ $org['name'] ?? '-' }}</h1>
-                <p>{{ $org['tagline'] ?? '-' }}</p>
+                <h1>{{ $org['name'] ?? '' }}</h1>
+                <p>{{ $org['tagline'] ?? '' }}</p>
             </div>
         </div>
     </article>
 
     <div class="figma-org-members-badge">
         <i class="bi bi-people"></i>
-        {{ $org['active_members'] ?? 0 }} Anggota Aktif
+        {{ $org['active_members'] ?? 0 }} {{ $ui['active_members_label'] ?? 'Anggota Aktif' }}
     </div>
 
     <div class="figma-org-action-grid">
@@ -47,7 +53,7 @@
 
     <article class="figma-section">
         <h2>{{ $ui['vision_title'] ?? '' }}</h2>
-        <p>{{ $org['visi'] ?? '-' }}</p>
+        <p>{{ $org['visi'] ?? '' }}</p>
 
         <h2 class="mt-3">{{ $ui['mission_title'] ?? '' }}</h2>
         <ul>
@@ -59,7 +65,7 @@
 
     <article class="figma-highlight">
         <h2 class="h4 mb-2">{{ $ui['culture_title'] ?? '' }}</h2>
-        <p class="mb-0">{{ $org['culture'] ?? '-' }}</p>
+        <p class="mb-0">{{ $org['culture'] ?? '' }}</p>
     </article>
 
     <article class="figma-section">
@@ -67,7 +73,7 @@
         <div class="figma-program-grid" id="program-grid">
             @foreach(($org['programs'] ?? []) as $index => $program)
                 <button type="button" class="figma-program-btn" data-program-index="{{ $index }}">
-                    <strong>{{ $program['name'] ?? '-' }}</strong>
+                    <strong>{{ $program['name'] ?? '' }}</strong>
                 </button>
             @endforeach
         </div>
@@ -79,9 +85,9 @@
             @foreach(($org['events'] ?? []) as $event)
                 <a href="{{ route('mahasiswa.organisasi.event.detail', ['orgId' => $org['id'] ?? 0, 'eventId' => $event['id'] ?? '']) }}" class="figma-event-item">
                     <div>
-                        <strong>{{ $event['name'] ?? '-' }}</strong>
+                        <strong>{{ $event['name'] ?? '' }}</strong>
                         <br>
-                        <small>{{ $event['date'] ?? '-' }}</small>
+                        <small>{{ $event['date'] ?? '' }}</small>
                     </div>
                     <i class="bi bi-calendar-event"></i>
                 </a>
@@ -94,8 +100,8 @@
         <div class="figma-structure-grid">
             @foreach(($org['structure'] ?? []) as $member)
                 <div class="figma-structure-item">
-                    <strong>{{ $member['position'] ?? '-' }}</strong>
-                    <p class="mb-0">{{ $member['name'] ?? '-' }}</p>
+                    <strong>{{ $member['position'] ?? '' }}</strong>
+                    <p class="mb-0">{{ $member['name'] ?? '' }}</p>
                 </div>
             @endforeach
         </div>
@@ -193,13 +199,13 @@
 
             titleEl.textContent = program.name || (ui.program_modal_title || '');
             bodyEl.innerHTML = `
-                <p><strong>${ui.program_goal_label || ''}</strong> ${program.goal || '-'}</p>
+                <p><strong>${ui.program_goal_label || ''}</strong> ${program.goal || ''}</p>
                 <h6>${ui.program_activities_label || ''}</h6>
                 ${asList(program.activities || [])}
                 <div class="figma-register-alert mt-3 mb-3">
-                    <strong>${ui.program_period_label || ''}</strong> ${program.period || '-'}
+                    <strong>${ui.program_period_label || ''}</strong> ${program.period || ''}
                 </div>
-                <p class="mb-0"><strong>${ui.program_impact_label || ''}</strong> ${program.impact || '-'}</p>
+                <p class="mb-0"><strong>${ui.program_impact_label || ''}</strong> ${program.impact || ''}</p>
             `;
 
             modal.show();

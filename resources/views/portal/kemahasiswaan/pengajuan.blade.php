@@ -6,6 +6,7 @@
 @section('page_class', 'kmh-page-pengajuan')
 
 @php
+    $ui = $ui ?? [];
     $workflowPengajuan = $workflowPengajuan ?? [];
     $workflowLaporan = $workflowLaporan ?? [];
     $jadwalKegiatan = $jadwalKegiatan ?? [];
@@ -96,15 +97,15 @@
                             id="kmh-review-search"
                             type="search"
                             class="kmh-toolbar-input"
-                            placeholder="Cari judul, organisasi, atau catatan review..."
-                            aria-label="Cari data pengajuan dan laporan"
+                            placeholder="{{ $ui['search_placeholder'] ?? '' }}"
+                            aria-label="{{ $ui['search_aria'] ?? '' }}"
                         >
                     </label>
 
                     <label class="kmh-toolbar-field mb-0" for="kmh-review-status">
                         <i class="bi bi-funnel kmh-toolbar-icon"></i>
                         <select id="kmh-review-status" class="kmh-toolbar-select" aria-label="Filter status review">
-                            <option value="semua">Semua Status</option>
+                            <option value="semua">{{ $ui['all_statuses'] ?? '' }}</option>
                             <option value="diajukan">Diajukan</option>
                             <option value="sedang-direview">Sedang Direview</option>
                             <option value="revisi">Revisi</option>
@@ -116,7 +117,7 @@
                 </div>
 
                 <div class="kmh-toolbar-end">
-                    <p class="kmh-toolbar-caption mb-0">Filter berlaku untuk tabel pengajuan dan laporan.</p>
+                    <p class="kmh-toolbar-caption mb-0">{{ $ui['filter_scope_caption'] ?? '' }}</p>
                 </div>
             </div>
         </div>
@@ -161,7 +162,7 @@
                                 <td>
                                     <span class="kmh-status-pill {{ $statusClass($item['status']) }}">{{ $item['status'] }}</span>
                                 </td>
-                                <td>{{ $item['catatan_departemen'] ?? '-' }}</td>
+                                <td>{{ $item['catatan_departemen'] ?? '' }}</td>
                                 <td class="text-center">
                                     @if(in_array($item['status'], $pendingStatuses, true))
                                         <form method="POST" action="{{ route('portal.kemahasiswaan.pengajuan.review', ['id' => $item['id']]) }}" class="kmh-inline-review">
@@ -171,26 +172,26 @@
                                                 <option value="ditolak">Tolak</option>
                                                 <option value="revisi">Revisi</option>
                                             </select>
-                                            <input type="text" name="catatan" class="form-control form-control-sm" placeholder="Catatan (wajib jika tolak/revisi)">
+                                            <input type="text" name="catatan" class="form-control form-control-sm" placeholder="{{ $ui['review_note_placeholder'] ?? '' }}">
                                             <button type="submit" class="btn btn-sm btn-primary kmh-review-submit-btn">
                                                 <i class="bi bi-check2-circle"></i>
-                                                <span>Simpan</span>
+                                                <span>{{ $ui['review_save_button'] ?? '' }}</span>
                                             </button>
                                         </form>
                                     @else
-                                        <small class="text-muted">Tidak ada aksi lanjutan</small>
+                                        <small class="text-muted">{{ $ui['no_followup_action'] ?? '' }}</small>
                                     @endif
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="kmh-empty-row">Belum ada pengajuan kegiatan.</td>
+                                <td colspan="6" class="kmh-empty-row">{{ $ui['table_pengajuan_empty'] ?? '' }}</td>
                             </tr>
                         @endforelse
 
                         @if(count($workflowPengajuan) > 0)
                             <tr class="kmh-filter-empty-row d-none" data-review-empty="pengajuan">
-                                <td colspan="6" class="kmh-empty-row">Tidak ada data pengajuan yang cocok dengan filter.</td>
+                                <td colspan="6" class="kmh-empty-row">{{ $ui['table_pengajuan_filter_empty'] ?? '' }}</td>
                             </tr>
                         @endif
                     </tbody>
@@ -238,7 +239,7 @@
                                 <td>
                                     <span class="kmh-status-pill {{ $statusClass($item['status']) }}">{{ $item['status'] }}</span>
                                 </td>
-                                <td>{{ $item['catatan_departemen'] ?? '-' }}</td>
+                                <td>{{ $item['catatan_departemen'] ?? '' }}</td>
                                 <td class="text-center">
                                     @if(in_array($item['status'], $pendingStatuses, true))
                                         <form method="POST" action="{{ route('portal.kemahasiswaan.laporan.review', ['id' => $item['id']]) }}" class="kmh-inline-review">
@@ -248,26 +249,26 @@
                                                 <option value="ditolak">Tolak</option>
                                                 <option value="revisi">Revisi</option>
                                             </select>
-                                            <input type="text" name="catatan" class="form-control form-control-sm" placeholder="Catatan (wajib jika tolak/revisi)">
+                                            <input type="text" name="catatan" class="form-control form-control-sm" placeholder="{{ $ui['review_note_placeholder'] ?? '' }}">
                                             <button type="submit" class="btn btn-sm btn-primary kmh-review-submit-btn">
                                                 <i class="bi bi-check2-circle"></i>
-                                                <span>Simpan</span>
+                                                <span>{{ $ui['review_save_button'] ?? '' }}</span>
                                             </button>
                                         </form>
                                     @else
-                                        <small class="text-muted">Tidak ada aksi lanjutan</small>
+                                        <small class="text-muted">{{ $ui['no_followup_action'] ?? '' }}</small>
                                     @endif
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="kmh-empty-row">Belum ada laporan kegiatan.</td>
+                                <td colspan="6" class="kmh-empty-row">{{ $ui['table_laporan_empty'] ?? '' }}</td>
                             </tr>
                         @endforelse
 
                         @if(count($workflowLaporan) > 0)
                             <tr class="kmh-filter-empty-row d-none" data-review-empty="laporan">
-                                <td colspan="6" class="kmh-empty-row">Tidak ada data laporan yang cocok dengan filter.</td>
+                                <td colspan="6" class="kmh-empty-row">{{ $ui['table_laporan_filter_empty'] ?? '' }}</td>
                             </tr>
                         @endif
                     </tbody>
@@ -284,7 +285,7 @@
             <div class="kmh-card-body">
                 @unless($hasOrganizations)
                     <div class="alert alert-warning" role="alert">
-                        Belum ada data organisasi. Tambahkan organisasi terlebih dahulu.
+                        {{ $ui['schedule_form_warning'] ?? '' }}
                     </div>
                 @endunless
 
@@ -294,25 +295,43 @@
                         <label class="form-label">Judul Kegiatan</label>
                         <input type="text" name="judul" class="form-control" required>
                     </div>
-                    <div class="col-12">
+                    <div class="col-md-6">
+                        <label class="form-label">Tanggal Mulai</label>
+                        <input type="date" name="tanggal_mulai" class="form-control" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Tanggal Selesai</label>
+                        <input type="date" name="tanggal_selesai" class="form-control">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Kategori</label>
+                        <select name="kategori" class="form-select" required>
+                            <option value="acad">{{ $ui['category_akademik'] ?? 'Kegiatan Akademik' }}</option>
+                            <option value="org" selected>{{ $ui['category_organisasi'] ?? 'Kegiatan Organisasi' }}</option>
+                            <option value="restricted">{{ $ui['category_masa_tenang'] ?? 'Masa Tidak Boleh Berorganisasi' }}</option>
+                            <option value="holiday">{{ $ui['category_libur'] ?? 'Libur Akademik' }}</option>
+                            <option value="campus">{{ $ui['category_event_besar'] ?? 'Event Kampus Besar' }}</option>
+                        </select>
+                    </div>
+                    <div class="col-md-6">
                         <label class="form-label">Organisasi</label>
                         <select name="organization_id" class="form-select" required @disabled(!$hasOrganizations)>
-                            <option value="">Pilih organisasi</option>
+                            <option value="">{{ $ui['schedule_org_placeholder'] ?? '' }}</option>
                             @foreach($organizations as $organization)
                                 <option value="{{ $organization['id'] }}">{{ $organization['name'] }}</option>
                             @endforeach
                         </select>
                     </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Tanggal</label>
-                        <input type="date" name="tanggal" class="form-control" required>
-                    </div>
-                    <div class="col-md-6">
+                    <div class="col-12">
                         <label class="form-label">Lokasi</label>
                         <input type="text" name="lokasi" class="form-control" required>
                     </div>
+                    <div class="col-12">
+                        <label class="form-label">Deskripsi</label>
+                        <textarea name="deskripsi" class="form-control" rows="3"></textarea>
+                    </div>
                     <div class="col-12 d-grid mt-2">
-                        <button type="submit" class="btn btn-primary kmh-form-action-btn" @disabled(!$hasOrganizations)>Simpan Jadwal</button>
+                        <button type="submit" class="btn btn-primary kmh-form-action-btn" @disabled(!$hasOrganizations)>{{ $ui['schedule_save_button'] ?? '' }}</button>
                     </div>
                 </form>
             </div>
@@ -331,6 +350,7 @@
                                 <th>Kegiatan</th>
                                 <th>Organisasi</th>
                                 <th>Tanggal</th>
+                                <th>Kategori</th>
                                 <th>Lokasi</th>
                             </tr>
                         </thead>
@@ -339,12 +359,13 @@
                                 <tr>
                                     <td>{{ $jadwal['judul'] }}</td>
                                     <td>{{ $jadwal['organisasi'] }}</td>
-                                    <td>{{ \Carbon\Carbon::parse($jadwal['tanggal'])->format('d M Y') }}</td>
+                                    <td>{{ $jadwal['tanggal_range_label'] ?? \Carbon\Carbon::parse($jadwal['tanggal'])->format('d M Y') }}</td>
+                                    <td>{{ $jadwal['kategori'] ?? '' }}</td>
                                     <td>{{ $jadwal['lokasi'] }}</td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="4" class="kmh-empty-row">Belum ada jadwal kegiatan.</td>
+                                    <td colspan="5" class="kmh-empty-row">{{ $ui['schedule_empty'] ?? '' }}</td>
                                 </tr>
                             @endforelse
                         </tbody>

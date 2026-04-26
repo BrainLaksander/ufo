@@ -1,6 +1,6 @@
 @extends('layouts.public.mahasiswa')
 
-@section('title', 'Pendaftaran ' . ($org['name'] ?? 'Organisasi') . ' - UFO')
+@section('title', 'Pendaftaran ' . ($org['name'] ?? '') . ' - UFO')
 
 @section('content')
 @php
@@ -13,7 +13,7 @@
     </a>
 
     <header class="figma-register-header">
-        <div class="figma-register-logo">{{ strtoupper($org['logo_text'] ?? 'ORG') }}</div>
+        <div class="figma-register-logo">{{ strtoupper($org['logo_text'] ?? '') }}</div>
         <h1 class="h3 mb-2">{{ $ui['title_prefix'] ?? '' }} {{ $org['name'] ?? '' }}</h1>
         <p class="figma-muted mb-0">{{ $ui['subtitle'] ?? '' }}</p>
     </header>
@@ -27,7 +27,7 @@
                 {{ $ui['status_open'] ?? '' }}
             </span>
 
-            <p class="mt-3">{{ $ui['period_label'] ?? '' }} <strong>{{ $registration['period'] ?? '-' }}</strong></p>
+            <p class="mt-3">{{ $ui['period_label'] ?? '' }} <strong>{{ $registration['period'] ?? '' }}</strong></p>
 
             @if(!empty($registration['form_link']))
                 <a href="{{ $registration['form_link'] }}" target="_blank" rel="noopener" class="figma-btn-primary">
@@ -54,8 +54,8 @@
             <div class="figma-program-grid">
                 @foreach($registration['divisions'] as $division)
                     <div class="figma-register-division">
-                        <strong>{{ $division['name'] ?? '-' }}</strong>
-                        <p class="mb-0 mt-1 figma-muted">{{ $division['description'] ?? '-' }}</p>
+                        <strong>{{ $division['name'] ?? '' }}</strong>
+                        <p class="mb-0 mt-1 figma-muted">{{ $division['description'] ?? '' }}</p>
                     </div>
                 @endforeach
             </div>

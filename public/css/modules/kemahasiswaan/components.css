@@ -27,8 +27,9 @@ body.kemahasiswaan-layout .kmh-shell-main.role-main-content {
     margin-left: 280px;
     width: calc(100% - 280px);
     min-height: 100vh;
-    padding: 84px 24px 24px;
+    padding: 96px 24px 24px;
     background: var(--km-bg);
+    transition: margin-left 0.24s ease, width 0.24s ease;
 }
 
 /* ===== Header ===== */
@@ -43,12 +44,17 @@ body.kemahasiswaan-layout .kemahasiswaan-header {
     border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     box-shadow: none;
     z-index: 1030;
+    transition: left 0.24s ease, width 0.24s ease;
 }
 
 body.kemahasiswaan-layout .kemahasiswaan-header .kmh-shell-header-container {
     min-height: 78px;
     max-width: none;
     padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
 }
 
 body.kemahasiswaan-layout .kmh-shell-header-left {
@@ -120,7 +126,7 @@ body.kemahasiswaan-layout .kmh-header-notification-count {
 }
 
 body.kemahasiswaan-layout .kemahasiswaan-header .sidebar-toggle {
-    display: none;
+    display: inline-flex;
     width: 2.3rem;
     height: 2.3rem;
     border: 0;
@@ -137,6 +143,74 @@ body.kemahasiswaan-layout .kemahasiswaan-header .sidebar-toggle:hover {
     background: rgba(255, 255, 255, 0.22);
 }
 
+body.kemahasiswaan-layout .sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(17, 12, 34, 0.42);
+    z-index: 1040;
+}
+
+body.kemahasiswaan-layout .sidebar-overlay.hidden {
+    display: none;
+}
+
+body.kemahasiswaan-layout.kmh-sidebar-collapsed .kmh-shell-main.role-main-content {
+    margin-left: 72px;
+    width: calc(100% - 72px);
+}
+
+body.kemahasiswaan-layout.kmh-sidebar-collapsed .kemahasiswaan-header {
+    left: 72px;
+    width: calc(100% - 72px);
+}
+
+body.kemahasiswaan-layout.kmh-sidebar-collapsed .kemahasiswaan-sidebar {
+    width: 72px;
+}
+
+body.kemahasiswaan-layout.kmh-sidebar-collapsed .kemahasiswaan-sidebar .sidebar-top {
+    justify-content: center;
+    padding: 1rem 0.55rem 0.8rem;
+}
+
+body.kemahasiswaan-layout.kmh-sidebar-collapsed .kemahasiswaan-sidebar .dept-title,
+body.kemahasiswaan-layout.kmh-sidebar-collapsed .kemahasiswaan-sidebar .sidebar-nav .nav-text,
+body.kemahasiswaan-layout.kmh-sidebar-collapsed .kemahasiswaan-sidebar .sidebar-footer .profile,
+body.kemahasiswaan-layout.kmh-sidebar-collapsed .kemahasiswaan-sidebar .sidebar-footer .logout span {
+    display: none;
+}
+
+body.kemahasiswaan-layout.kmh-sidebar-collapsed .kemahasiswaan-sidebar .sidebar-nav {
+    padding-left: 0.35rem;
+    padding-right: 0.35rem;
+}
+
+body.kemahasiswaan-layout.kmh-sidebar-collapsed .kemahasiswaan-sidebar .sidebar-nav .nav-link {
+    justify-content: center;
+    padding-left: 0.55rem;
+    padding-right: 0.55rem;
+    position: relative;
+}
+
+body.kemahasiswaan-layout.kmh-sidebar-collapsed .kemahasiswaan-sidebar .notif-badge {
+    margin-left: 0;
+    position: absolute;
+    top: 0.35rem;
+    right: 0.35rem;
+}
+
+body.kemahasiswaan-layout.kmh-sidebar-collapsed .kemahasiswaan-sidebar .sidebar-footer {
+    padding: 0.8rem 0.35rem;
+}
+
+body.kemahasiswaan-layout.kmh-sidebar-collapsed .kemahasiswaan-sidebar .sidebar-footer .logout {
+    justify-content: center;
+}
+
+body.kemahasiswaan-layout.kmh-sidebar-collapsed .kemahasiswaan-sidebar .sidebar-nav .nav-icon {
+    width: 1.25rem;
+}
+
 /* ===== Sidebar ===== */
 body.kemahasiswaan-layout .kemahasiswaan-sidebar {
     position: fixed;
@@ -151,6 +225,7 @@ body.kemahasiswaan-layout .kemahasiswaan-sidebar {
     background: var(--km-primary);
     color: #ffffff;
     z-index: 1050;
+    transition: width 0.24s ease, transform 0.24s ease;
 }
 
 body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-top {
@@ -209,6 +284,10 @@ body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-nav .nav-link.active {
     background: rgba(255, 255, 255, 0.14);
     color: #ffffff;
     box-shadow: none;
+}
+
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-nav .nav-link.active .nav-icon {
+    color: #ffffff;
 }
 
 body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-nav .nav-icon {
@@ -306,6 +385,10 @@ body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-footer .logout:hover {
     color: #ffffff;
 }
 
+body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-footer .logout .bi {
+    flex-shrink: 0;
+}
+
 body.kemahasiswaan-layout .kemahasiswaan-sidebar .sidebar-nav::-webkit-scrollbar {
     width: 10px;
 }
@@ -348,10 +431,6 @@ body.kemahasiswaan-layout .table-responsive .table tbody tr td {
         padding: 0 14px;
     }
 
-    body.kemahasiswaan-layout .kemahasiswaan-header .sidebar-toggle {
-        display: inline-flex;
-    }
-
     body.kemahasiswaan-layout .kmh-shell-page-subtitle {
         display: none;
     }
@@ -365,6 +444,7 @@ body.kemahasiswaan-layout .table-responsive .table tbody tr td {
     body.kemahasiswaan-layout .kemahasiswaan-sidebar[aria-hidden="false"] {
         transform: translateX(0);
     }
+
 }
 
 @media (max-width: 640px) {
@@ -387,4 +467,5 @@ body.kemahasiswaan-layout .table-responsive .table tbody tr td {
     body.kemahasiswaan-layout .kemahasiswaan-sidebar .university {
         font-size: 0.84rem;
     }
+
 }

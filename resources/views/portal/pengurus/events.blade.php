@@ -17,11 +17,11 @@
             </div>
 
             <div class="ufo-kboard-item-actions mt-0">
-                <button class="ufo-kboard-btn primary" data-bs-toggle="collapse" data-bs-target="#eventCreateForm" type="button">
+                <button class="ufo-kboard-btn primary" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Buat Event Baru" data-modal-message="Form event baru tersedia pada area edit event. Modal ini memastikan tombol membuka dialog terlebih dahulu." type="button">
                     <i class="bi bi-plus-lg"></i>
                     Buat Event Baru
                 </button>
-                <button class="ufo-kboard-btn gold" data-bs-toggle="collapse" data-bs-target="#eventNewsForm" type="button">
+                <button class="ufo-kboard-btn gold" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Buat Berita Event" data-modal-message="Form berita event dibuka melalui modal agar tombol selalu memunculkan dialog." type="button">
                     <i class="bi bi-file-earmark-text"></i>
                     Buat Berita Event
                 </button>
@@ -44,12 +44,12 @@
 
             <label class="ufo-kboard-span-full">
                 <span class="ufo-kboard-item-meta">Nama Event</span>
-                <input type="text" class="ufo-kboard-field" placeholder="{{ $eventNamePlaceholder ?? 'Workshop AI & Machine Learning' }}">
+                <input type="text" class="ufo-kboard-field" placeholder="{{ $eventNamePlaceholder ?? '' }}">
             </label>
 
             <label class="ufo-kboard-span-full">
                 <span class="ufo-kboard-item-meta">Deskripsi</span>
-                <textarea class="ufo-kboard-textarea" placeholder="{{ $eventDescriptionPlaceholder ?? 'Jelaskan tujuan, agenda, dan manfaat event.' }}"></textarea>
+                <textarea class="ufo-kboard-textarea" placeholder="{{ $eventDescriptionPlaceholder ?? '' }}"></textarea>
             </label>
 
             <label>
@@ -64,7 +64,7 @@
 
             <label class="ufo-kboard-span-full">
                 <span class="ufo-kboard-item-meta">Lokasi / Platform</span>
-                <input type="text" class="ufo-kboard-field" placeholder="{{ $eventLocationPlaceholder ?? 'Aula Gedung A atau Zoom Meeting' }}">
+                <input type="text" class="ufo-kboard-field" placeholder="{{ $eventLocationPlaceholder ?? '' }}">
             </label>
 
             <label class="ufo-kboard-span-full">
@@ -74,8 +74,8 @@
         </div>
 
         <div class="ufo-kboard-item-actions mt-3">
-            <button class="ufo-kboard-btn primary" type="button">Publikasikan Event</button>
-            <button class="ufo-kboard-btn ghost" type="button" data-bs-toggle="collapse" data-bs-target="#eventCreateForm">Batal</button>
+            <button class="ufo-kboard-btn primary" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Publikasikan Event" data-modal-message="Aksi publikasi event dibuka sebagai modal konfirmasi." type="button">Publikasikan Event</button>
+            <button class="ufo-kboard-btn ghost" type="button" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Batal Buat Event" data-modal-message="Aksi batal dibuka sebagai modal konfirmasi.">Batal</button>
         </div>
     </section>
 
@@ -85,7 +85,7 @@
         <div class="ufo-kboard-row two">
             <label class="ufo-kboard-span-full">
                 <span class="ufo-kboard-item-meta">Judul Berita</span>
-                <input type="text" class="ufo-kboard-field" placeholder="{{ $eventNewsTitlePlaceholder ?? 'Berita Event Organisasi' }}">
+                <input type="text" class="ufo-kboard-field" placeholder="{{ $eventNewsTitlePlaceholder ?? '' }}">
             </label>
 
             <label class="ufo-kboard-span-full">
@@ -95,12 +95,12 @@
 
             <label class="ufo-kboard-span-full">
                 <span class="ufo-kboard-item-meta">Cerita Kegiatan</span>
-                <textarea class="ufo-kboard-textarea" placeholder="{{ $eventNewsDescriptionPlaceholder ?? 'Ceritakan bagaimana event berlangsung dan apa highlight-nya.' }}"></textarea>
+                <textarea class="ufo-kboard-textarea" placeholder="{{ $eventNewsDescriptionPlaceholder ?? '' }}"></textarea>
             </label>
 
             <label class="ufo-kboard-span-full">
                 <span class="ufo-kboard-item-meta">Highlight / Kesan Event</span>
-                <textarea class="ufo-kboard-textarea" placeholder="{{ $eventNewsHighlightPlaceholder ?? 'Sorot momen utama, capaian, atau hasil paling penting.' }}"></textarea>
+                <textarea class="ufo-kboard-textarea" placeholder="{{ $eventNewsHighlightPlaceholder ?? '' }}"></textarea>
             </label>
 
             <div class="ufo-kboard-span-full">
@@ -114,8 +114,8 @@
         </div>
 
         <div class="ufo-kboard-item-actions mt-3">
-            <button class="ufo-kboard-btn primary" type="button">Publikasikan Berita</button>
-            <button class="ufo-kboard-btn ghost" type="button" data-bs-toggle="collapse" data-bs-target="#eventNewsForm">Batal</button>
+            <button class="ufo-kboard-btn primary" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Publikasikan Berita" data-modal-message="Aksi publikasi berita event dibuka sebagai modal konfirmasi." type="button">Publikasikan Berita</button>
+            <button class="ufo-kboard-btn ghost" type="button" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Batal Buat Berita Event" data-modal-message="Aksi batal dibuka sebagai modal konfirmasi.">Batal</button>
         </div>
 
         <div class="alert alert-info mt-3 mb-0" role="alert">
@@ -157,8 +157,8 @@
                                 <p class="ufo-kboard-item-meta"><i class="bi bi-people"></i> {{ $event['registrants'] }} pendaftar</p>
 
                                 <div class="ufo-kboard-item-actions mt-3">
-                                    <a href="{{ route('portal.pengurus.events.create') }}" class="ufo-kboard-btn primary">Edit Event</a>
-                                    <a href="{{ route('portal.pengurus.events.detail', ['id' => $event['id']]) }}" class="ufo-kboard-btn ghost">Lihat Detail</a>
+                                    <a href="{{ route('portal.pengurus.events.create') }}" class="ufo-kboard-btn primary" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Edit Event" data-modal-message="Modal ini menampilkan form edit event.">Edit Event</a>
+                                    <a href="{{ route('portal.pengurus.events.detail', ['id' => $event['id']]) }}" class="ufo-kboard-btn ghost" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Lihat Detail Event" data-modal-message="Modal ini menampilkan detail event.">Lihat Detail</a>
                                 </div>
                             </div>
                         </article>
@@ -190,11 +190,11 @@
 
                                 <div class="ufo-kboard-item-actions mt-3">
                                     @if($event['has_news'])
-                                        <button class="ufo-kboard-btn primary" type="button">Lihat Berita</button>
+                                        <button class="ufo-kboard-btn primary" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Lihat Berita" data-modal-message="Modal ini menampilkan ringkasan berita event." type="button">Lihat Berita</button>
                                     @else
-                                        <button class="ufo-kboard-btn gold" type="button" data-bs-toggle="collapse" data-bs-target="#eventNewsForm">Buat Berita Event</button>
+                                        <button class="ufo-kboard-btn gold" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Buat Berita Event" data-modal-message="Modal ini dibuka untuk membuat berita event baru." type="button">Buat Berita Event</button>
                                     @endif
-                                    <button class="ufo-kboard-btn ghost" type="button">Detail</button>
+                                        <button class="ufo-kboard-btn ghost" data-bs-toggle="modal" data-bs-target="#ufoActionModal" data-modal-title="Detail Event" data-modal-message="Modal ini menampilkan detail event yang dipilih." type="button">Detail</button>
                                 </div>
                             </div>
                         </article>

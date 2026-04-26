@@ -6,6 +6,7 @@
 @section('page_class', 'kmh-page-kontak')
 
 @php
+    $ui = $ui ?? [];
     $kontakPengurus = $kontakPengurus ?? [];
     $contactSummary = $contactSummary ?? [
         'total_kontak' => 0,
@@ -15,9 +16,9 @@
     ];
 
     $organizationGroups = collect($kontakPengurus)
-        ->groupBy(fn (array $item) => trim((string) ($item['organisasi'] ?? '-')) !== ''
-            ? (string) ($item['organisasi'] ?? '-')
-            : '-')
+        ->groupBy(fn (array $item) => trim((string) ($item['organisasi'] ?? '')) !== ''
+            ? (string) ($item['organisasi'] ?? '')
+            : '')
         ->map(function ($items, $organizationName) {
             $organization = (string) $organizationName;
             $isBem = \Illuminate\Support\Str::contains(\Illuminate\Support\Str::lower($organization), 'bem');
@@ -51,12 +52,12 @@
                         ]));
 
                         return [
-                            'nama' => (string) ($member['nama'] ?? '-'),
-                            'jabatan' => (string) ($member['jabatan'] ?? '-'),
-                            'email' => (string) ($member['email'] ?? '-'),
-                            'kontak' => (string) ($member['kontak'] ?? '-'),
-                            'status_code' => (string) ($member['status_code'] ?? 'inactive'),
-                            'status_label' => (string) ($member['status_label'] ?? 'Nonaktif'),
+                            'nama' => (string) ($member['nama'] ?? ''),
+                            'jabatan' => (string) ($member['jabatan'] ?? ''),
+                            'email' => (string) ($member['email'] ?? ''),
+                            'kontak' => (string) ($member['kontak'] ?? ''),
+                            'status_code' => (string) ($member['status_code'] ?? ''),
+                            'status_label' => (string) ($member['status_label'] ?? ''),
                             'search_blob' => $searchBlob,
                         ];
                     })
@@ -86,8 +87,8 @@
             <div class="kmh-contact-hero">
                 <span class="kmh-contact-hero-icon"><i class="bi bi-people"></i></span>
                 <div>
-                    <h2>Kontak Pengurus UKM</h2>
-                    <p>Daftar kontak pengurus organisasi mahasiswa Universitas Klabat</p>
+                    <h2>{{ $ui['hero_title'] ?? '' }}</h2>
+                    <p>{{ $ui['hero_subtitle'] ?? '' }}</p>
                 </div>
             </div>
         </div>
@@ -100,8 +101,8 @@
                 <input
                     id="kmh-kontak-search"
                     type="search"
-                    placeholder="Cari organisasi berdasarkan nama, kategori, atau bidang..."
-                    aria-label="Cari organisasi berdasarkan nama, kategori, atau bidang"
+                    placeholder="{{ $ui['search_placeholder'] ?? '' }}"
+                    aria-label="{{ $ui['search_aria'] ?? '' }}"
                 >
             </label>
         </div>
@@ -110,21 +111,21 @@
     <section class="kmh-contact-mini-stats" aria-label="Ringkasan organisasi">
         <article class="kmh-contact-mini-card">
             <div>
-                <p>Total Organisasi</p>
+                <p>{{ $ui['total_org_label'] ?? '' }}</p>
                 <strong>{{ $organizationGroups->count() }}</strong>
             </div>
             <span><i class="bi bi-people"></i></span>
         </article>
         <article class="kmh-contact-mini-card">
             <div>
-                <p>BEM</p>
+                <p>{{ $ui['bem_label'] ?? '' }}</p>
                 <strong>{{ $bemCount }}</strong>
             </div>
             <span><i class="bi bi-people"></i></span>
         </article>
         <article class="kmh-contact-mini-card">
             <div>
-                <p>UKM</p>
+                <p>{{ $ui['ukm_label'] ?? '' }}</p>
                 <strong>{{ $ukmCount }}</strong>
             </div>
             <span><i class="bi bi-people"></i></span>
@@ -153,15 +154,15 @@
 
                             <p>
                                 <i class="bi bi-telephone"></i>
-                                <span>{{ !empty($member['kontak']) && $member['kontak'] !== '-' ? $member['kontak'] : 'Kontak belum tersedia' }}</span>
+                                <span>{{ !empty($member['kontak']) ? $member['kontak'] : ($ui['contact_unavailable'] ?? '') }}</span>
                             </p>
 
                             <p>
                                 <i class="bi bi-envelope"></i>
-                                @if(!empty($member['email']) && $member['email'] !== '-')
+                                @if(!empty($member['email']))
                                     <a href="mailto:{{ $member['email'] }}">{{ $member['email'] }}</a>
                                 @else
-                                    <span>Email belum tersedia</span>
+                                    <span>{{ $ui['email_unavailable'] ?? '' }}</span>
                                 @endif
                             </p>
                         </article>
@@ -171,7 +172,7 @@
         @empty
             <article class="kmh-card">
                 <div class="kmh-card-body">
-                    <p class="kmh-empty-row mb-0">Belum ada data kontak pengurus UKM.</p>
+                    <p class="kmh-empty-row mb-0">{{ $ui['empty_state'] ?? '' }}</p>
                 </div>
             </article>
         @endforelse
@@ -180,7 +181,7 @@
     @if($organizationGroups->count() > 0)
         <section class="kmh-card d-none" data-kmh-contact-empty-state>
             <div class="kmh-card-body">
-                <p class="kmh-empty-row mb-0">Tidak ada organisasi yang cocok dengan kata kunci pencarian.</p>
+                <p class="kmh-empty-row mb-0">{{ $ui['search_empty_state'] ?? '' }}</p>
             </div>
         </section>
     @endif

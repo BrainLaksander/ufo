@@ -46,6 +46,7 @@
     var orgFilter = @json($orgFilter);
     var organizations = @json($organizations);
     var ui = @json($ui);
+    var allCategory = @json($categories[0] ?? '');
 
     var searchInput = document.getElementById('event-search');
     var categoryButtons = Array.from(document.querySelectorAll('[data-event-category]'));
@@ -55,7 +56,7 @@
     var emptyMessage = document.getElementById('event-empty-message');
     var showAll = document.getElementById('event-show-all');
 
-    var currentCategory = 'Semua';
+    var currentCategory = allCategory;
 
     function byOrgName(orgId) {
         var found = organizations.find(function (item) {
@@ -90,7 +91,7 @@
         var filtered = events.filter(function (event) {
             var matchSearch = (event.title || '').toLowerCase().includes(query) ||
                 (event.organizer || '').toLowerCase().includes(query);
-            var matchCategory = currentCategory === 'Semua' || event.category === currentCategory;
+            var matchCategory = currentCategory === allCategory || event.category === currentCategory;
             var matchOrg = !orgFilter || String(event.organizer_id) === String(orgFilter);
 
             return matchSearch && matchCategory && matchOrg;
@@ -120,7 +121,7 @@
 
     categoryButtons.forEach(function (button) {
         button.addEventListener('click', function () {
-            currentCategory = button.getAttribute('data-event-category') || 'Semua';
+            currentCategory = button.getAttribute('data-event-category') || allCategory;
             categoryButtons.forEach(function (item) { item.classList.remove('is-active'); });
             button.classList.add('is-active');
             render();

@@ -4,9 +4,11 @@ namespace App\Http\Controllers\Pengurus;
 
 use App\Http\Controllers\Controller;
 use Carbon\Carbon;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
@@ -104,6 +106,102 @@ class IzinKegiatanWorkflowController extends Controller
         return back()->with('success', $this->refLabel('flash_message', 'profile_updated'));
     }
 
+    public function updatePengurusMembersProfile(Request $request): RedirectResponse
+    {
+        $context = $this->resolvePengurusContext($request);
+
+        if (!$context['organization_id']) {
+            return back()->with('error', $this->refLabel('flash_message', 'org_context_missing'));
+        }
+
+        $validated = $request->validate([
+            'category' => 'nullable|string|max:80',
+            'type' => 'nullable|string|max:20',
+            'level' => 'nullable|string|max:40',
+            'field' => 'nullable|string|max:120',
+            'vision_text' => 'nullable|string|max:2000',
+            'mission_text' => 'nullable|string|max:4000',
+            'culture_text' => 'nullable|string|max:4000',
+            'email' => 'nullable|email|max:120',
+            'phone' => 'nullable|string|max:40',
+            'instagram' => 'nullable|string|max:120',
+            'line' => 'nullable|string|max:120',
+            'values_text' => 'nullable|string|max:12000',
+            'programs_text' => 'nullable|string|max:20000',
+            'structure_text' => 'nullable|string|max:12000',
+            'contacts_text' => 'nullable|string|max:12000',
+            'logo_file' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:2048',
+            'banner_file' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:5120',
+        ]);
+
+        $table = 'organizations';
+
+        $payload = [
+            'vision' => $validated['vision_text'] ?? null,
+            'mission' => $validated['mission_text'] ?? null,
+            'description' => $validated['culture_text'] ?? null,
+            'email' => $validated['email'] ?? null,
+            'phone' => $validated['phone'] ?? null,
+            'instagram' => $validated['instagram'] ?? null,
+            'line' => $validated['line'] ?? null,
+            'updated_at' => now(),
+        ];
+
+        if (Schema::hasColumn($table, 'category')) {
+            $payload['category'] = $validated['category'] ?? null;
+        }
+
+        if (Schema::hasColumn($table, 'type')) {
+            $payload['type'] = $validated['type'] ?? null;
+        }
+
+        if (Schema::hasColumn($table, 'level')) {
+            $payload['level'] = $validated['level'] ?? null;
+        }
+
+        if (Schema::hasColumn($table, 'field')) {
+            $payload['field'] = $validated['field'] ?? null;
+        }
+
+        if ($request->hasFile('logo_file')) {
+            $payload['logo'] = $this->storeOrganizationMedia(
+                $request->file('logo_file'),
+                (int) $context['organization_id'],
+                'logo'
+            );
+        }
+
+        if ($request->hasFile('banner_file')) {
+            $payload['banner'] = $this->storeOrganizationMedia(
+                $request->file('banner_file'),
+                (int) $context['organization_id'],
+                'banner'
+            );
+        }
+
+        if (Schema::hasColumn($table, 'profile_values_json')) {
+            $payload['profile_values_json'] = json_encode($this->parseProfileRows($validated['values_text'] ?? '', ['name', 'desc'], 20), JSON_UNESCAPED_UNICODE);
+        }
+
+        if (Schema::hasColumn($table, 'profile_programs_json')) {
+            $payload['profile_programs_json'] = json_encode($this->parseProfileRows($validated['programs_text'] ?? '', ['nama', 'periode', 'tujuan', 'kegiatan', 'output'], 30), JSON_UNESCAPED_UNICODE);
+        }
+
+        if (Schema::hasColumn($table, 'profile_structure_json')) {
+            $payload['profile_structure_json'] = json_encode($this->parseProfileRows($validated['structure_text'] ?? '', ['jabatan', 'nama'], 40), JSON_UNESCAPED_UNICODE);
+        }
+
+        if (Schema::hasColumn($table, 'profile_contacts_json')) {
+            $payload['profile_contacts_json'] = json_encode($this->parseProfileRows($validated['contacts_text'] ?? '', ['nama', 'jabatan', 'whatsapp'], 40), JSON_UNESCAPED_UNICODE);
+        }
+
+        DB::table($table)
+            ->where('id', $context['organization_id'])
+            ->update($payload);
+
+        return back()->with('success', $this->refLabel('flash_message', 'profile_updated'));
+    }
+
     public function kemahasiswaanIndex(): View
     {
         $workflowPengajuan = $this->getPengajuan();
@@ -114,6 +212,7 @@ class IzinKegiatanWorkflowController extends Controller
             'workflowLaporan' => $workflowLaporan,
             'jadwalKegiatan' => $this->getJadwal(),
             'organizations' => $this->getOrganizations(),
+            'ui' => $this->buildKemahasiswaanPengajuanUiText(),
             'headerNotificationCount' => $this->countKemahasiswaanPendingNotifications($workflowPengajuan, $workflowLaporan),
         ]);
     }
@@ -124,18 +223,33 @@ class IzinKegiatanWorkflowController extends Controller
         $organizationId = $context['organization_id'];
 
         $month = now()->startOfMonth();
+        $monthQuery = trim((string) $request->query('bulan', ''));
+
+        if (preg_match('/^\d{4}-\d{2}$/', $monthQuery) === 1) {
+            try {
+                $month = Carbon::createFromFormat('Y-m', $monthQuery)->startOfMonth();
+            } catch (\Throwable) {
+                $month = now()->startOfMonth();
+            }
+        }
+
         $start = $month->copy()->startOfMonth()->startOfWeek(Carbon::SUNDAY);
         $end = $month->copy()->endOfMonth()->endOfWeek(Carbon::SATURDAY);
 
         $activities = $this->getDashboardActivities($organizationId, $start, $end);
+        [$profileStatusValue, $profileStatusLabel] = $this->buildDashboardProfileStatus($organizationId);
 
         return view('portal.pengurus.dashboard', [
             'activities' => $activities,
-            'summaryCards' => $this->buildDashboardSummaryCards($activities, $organizationId),
+            'summaryCards' => $this->buildDashboardSummaryCards($activities, $organizationId, $month),
             'legendItems' => $this->buildDashboardLegend($activities),
             'calendarDays' => $this->buildCalendarDays($activities, $month, $start, $end, now()),
             'pendingTasks' => $this->getPendingTasks($organizationId),
             'monthLabel' => $month->translatedFormat('F Y'),
+            'prevMonth' => $month->copy()->subMonth()->format('Y-m'),
+            'nextMonth' => $month->copy()->addMonth()->format('Y-m'),
+            'profileStatusValue' => $profileStatusValue,
+            'profileStatusLabel' => $profileStatusLabel,
             ...$this->buildPengurusShellData($organizationId),
         ]);
     }
@@ -421,6 +535,9 @@ class IzinKegiatanWorkflowController extends Controller
                 ->first();
         }
 
+        $logoUrl = $this->resolveOrganizationMediaUrl((string) ($organization->logo ?? ''));
+        $bannerUrl = $this->resolveOrganizationMediaUrl((string) ($organization->banner ?? ''));
+
         $members = collect();
         if ($organizationId && Schema::hasTable('members')) {
             $members = DB::table('members')
@@ -430,6 +547,11 @@ class IzinKegiatanWorkflowController extends Controller
                 ->orderBy('name')
                 ->get();
         }
+
+        $storedValues = $this->decodeProfileList($organization, 'profile_values_json', ['name', 'desc']);
+        $storedPrograms = $this->decodeProfileList($organization, 'profile_programs_json', ['nama', 'periode', 'tujuan', 'kegiatan', 'output']);
+        $storedStructure = $this->decodeProfileList($organization, 'profile_structure_json', ['jabatan', 'nama']);
+        $storedContacts = $this->decodeProfileList($organization, 'profile_contacts_json', ['nama', 'jabatan', 'whatsapp']);
 
         $programKegiatan = [];
         if ($organizationId && Schema::hasTable('events')) {
@@ -471,6 +593,18 @@ class IzinKegiatanWorkflowController extends Controller
             ])
             ->values()
             ->all();
+
+        if (empty($programKegiatan) && !empty($storedPrograms)) {
+            $programKegiatan = $storedPrograms;
+        }
+
+        if (empty($struktur) && !empty($storedStructure)) {
+            $struktur = $storedStructure;
+        }
+
+        if (empty($kontakPengurus) && !empty($storedContacts)) {
+            $kontakPengurus = $storedContacts;
+        }
 
         $socialMedia = [];
         if ($organization) {
@@ -531,16 +665,29 @@ class IzinKegiatanWorkflowController extends Controller
 
         return view('portal.pengurus.members', [
             'kategoriOptions' => $kategoriOptions,
-            'activeKategori' => $this->inferOrganizationCategory($organization),
+            'activeKategori' => (string) ($organization->category ?? $this->inferOrganizationCategory($organization)),
             'programKegiatan' => $programKegiatan,
             'struktur' => $struktur,
             'kontakPengurus' => $kontakPengurus,
             'socialMedia' => $socialMedia,
-            'values' => $this->missionToValues($organization?->mission),
+            'values' => !empty($storedValues) ? $storedValues : $this->missionToValues($organization?->mission),
             'profileCompletion' => $profileCompletion,
             'visionText' => (string) ($organization?->vision ?? ''),
             'missionText' => (string) ($organization?->mission ?? ''),
             'cultureText' => (string) ($organization?->description ?? ''),
+            'organizationType' => (string) ($organization->type ?? ''),
+            'organizationLevel' => (string) ($organization->level ?? ''),
+            'organizationField' => (string) ($organization->field ?? ''),
+            'contactEmail' => (string) ($organization->email ?? ''),
+            'contactPhone' => (string) ($organization->phone ?? ''),
+            'contactInstagram' => (string) ($organization->instagram ?? ''),
+            'contactLine' => (string) ($organization->line ?? ''),
+            'valuesText' => $this->formatProfileRows(!empty($storedValues) ? $storedValues : $this->missionToValues($organization?->mission), ['name', 'desc']),
+            'programsText' => $this->formatProfileRows($programKegiatan, ['nama', 'periode', 'tujuan', 'kegiatan', 'output']),
+            'structureText' => $this->formatProfileRows($struktur, ['jabatan', 'nama']),
+            'contactsText' => $this->formatProfileRows($kontakPengurus, ['nama', 'jabatan', 'whatsapp']),
+            'logoUrl' => $logoUrl,
+            'bannerUrl' => $bannerUrl,
             ...$this->buildPengurusShellData($organizationId),
         ]);
     }
@@ -587,6 +734,7 @@ class IzinKegiatanWorkflowController extends Controller
 
         return view('portal.pengurus.applications', [
             'contacts' => $mappedContacts,
+            'supportInfo' => $this->buildPengurusSupportInfo(),
             ...$this->buildPengurusShellData($organizationId),
         ]);
     }
@@ -955,21 +1103,39 @@ class IzinKegiatanWorkflowController extends Controller
         $validated = $request->validate([
             'judul' => 'required|string|max:120',
             'organization_id' => 'required|integer|exists:organizations,id',
-            'tanggal' => 'required|date',
+            'tanggal_mulai' => 'nullable|date|required_without:tanggal',
+            'tanggal' => 'nullable|date|required_without:tanggal_mulai',
+            'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
+            'kategori' => 'nullable|string|in:acad,org,restricted,holiday,campus',
             'lokasi' => 'required|string|max:120',
+            'deskripsi' => 'nullable|string|max:4000',
         ]);
 
-        DB::table('kemahasiswaan_schedules')->insert([
+        $startRaw = $validated['tanggal_mulai'] ?? $validated['tanggal'] ?? null;
+        $endRaw = $validated['tanggal_selesai'] ?? $startRaw;
+        $kategori = $validated['kategori'] ?? 'org';
+
+        $insertPayload = [
             'organization_id' => (int) $validated['organization_id'],
             'title' => $validated['judul'],
-            'start_at' => Carbon::parse($validated['tanggal'])->startOfDay(),
-            'end_at' => null,
+            'start_at' => Carbon::parse((string) $startRaw)->startOfDay(),
+            'end_at' => $endRaw ? Carbon::parse((string) $endRaw)->endOfDay() : null,
             'location' => $validated['lokasi'],
             'status' => 'planned',
             'created_by' => $this->resolveSessionUserId($request),
             'created_at' => now(),
             'updated_at' => now(),
-        ]);
+        ];
+
+        if (Schema::hasColumn('kemahasiswaan_schedules', 'category')) {
+            $insertPayload['category'] = $kategori;
+        }
+
+        if (Schema::hasColumn('kemahasiswaan_schedules', 'description')) {
+            $insertPayload['description'] = $validated['deskripsi'] ?? null;
+        }
+
+        DB::table('kemahasiswaan_schedules')->insert($insertPayload);
 
         return back()->with('success', $this->refLabel('flash_message', 'schedule_created'));
     }
@@ -1063,69 +1229,102 @@ class IzinKegiatanWorkflowController extends Controller
     private function buildPengurusPlaceholderData(?string $organizationName): array
     {
         $organization = trim((string) $organizationName);
-        $organizationSuffix = $organization !== '' ? ' untuk ' . $organization : '';
+        $withOrganization = static function (string $text) use ($organization): string {
+            if ($text === '') {
+                return '';
+            }
+
+            return str_replace('{organization}', $organization, $text);
+        };
 
         return [
-            'eventNamePlaceholder' => $organization !== '' ? 'Workshop ' . $organization : 'Workshop AI & Machine Learning',
-            'eventLocationPlaceholder' => 'Aula Gedung A atau Zoom Meeting',
-            'eventDescriptionPlaceholder' => 'Jelaskan tujuan, agenda, dan manfaat event' . $organizationSuffix . '.',
-            'proposalTitlePlaceholder' => $organization !== '' ? 'Proposal ' . $organization : 'Proposal Kegiatan Organisasi',
-            'proposalDescriptionPlaceholder' => 'Jelaskan detail kegiatan yang akan diajukan' . $organizationSuffix . '.',
-            'reportTitlePlaceholder' => $organization !== '' ? 'Laporan ' . $organization : 'Laporan Kegiatan Organisasi',
-            'reportContentPlaceholder' => 'Ceritakan hasil kegiatan, evaluasi, dan dampak program' . $organizationSuffix . '.',
-            'announcementTitlePlaceholder' => $organization !== '' ? 'Pengumuman ' . $organization : 'Pengumuman Organisasi',
-            'announcementDescriptionPlaceholder' => 'Jelaskan isi pengumuman di sini' . $organizationSuffix . '.',
-            'eventNewsTitlePlaceholder' => $organization !== '' ? 'Berita ' . $organization : 'Berita Event Organisasi',
-            'eventNewsDescriptionPlaceholder' => 'Ceritakan bagaimana event berlangsung dan apa highlight-nya' . $organizationSuffix . '.',
-            'eventNewsHighlightPlaceholder' => 'Sorot momen utama, capaian, atau hasil paling penting.',
+            'eventNamePlaceholder' => $withOrganization($this->refLabel('ui_text', 'pengurus_event_name_placeholder')),
+            'eventLocationPlaceholder' => $withOrganization($this->refLabel('ui_text', 'pengurus_event_location_placeholder')),
+            'eventDescriptionPlaceholder' => $withOrganization($this->refLabel('ui_text', 'pengurus_event_description_placeholder')),
+            'proposalTitlePlaceholder' => $withOrganization($this->refLabel('ui_text', 'pengurus_proposal_title_placeholder')),
+            'proposalDescriptionPlaceholder' => $withOrganization($this->refLabel('ui_text', 'pengurus_proposal_description_placeholder')),
+            'reportTitlePlaceholder' => $withOrganization($this->refLabel('ui_text', 'pengurus_report_title_placeholder')),
+            'reportContentPlaceholder' => $withOrganization($this->refLabel('ui_text', 'pengurus_report_content_placeholder')),
+            'announcementTitlePlaceholder' => $withOrganization($this->refLabel('ui_text', 'pengurus_announcement_title_placeholder')),
+            'announcementDescriptionPlaceholder' => $withOrganization($this->refLabel('ui_text', 'pengurus_announcement_description_placeholder')),
+            'eventNewsTitlePlaceholder' => $withOrganization($this->refLabel('ui_text', 'pengurus_event_news_title_placeholder')),
+            'eventNewsDescriptionPlaceholder' => $withOrganization($this->refLabel('ui_text', 'pengurus_event_news_description_placeholder')),
+            'eventNewsHighlightPlaceholder' => $withOrganization($this->refLabel('ui_text', 'pengurus_event_news_highlight_placeholder')),
+        ];
+    }
+
+    private function buildDashboardProfileStatus(?int $organizationId): array
+    {
+        $label = $this->refLabel('ui_text', 'pengurus_profile_status_label');
+
+        if (!$organizationId || !Schema::hasTable('organizations')) {
+            return ['', $label];
+        }
+
+        $org = DB::table('organizations')
+            ->select(['description', 'vision', 'mission', 'email', 'phone', 'instagram', 'line', 'logo'])
+            ->where('id', $organizationId)
+            ->first();
+
+        if (!$org) {
+            return ['', $label];
+        }
+
+        $fields = ['description', 'vision', 'mission', 'email', 'phone', 'instagram', 'line', 'logo'];
+        $filled = 0;
+
+        foreach ($fields as $field) {
+            if (!empty($org->{$field})) {
+                $filled++;
+            }
+        }
+
+        $percentage = (int) round(($filled / count($fields)) * 100);
+
+        return [$percentage . '%', $label];
+    }
+
+    private function buildPengurusSupportInfo(): array
+    {
+        $title = $this->refLabel('ui_text', 'pengurus_support_info_title');
+
+        $items = [
+            [
+                'icon' => $this->refLabel('ui_text', 'pengurus_support_info_icon_1'),
+                'text' => $this->refLabel('ui_text', 'pengurus_support_info_text_1'),
+            ],
+            [
+                'icon' => $this->refLabel('ui_text', 'pengurus_support_info_icon_2'),
+                'text' => $this->refLabel('ui_text', 'pengurus_support_info_text_2'),
+            ],
+            [
+                'icon' => $this->refLabel('ui_text', 'pengurus_support_info_icon_3'),
+                'text' => $this->refLabel('ui_text', 'pengurus_support_info_text_3'),
+            ],
+        ];
+
+        $items = collect($items)
+            ->filter(fn ($item) => trim((string) ($item['text'] ?? '')) !== '')
+            ->values()
+            ->all();
+
+        if ($title === '' && empty($items)) {
+            return [];
+        }
+
+        return [
+            'title' => $title,
+            'items' => $items,
         ];
     }
 
     private function getDashboardActivities(?int $organizationId, Carbon $start, Carbon $end): array
     {
-        $activities = [];
-
-        if (Schema::hasTable('events')) {
-            $query = DB::table('events as evt')
-                ->leftJoin('organizations as org', 'org.id', '=', 'evt.organization_id')
-                ->select([
-                    'evt.name',
-                    'evt.start_date',
-                    'evt.end_date',
-                    'evt.status',
-                    'org.name as organizer',
-                ])
-                ->whereDate('evt.start_date', '<=', $end->toDateString())
-                ->whereDate('evt.end_date', '>=', $start->toDateString())
-                ->orderBy('evt.start_date')
-                ->limit(300);
-
-            if ($organizationId) {
-                $query->where('evt.organization_id', $organizationId);
-            }
-
-            $eventActivities = $query->get()->map(function ($row) {
-                $status = Str::lower((string) $row->status);
-
-                $category = trim($this->refLabel('event_status_category_map', $status));
-                if ($category === '') {
-                    $category = trim($this->refLabel('event_status_category_map', 'default'));
-                }
-
-                return [
-                    'name' => (string) $row->name,
-                    'category' => $category,
-                    'emoji' => $this->dashboardEmojiForCategory($category),
-                    'start' => Carbon::parse($row->start_date)->toDateString(),
-                    'end' => Carbon::parse($row->end_date ?: $row->start_date)->toDateString(),
-                    'organizer' => (string) ($row->organizer ?? ''),
-                ];
-            })->all();
-
-            $activities = array_merge($activities, $eventActivities);
-        }
-
+        // Keep source in sync with campus calendar: prioritize kemahasiswaan_schedules;
+        // fallback to events only when schedules table is unavailable.
         if (Schema::hasTable('kemahasiswaan_schedules')) {
+            $hasCategory = Schema::hasColumn('kemahasiswaan_schedules', 'category');
+
             $query = DB::table('kemahasiswaan_schedules as sch')
                 ->leftJoin('organizations as org', 'org.id', '=', 'sch.organization_id')
                 ->select([
@@ -1140,14 +1339,24 @@ class IzinKegiatanWorkflowController extends Controller
                 ->orderBy('sch.start_at')
                 ->limit(300);
 
+            if ($hasCategory) {
+                $query->addSelect('sch.category');
+            } else {
+                $query->selectRaw('NULL as category');
+            }
+
             if ($organizationId) {
                 $query->where('sch.organization_id', $organizationId);
             }
 
-            $scheduleActivities = $query->get()->map(function ($row) {
+            return $query->get()->map(function ($row) {
                 $status = Str::lower((string) $row->status);
+                $category = trim((string) ($row->category ?? ''));
 
-                $category = trim($this->refLabel('schedule_status_category_map', $status));
+                if ($category === '') {
+                    $category = trim($this->refLabel('schedule_status_category_map', $status));
+                }
+
                 if ($category === '') {
                     $category = trim($this->refLabel('schedule_status_category_map', 'default'));
                 }
@@ -1155,51 +1364,59 @@ class IzinKegiatanWorkflowController extends Controller
                 return [
                     'name' => (string) $row->title,
                     'category' => $category,
-                    'emoji' => $this->dashboardEmojiForCategory($category),
                     'start' => Carbon::parse($row->start_at)->toDateString(),
                     'end' => Carbon::parse($row->end_at ?: $row->start_at)->toDateString(),
                     'organizer' => (string) ($row->organizer ?? ''),
                 ];
             })->all();
-
-            $activities = array_merge($activities, $scheduleActivities);
         }
 
-        usort($activities, function ($left, $right) {
-            return strcmp((string) ($left['start'] ?? ''), (string) ($right['start'] ?? ''));
-        });
-
-        return $activities;
-    }
-
-    private function dashboardEmojiForCategory(string $category): string
-    {
-        $legend = $this->getReferencePayload('dashboard_legend', $category);
-        $emoji = trim((string) ($legend['emoji'] ?? ''));
-
-        if ($emoji !== '') {
-            return $emoji;
+        if (!Schema::hasTable('events')) {
+            return [];
         }
 
-        $fallback = $this->getReferencePayload('dashboard_setting', 'default_event');
+        $query = DB::table('events as evt')
+            ->leftJoin('organizations as org', 'org.id', '=', 'evt.organization_id')
+            ->select([
+                'evt.name',
+                'evt.start_date',
+                'evt.end_date',
+                'evt.status',
+                'org.name as organizer',
+            ])
+            ->whereDate('evt.start_date', '<=', $end->toDateString())
+            ->whereDate('evt.end_date', '>=', $start->toDateString())
+            ->orderBy('evt.start_date')
+            ->limit(300);
 
-        return trim((string) ($fallback['emoji'] ?? ''));
-    }
+        if ($organizationId) {
+            $query->where('evt.organization_id', $organizationId);
+        }
 
-    private function buildDashboardSummaryCards(array $activities, ?int $organizationId): array
-    {
-        $collection = collect($activities);
-        $currentMonth = now()->format('Y-m');
+        return $query->get()->map(function ($row) {
+            $status = Str::lower((string) $row->status);
 
-        $totalEvents = count($activities);
-        if (Schema::hasTable('events')) {
-            $eventQuery = DB::table('events');
-            if ($organizationId) {
-                $eventQuery->where('organization_id', $organizationId);
+            $category = trim($this->refLabel('event_status_category_map', $status));
+            if ($category === '') {
+                $category = trim($this->refLabel('event_status_category_map', 'default'));
             }
 
-            $totalEvents = (int) $eventQuery->count();
-        }
+            return [
+                'name' => (string) $row->name,
+                'category' => $category,
+                'start' => Carbon::parse($row->start_date)->toDateString(),
+                'end' => Carbon::parse($row->end_date ?: $row->start_date)->toDateString(),
+                'organizer' => (string) ($row->organizer ?? ''),
+            ];
+        })->all();
+    }
+
+    private function buildDashboardSummaryCards(array $activities, ?int $organizationId, Carbon $month): array
+    {
+        $collection = collect($activities);
+        $currentMonth = $month->format('Y-m');
+
+        $totalEvents = count($activities);
 
         return [
             [
@@ -1250,15 +1467,11 @@ class IzinKegiatanWorkflowController extends Controller
 
                 if (is_array($entry)) {
                     return [
-                        'emoji' => (string) ($entry['payload']['emoji'] ?? ''),
                         'label' => (string) ($entry['label'] ?? ''),
                     ];
                 }
 
-                $fallback = $this->getReferencePayload('dashboard_setting', 'default_event');
-
                 return [
-                    'emoji' => (string) ($fallback['emoji'] ?? ''),
                     'label' => Str::title((string) $category),
                 ];
             })
@@ -1279,12 +1492,10 @@ class IzinKegiatanWorkflowController extends Controller
 
                 if ($cursor->greaterThanOrEqualTo($activityStart) && $cursor->lessThanOrEqualTo($activityEnd)) {
                     $defaultCategory = trim($this->refLabel('dashboard_setting', 'default_category'));
-                    $defaultEvent = $this->getReferencePayload('dashboard_setting', 'default_event');
 
                     $matches[] = [
                         'name' => (string) $activity['name'],
                         'badge' => (string) ($activity['category'] ?? $defaultCategory),
-                        'emoji' => (string) ($activity['emoji'] ?? ($defaultEvent['emoji'] ?? '')),
                     ];
                 }
             }
@@ -1419,6 +1630,124 @@ class IzinKegiatanWorkflowController extends Controller
         })->all();
     }
 
+    private function decodeProfileList(?object $organization, string $column, array $keys): array
+    {
+        if (!$organization || !Schema::hasColumn('organizations', $column)) {
+            return [];
+        }
+
+        $raw = trim((string) ($organization->{$column} ?? ''));
+        if ($raw === '') {
+            return [];
+        }
+
+        $decoded = json_decode($raw, true);
+        if (!is_array($decoded)) {
+            return [];
+        }
+
+        return collect($decoded)
+            ->filter(fn ($row) => is_array($row))
+            ->map(function ($row) use ($keys) {
+                $item = [];
+                foreach ($keys as $key) {
+                    $item[$key] = trim((string) ($row[$key] ?? ''));
+                }
+
+                return $item;
+            })
+            ->filter(function ($row) {
+                foreach ($row as $value) {
+                    if ($value !== '') {
+                        return true;
+                    }
+                }
+
+                return false;
+            })
+            ->values()
+            ->all();
+    }
+
+    private function parseProfileRows(string $text, array $keys, int $maxItems = 20): array
+    {
+        $lines = preg_split('/\r\n|\r|\n/', trim($text)) ?: [];
+
+        return collect($lines)
+            ->map(fn ($line) => trim((string) $line))
+            ->filter(fn ($line) => $line !== '')
+            ->take($maxItems)
+            ->map(function ($line) use ($keys) {
+                $parts = array_map('trim', explode('|', $line));
+                $item = [];
+
+                foreach ($keys as $index => $key) {
+                    $item[$key] = (string) ($parts[$index] ?? '');
+                }
+
+                return $item;
+            })
+            ->filter(function ($row) {
+                foreach ($row as $value) {
+                    if ($value !== '') {
+                        return true;
+                    }
+                }
+
+                return false;
+            })
+            ->values()
+            ->all();
+    }
+
+    private function formatProfileRows(array $rows, array $keys): string
+    {
+        return collect($rows)
+            ->filter(fn ($row) => is_array($row))
+            ->map(function ($row) use ($keys) {
+                $values = [];
+
+                foreach ($keys as $key) {
+                    $values[] = trim((string) ($row[$key] ?? ''));
+                }
+
+                return implode('|', $values);
+            })
+            ->filter(fn ($line) => trim($line, '| ') !== '')
+            ->values()
+            ->implode("\n");
+    }
+
+    private function storeOrganizationMedia(UploadedFile $file, int $organizationId, string $type): string
+    {
+        $safeType = in_array($type, ['logo', 'banner'], true) ? $type : 'media';
+        $relativeDirectory = 'uploads/organizations/' . $organizationId;
+        $absoluteDirectory = public_path($relativeDirectory);
+
+        File::ensureDirectoryExists($absoluteDirectory);
+
+        $extension = strtolower((string) ($file->getClientOriginalExtension() ?: 'jpg'));
+        $fileName = $safeType . '_' . now()->format('YmdHis') . '_' . Str::random(10) . '.' . $extension;
+
+        $file->move($absoluteDirectory, $fileName);
+
+        return $relativeDirectory . '/' . $fileName;
+    }
+
+    private function resolveOrganizationMediaUrl(string $path): string
+    {
+        $trimmed = trim($path);
+        if ($trimmed === '') {
+            return '';
+        }
+
+        if (Str::startsWith($trimmed, ['http://', 'https://', '//'])) {
+            return $trimmed;
+        }
+
+        return asset(ltrim($trimmed, '/'));
+    }
+
     private function formatWhatsappLink(string $phone): string
     {
         $digits = preg_replace('/[^0-9]/', '', $phone) ?: '';
@@ -1503,25 +1832,54 @@ class IzinKegiatanWorkflowController extends Controller
 
     private function getJadwal(): array
     {
-        $rows = DB::table('kemahasiswaan_schedules as jadwal')
+        $hasCategory = Schema::hasColumn('kemahasiswaan_schedules', 'category');
+        $hasDescription = Schema::hasColumn('kemahasiswaan_schedules', 'description');
+
+        $query = DB::table('kemahasiswaan_schedules as jadwal')
             ->leftJoin('organizations as org', 'org.id', '=', 'jadwal.organization_id')
             ->select([
                 'jadwal.id',
                 'jadwal.title',
                 'jadwal.start_at',
+                'jadwal.end_at',
                 'jadwal.location',
                 'org.name as organization_name',
             ])
-            ->orderBy('jadwal.start_at')
-            ->get();
+            ->orderBy('jadwal.start_at');
+
+        if ($hasCategory) {
+            $query->addSelect('jadwal.category');
+        } else {
+            $query->selectRaw('NULL as category');
+        }
+
+        if ($hasDescription) {
+            $query->addSelect('jadwal.description');
+        } else {
+            $query->selectRaw('NULL as description');
+        }
+
+        $rows = $query->get();
 
         return $rows->map(function ($row) {
+            $startDate = $row->start_at ? Carbon::parse((string) $row->start_at) : null;
+            $endDate = $row->end_at ? Carbon::parse((string) $row->end_at) : $startDate;
+
             return [
                 'id' => (int) $row->id,
                 'judul' => $row->title,
                 'organisasi' => (string) ($row->organization_name ?? ''),
+                'kategori' => (string) ($row->category ?? 'org'),
                 'tanggal' => $this->normalizeDateField($row->start_at, $row->start_at),
+                'tanggal_mulai' => $startDate?->toDateString(),
+                'tanggal_selesai' => $endDate?->toDateString(),
+                'tanggal_range_label' => $startDate
+                    ? (($endDate && !$startDate->isSameDay($endDate))
+                        ? $startDate->translatedFormat('d M Y') . ' - ' . $endDate->translatedFormat('d M Y')
+                        : $startDate->translatedFormat('d M Y'))
+                    : '-',
                 'lokasi' => $row->location,
+                'deskripsi' => (string) ($row->description ?? ''),
             ];
         })->all();
     }
@@ -1645,6 +2003,38 @@ class IzinKegiatanWorkflowController extends Controller
             $label !== '' ? $label : $fallbackLabel,
             $value !== '' ? $value : $fallbackValue,
         ];
+    }
+
+    private function buildKemahasiswaanPengajuanUiText(): array
+    {
+        return $this->uiTextMap([
+            'all_statuses' => 'kmh_common_all_statuses',
+            'search_placeholder' => 'kmh_submission_search_placeholder',
+            'search_aria' => 'kmh_submission_search_aria',
+            'filter_scope_caption' => 'kmh_submission_filter_scope_caption',
+            'table_pengajuan_empty' => 'kmh_submission_table_empty',
+            'table_pengajuan_filter_empty' => 'kmh_submission_filter_empty',
+            'table_laporan_empty' => 'kmh_report_table_empty',
+            'table_laporan_filter_empty' => 'kmh_report_filter_empty',
+            'review_save_button' => 'kmh_common_save_button',
+            'review_note_placeholder' => 'kmh_common_review_note_placeholder',
+            'no_followup_action' => 'kmh_common_no_followup_action',
+            'schedule_form_warning' => 'kmh_schedule_form_warning',
+            'schedule_org_placeholder' => 'kmh_schedule_org_placeholder',
+            'schedule_save_button' => 'kmh_schedule_save_button',
+            'schedule_empty' => 'kmh_schedule_empty',
+        ]);
+    }
+
+    private function uiTextMap(array $keyCodeMap): array
+    {
+        $labels = [];
+
+        foreach ($keyCodeMap as $key => $code) {
+            $labels[$key] = $this->refLabel('ui_text', (string) $code);
+        }
+
+        return $labels;
     }
 
     private function refLabel(string $domain, string $code): string
