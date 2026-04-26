@@ -80,9 +80,8 @@
     <section class="kmh-card kmh-tab-card">
         <div class="kmh-card-body pt-0">
             <div class="kmh-tab-links" role="navigation" aria-label="Navigasi bagian review">
-                <a href="#bagian-pengajuan" class="kmh-tab-link is-active">Pengajuan Kegiatan</a>
+                 <a href="#bagian-pengajuan" class="kmh-tab-link is-active">Pengajuan Kegiatan</a>
                 <a href="#bagian-laporan" class="kmh-tab-link">Laporan Kegiatan (LPJ)</a>
-                <a href="#bagian-jadwal" class="kmh-tab-link">Jadwal Kegiatan</a>
             </div>
         </div>
     </section>
@@ -152,10 +151,17 @@
                             @endphp
                             <tr
                                 data-review-row
-                                data-review-table="pengajuan"
-                                data-review-status="{{ \Illuminate\Support\Str::slug((string) ($item['status'] ?? ''), '-') }}"
-                                data-review-search="{{ $rowSearch }}"
-                            >
+                                 data-review-table="pengajuan"
+                                 data-review-status="{{ \Illuminate\Support\Str::slug((string) ($item['status'] ?? ''), '-') }}"
+                                 data-review-search="{{ $rowSearch }}"
+                                 data-review-id="{{ $item['id'] }}"
+                                 data-review-judul="{{ $item['judul'] }}"
+                                 data-review-organisasi="{{ $item['organisasi'] }}"
+                                 data-review-tanggal="{{ \Carbon\Carbon::parse($item['tanggal_kegiatan'])->format('d M Y') }}"
+                                 data-review-deskripsi="{{ $item['deskripsi'] ?? '' }}"
+                                 data-review-file="{{ $item['file_path'] ?? '' }}"
+                                 data-review-catatan="{{ $item['catatan_departemen'] ?? '' }}"
+                             >
                                 <td>{{ $item['judul'] }}</td>
                                 <td>{{ $item['organisasi'] }}</td>
                                 <td>{{ \Carbon\Carbon::parse($item['tanggal_kegiatan'])->format('d M Y') }}</td>
@@ -163,24 +169,15 @@
                                     <span class="kmh-status-pill {{ $statusClass($item['status']) }}">{{ $item['status'] }}</span>
                                 </td>
                                 <td>{{ $item['catatan_departemen'] ?? '' }}</td>
-                                <td class="text-center">
-                                    @if(in_array($item['status'], $pendingStatuses, true))
-                                        <form method="POST" action="{{ route('portal.kemahasiswaan.pengajuan.review', ['id' => $item['id']]) }}" class="kmh-inline-review">
-                                            @csrf
-                                            <select name="decision" class="form-select form-select-sm">
-                                                <option value="disetujui">Setujui</option>
-                                                <option value="ditolak">Tolak</option>
-                                                <option value="revisi">Revisi</option>
-                                            </select>
-                                            <input type="text" name="catatan" class="form-control form-control-sm" placeholder="{{ $ui['review_note_placeholder'] ?? '' }}">
-                                            <button type="submit" class="btn btn-sm btn-primary kmh-review-submit-btn">
-                                                <i class="bi bi-check2-circle"></i>
-                                                <span>{{ $ui['review_save_button'] ?? '' }}</span>
-                                            </button>
-                                        </form>
-                                    @else
-                                        <small class="text-muted">{{ $ui['no_followup_action'] ?? '' }}</small>
-                                    @endif
+                                 <td class="text-center">
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-sm btn-primary kmh-review-btn" 
+                                        data-review-trigger="pengajuan"
+                                    >
+                                        <i class="bi bi-search"></i>
+                                        <span>Review</span>
+                                    </button>
                                 </td>
                             </tr>
                         @empty
@@ -200,7 +197,7 @@
         </div>
     </section>
 
-    <section id="bagian-laporan" class="kmh-card">
+    <section id="bagian-laporan" class="kmh-card d-none">
         <header class="kmh-card-head">
             <h2>Review Laporan Kegiatan (LPJ)</h2>
             <small>{{ count($workflowLaporan) }} data laporan</small>
@@ -229,10 +226,17 @@
                             @endphp
                             <tr
                                 data-review-row
-                                data-review-table="laporan"
-                                data-review-status="{{ \Illuminate\Support\Str::slug((string) ($item['status'] ?? ''), '-') }}"
-                                data-review-search="{{ $rowSearch }}"
-                            >
+                                 data-review-table="laporan"
+                                 data-review-status="{{ \Illuminate\Support\Str::slug((string) ($item['status'] ?? ''), '-') }}"
+                                 data-review-search="{{ $rowSearch }}"
+                                 data-review-id="{{ $item['id'] }}"
+                                 data-review-judul="{{ $item['judul'] }}"
+                                 data-review-organisasi="{{ $item['organisasi'] }}"
+                                 data-review-tanggal="{{ \Carbon\Carbon::parse($item['tanggal_laporan'])->format('d M Y') }}"
+                                 data-review-deskripsi="{{ $item['konten'] ?? '' }}"
+                                 data-review-file="{{ $item['attachment'] ?? '' }}"
+                                 data-review-catatan="{{ $item['catatan_departemen'] ?? '' }}"
+                             >
                                 <td>{{ $item['judul'] }}</td>
                                 <td>{{ $item['organisasi'] }}</td>
                                 <td>{{ \Carbon\Carbon::parse($item['tanggal_laporan'])->format('d M Y') }}</td>
@@ -240,24 +244,15 @@
                                     <span class="kmh-status-pill {{ $statusClass($item['status']) }}">{{ $item['status'] }}</span>
                                 </td>
                                 <td>{{ $item['catatan_departemen'] ?? '' }}</td>
-                                <td class="text-center">
-                                    @if(in_array($item['status'], $pendingStatuses, true))
-                                        <form method="POST" action="{{ route('portal.kemahasiswaan.laporan.review', ['id' => $item['id']]) }}" class="kmh-inline-review">
-                                            @csrf
-                                            <select name="decision" class="form-select form-select-sm">
-                                                <option value="disetujui">Setujui</option>
-                                                <option value="ditolak">Tolak</option>
-                                                <option value="revisi">Revisi</option>
-                                            </select>
-                                            <input type="text" name="catatan" class="form-control form-control-sm" placeholder="{{ $ui['review_note_placeholder'] ?? '' }}">
-                                            <button type="submit" class="btn btn-sm btn-primary kmh-review-submit-btn">
-                                                <i class="bi bi-check2-circle"></i>
-                                                <span>{{ $ui['review_save_button'] ?? '' }}</span>
-                                            </button>
-                                        </form>
-                                    @else
-                                        <small class="text-muted">{{ $ui['no_followup_action'] ?? '' }}</small>
-                                    @endif
+                                 <td class="text-center">
+                                    <button 
+                                        type="button" 
+                                        class="btn btn-sm btn-primary kmh-review-btn" 
+                                        data-review-trigger="laporan"
+                                    >
+                                        <i class="bi bi-search"></i>
+                                        <span>Review</span>
+                                    </button>
                                 </td>
                             </tr>
                         @empty
@@ -277,104 +272,113 @@
         </div>
     </section>
 
-    <section id="bagian-jadwal" class="kmh-grid-2 is-4-6">
-        <article class="kmh-card">
-            <header class="kmh-card-head">
-                <h2>Masukkan Jadwal Kegiatan</h2>
-            </header>
-            <div class="kmh-card-body">
-                @unless($hasOrganizations)
-                    <div class="alert alert-warning" role="alert">
-                        {{ $ui['schedule_form_warning'] ?? '' }}
-                    </div>
-                @endunless
+</div>
 
-                <form method="POST" action="{{ route('portal.kemahasiswaan.jadwal.store') }}" class="row g-2">
-                    @csrf
-                    <div class="col-12">
-                        <label class="form-label">Judul Kegiatan</label>
-                        <input type="text" name="judul" class="form-control" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Tanggal Mulai</label>
-                        <input type="date" name="tanggal_mulai" class="form-control" required>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Tanggal Selesai</label>
-                        <input type="date" name="tanggal_selesai" class="form-control">
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Kategori</label>
-                        <select name="kategori" class="form-select" required>
-                            <option value="acad">{{ $ui['category_akademik'] ?? 'Kegiatan Akademik' }}</option>
-                            <option value="org" selected>{{ $ui['category_organisasi'] ?? 'Kegiatan Organisasi' }}</option>
-                            <option value="restricted">{{ $ui['category_masa_tenang'] ?? 'Masa Tidak Boleh Berorganisasi' }}</option>
-                            <option value="holiday">{{ $ui['category_libur'] ?? 'Libur Akademik' }}</option>
-                            <option value="campus">{{ $ui['category_event_besar'] ?? 'Event Kampus Besar' }}</option>
-                        </select>
-                    </div>
-                    <div class="col-md-6">
-                        <label class="form-label">Organisasi</label>
-                        <select name="organization_id" class="form-select" required @disabled(!$hasOrganizations)>
-                            <option value="">{{ $ui['schedule_org_placeholder'] ?? '' }}</option>
-                            @foreach($organizations as $organization)
-                                <option value="{{ $organization['id'] }}">{{ $organization['name'] }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label">Lokasi</label>
-                        <input type="text" name="lokasi" class="form-control" required>
-                    </div>
-                    <div class="col-12">
-                        <label class="form-label">Deskripsi</label>
-                        <textarea name="deskripsi" class="form-control" rows="3"></textarea>
-                    </div>
-                    <div class="col-12 d-grid mt-2">
-                        <button type="submit" class="btn btn-primary kmh-form-action-btn" @disabled(!$hasOrganizations)>{{ $ui['schedule_save_button'] ?? '' }}</button>
-                    </div>
-                </form>
+<!-- Modal Review -->
+<div class="modal fade kmh-org-modal" id="kmh-review-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <div>
+                    <h5 class="modal-title fw-bold">Detail & Review <span id="kmh-review-modal-type"></span></h5>
+                    <small class="text-muted" id="kmh-review-modal-subtitle"></small>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
             </div>
-        </article>
+            <div class="modal-body">
+                <div class="mb-4">
+                    <div class="p-3 bg-light rounded-3 mb-4">
+                        <h6 class="fw-bold text-uppercase small text-muted mb-2">Informasi Berkas</h6>
+                        <h5 id="kmh-review-detail-title" class="fw-bold mb-3"></h5>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0 me-2 text-primary">
+                                        <i class="bi bi-building fs-5"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Organisasi</small>
+                                        <span id="kmh-review-detail-org" class="fw-medium"></span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="d-flex align-items-center">
+                                    <div class="flex-shrink-0 me-2 text-primary">
+                                        <i class="bi bi-calendar-event fs-5"></i>
+                                    </div>
+                                    <div>
+                                        <small class="text-muted d-block">Tanggal Diajukan</small>
+                                        <span id="kmh-review-detail-date" class="fw-medium"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
 
-        <article class="kmh-card">
-            <header class="kmh-card-head">
-                <h2>Jadwal Kegiatan Aktif</h2>
-                <small>{{ count($jadwalKegiatan) }} data jadwal</small>
-            </header>
-            <div class="kmh-card-body pt-0">
-                <div class="table-responsive">
-                    <table class="table kmh-table">
-                        <thead>
-                            <tr>
-                                <th>Kegiatan</th>
-                                <th>Organisasi</th>
-                                <th>Tanggal</th>
-                                <th>Kategori</th>
-                                <th>Lokasi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @forelse($jadwalKegiatan as $jadwal)
-                                <tr>
-                                    <td>{{ $jadwal['judul'] }}</td>
-                                    <td>{{ $jadwal['organisasi'] }}</td>
-                                    <td>{{ $jadwal['tanggal_range_label'] ?? \Carbon\Carbon::parse($jadwal['tanggal'])->format('d M Y') }}</td>
-                                    <td>{{ $jadwal['kategori'] ?? '' }}</td>
-                                    <td>{{ $jadwal['lokasi'] }}</td>
-                                </tr>
-                            @empty
-                                <tr>
-                                    <td colspan="5" class="kmh-empty-row">{{ $ui['schedule_empty'] ?? '' }}</td>
-                                </tr>
-                            @endforelse
-                        </tbody>
-                    </table>
+                    <h6 class="fw-bold mb-2"><i class="bi bi-text-paragraph me-1"></i> Deskripsi / Konten</h6>
+                    <div id="kmh-review-detail-desc" class="p-3 border rounded-3 mb-4 bg-white" style="white-space: pre-wrap; min-height: 120px; font-size: 0.95rem; line-height: 1.6;"></div>
+
+                    <div id="kmh-review-detail-file-container" class="mb-2">
+                        <h6 class="fw-bold mb-2"><i class="bi bi-paperclip me-1"></i> Lampiran File</h6>
+                        <div class="p-3 border rounded-3 bg-white d-flex align-items-center justify-content-between">
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-file-earmark-pdf fs-3 text-danger me-3"></i>
+                                <div>
+                                    <span class="d-block fw-medium">Dokumen Pendukung</span>
+                                    <small class="text-muted">Klik tombol di samping untuk mengunduh berkas</small>
+                                </div>
+                            </div>
+                            <a id="kmh-review-detail-file-link" href="#" target="_blank" class="btn btn-sm btn-primary px-3">
+                                <i class="bi bi-download me-1"></i>
+                                Unduh
+                            </a>
+                        </div>
+                        <div id="kmh-review-detail-no-file" class="p-3 border border-dashed rounded-3 text-center text-muted italic bg-light">
+                            Tidak ada lampiran file untuk berkas ini
+                        </div>
+                    </div>
+                </div>
+
+                <div class="kmh-review-section p-4 bg-primary bg-opacity-10 rounded-4 border border-primary border-opacity-25">
+                    <form id="kmh-review-modal-form" method="POST" action="">
+                        @csrf
+                        <div class="d-flex align-items-center mb-3">
+                            <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center me-2" style="width: 32px; height: 32px;">
+                                <i class="bi bi-pencil-square"></i>
+                            </div>
+                            <h6 class="fw-bold mb-0 text-primary">Tindakan Review & Keputusan</h6>
+                        </div>
+                        
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label class="form-label fw-medium small">Keputusan Final</label>
+                                <select name="decision" class="form-select border-primary border-opacity-25" required>
+                                    <option value="disetujui">Setujui (Approve)</option>
+                                    <option value="ditolak">Tolak (Disapprove)</option>
+                                    <option value="revisi">Minta Revisi</option>
+                                </select>
+                            </div>
+                            <div class="col-md-8">
+                                <label class="form-label fw-medium small">Komentar / Catatan Review</label>
+                                <textarea name="catatan" class="form-control border-primary border-opacity-25" rows="3" placeholder="Berikan alasan penolakan, instruksi revisi yang jelas, atau catatan khusus persetujuan..."></textarea>
+                            </div>
+                        </div>
+                    </form>
                 </div>
             </div>
-        </article>
-    </section>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-light px-4" data-bs-dismiss="modal">Batal</button>
+                <button type="submit" form="kmh-review-modal-form" class="btn btn-primary px-5 fw-bold">
+                    <i class="bi bi-check2-circle me-1"></i>
+                    Simpan Keputusan
+                </button>
+            </div>
+        </div>
+    </div>
 </div>
+
 @endsection
 
 @push('scripts')
@@ -383,12 +387,14 @@ document.addEventListener('DOMContentLoaded', function () {
     var searchInput = document.getElementById('kmh-review-search');
     var statusSelect = document.getElementById('kmh-review-status');
     var rows = Array.prototype.slice.call(document.querySelectorAll('[data-review-row]'));
-
-    if (!searchInput || !statusSelect || rows.length === 0) {
-        return;
-    }
+    
+    var reviewModalEl = document.getElementById('kmh-review-modal');
+    var reviewForm = document.getElementById('kmh-review-modal-form');
+    var reviewButtons = document.querySelectorAll('.kmh-review-btn');
 
     function applyFilter() {
+        if (!searchInput || !statusSelect || rows.length === 0) return;
+
         var query = (searchInput.value || '').toLowerCase().trim();
         var status = (statusSelect.value || 'semua').toLowerCase();
         var visibleByTable = {
@@ -420,8 +426,82 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    searchInput.addEventListener('input', applyFilter);
-    statusSelect.addEventListener('change', applyFilter);
+    if (reviewModalEl && reviewForm) {
+        var reviewModal = new bootstrap.Modal(reviewModalEl);
+
+        reviewButtons.forEach(function (button) {
+            button.addEventListener('click', function () {
+                var row = button.closest('[data-review-row]');
+                if (!row) return;
+
+                var type = button.getAttribute('data-review-trigger');
+                var id = row.getAttribute('data-review-id');
+                var judul = row.getAttribute('data-review-judul');
+                var org = row.getAttribute('data-review-organisasi');
+                var tanggal = row.getAttribute('data-review-tanggal');
+                var deskripsi = row.getAttribute('data-review-deskripsi');
+                var filePath = row.getAttribute('data-review-file');
+                var catatan = row.getAttribute('data-review-catatan');
+
+                document.getElementById('kmh-review-modal-type').textContent = type === 'pengajuan' ? 'Izin Kegiatan' : 'Laporan (LPJ)';
+                document.getElementById('kmh-review-modal-subtitle').textContent = 'Review berkas dari ' + org;
+                document.getElementById('kmh-review-detail-title').textContent = judul;
+                document.getElementById('kmh-review-detail-desc').textContent = deskripsi || '-';
+                document.getElementById('kmh-review-detail-org').textContent = org;
+                document.getElementById('kmh-review-detail-date').textContent = tanggal;
+
+                var fileLink = document.getElementById('kmh-review-detail-file-link');
+                var noFile = document.getElementById('kmh-review-detail-no-file');
+
+                if (filePath) {
+                    fileLink.href = '/storage/' + filePath;
+                    fileLink.parentElement.classList.remove('d-none');
+                    noFile.classList.add('d-none');
+                } else {
+                    fileLink.parentElement.classList.add('d-none');
+                    noFile.classList.remove('d-none');
+                }
+
+                reviewForm.querySelector('textarea[name="catatan"]').value = catatan || '';
+
+                var actionUrl = type === 'pengajuan' 
+                    ? '{{ route('portal.kemahasiswaan.pengajuan.review', ['id' => ':id']) }}'
+                    : '{{ route('portal.kemahasiswaan.laporan.review', ['id' => ':id']) }}';
+                reviewForm.setAttribute('action', actionUrl.replace(':id', id));
+
+                reviewModal.show();
+            });
+        });
+    }
+
+    // Tab switching logic
+    var tabLinks = document.querySelectorAll('.kmh-tab-link');
+    var sections = {
+        '#bagian-pengajuan': document.getElementById('bagian-pengajuan'),
+        '#bagian-laporan': document.getElementById('bagian-laporan')
+    };
+
+    tabLinks.forEach(function (link) {
+        link.addEventListener('click', function (e) {
+            e.preventDefault();
+            var targetId = link.getAttribute('href');
+
+            // Update active tab link
+            tabLinks.forEach(function (l) { l.classList.remove('is-active'); });
+            link.classList.add('is-active');
+
+            // Toggle sections
+            Object.keys(sections).forEach(function (id) {
+                if (sections[id]) {
+                    sections[id].classList.toggle('d-none', id !== targetId);
+                }
+            });
+        });
+    });
+
+    if (searchInput) searchInput.addEventListener('input', applyFilter);
+    if (statusSelect) statusSelect.addEventListener('change', applyFilter);
+    
     applyFilter();
 });
 </script>

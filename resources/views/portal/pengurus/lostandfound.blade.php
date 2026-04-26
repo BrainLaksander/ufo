@@ -37,9 +37,56 @@
                 <p>Menunggu Persetujuan</p>
             </article>
             <article class="ufo-kboard-stat green">
-                <h3>{{ count($priorityItems) }}</h3>
-                <p>Prioritas Tinggi</p>
+                <button class="ufo-kboard-btn light w-100 h-100" data-bs-toggle="modal" data-bs-target="#createLostFoundModal">
+                    <i class="bi bi-plus-circle mb-2 d-block fs-4"></i>
+                    Laporkan Barang
+                </button>
             </article>
+        </div>
+
+        <!-- Create Lost & Found Modal -->
+        <div class="modal fade" id="createLostFoundModal" tabindex="-1" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <form action="{{ route('portal.pengurus.lostandfound.store') }}" method="POST" enctype="multipart/form-data" class="modal-content">
+                    @csrf
+                    <div class="modal-header">
+                        <h5 class="modal-title">Laporkan Barang Hilang / Temuan</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row g-3">
+                            <div class="col-md-8">
+                                <label class="form-label">Nama Barang</label>
+                                <input type="text" name="item_name" class="form-control" placeholder="Contoh: Kunci Motor Honda, KTM atas nama..." required>
+                            </div>
+                            <div class="col-md-4">
+                                <label class="form-label">Jenis Laporan</label>
+                                <select name="type" class="form-select" required>
+                                    <option value="found">Barang Temuan</option>
+                                    <option value="lost">Barang Hilang</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Lokasi Ditemukan / Hilang</label>
+                                <input type="text" name="location_found" class="form-control" placeholder="Contoh: Depan GK1, Kantin, dll" required>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Deskripsi & Ciri-ciri</label>
+                                <textarea name="description" class="form-control" rows="3" placeholder="Jelaskan detail barang agar mudah diidentifikasi" required></textarea>
+                            </div>
+                            <div class="col-12">
+                                <label class="form-label">Foto Barang (Opsional)</label>
+                                <input type="file" name="image" class="form-control" accept="image/*">
+                                <div class="form-text">Format: JPG, PNG, WEBP. Maks: 5MB.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan Laporan</button>
+                    </div>
+                </form>
+            </div>
         </div>
     </section>
 

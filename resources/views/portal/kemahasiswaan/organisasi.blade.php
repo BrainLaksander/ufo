@@ -230,6 +230,7 @@
                                 data-org-type="{{ $org['type'] ?? '' }}"
                                 data-org-field="{{ $org['field'] ?? '' }}"
                                 data-org-leader="{{ $org['leader'] ?? '' }}"
+                                 data-org-account-email="{{ $org['account_email'] ?? '' }}"
                             >
                                 <td>
                                     <div class="kmh-org-name-cell">
@@ -408,8 +409,40 @@
                                     class="form-control"
                                     value="{{ old('phone') }}"
                                     maxlength="30"
-                                    placeholder="opsional"
+                                 >
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+                        <h6 class="mb-2">Akun Pengurus UKM</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="kmh-org-account-email" class="form-label">Email Akun (untuk Login)</label>
+                                <input
+                                    id="kmh-org-account-email"
+                                    type="email"
+                                    name="account_email"
+                                    class="form-control"
+                                    value="{{ old('account_email') }}"
+                                    maxlength="120"
+                                    placeholder="Contoh: ukm_seni@unklab.ac.id"
+                                    required
                                 >
+                                <small class="text-muted d-block mt-1">Email ini akan digunakan pengurus untuk masuk ke portal.</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="kmh-org-account-password" class="form-label">Buatkan Password</label>
+                                <input
+                                    id="kmh-org-account-password"
+                                    type="password"
+                                    name="account_password"
+                                    class="form-control"
+                                    minlength="6"
+                                    maxlength="40"
+                                    required
+                                    autocomplete="new-password"
+                                >
+                                <small class="text-muted d-block mt-1">Minimal 6 karakter. Berikan password ini kepada pengurus.</small>
                             </div>
                         </div>
                     </div>
@@ -555,6 +588,21 @@
                                 <input id="kmh-org-edit-phone" type="text" name="phone" class="form-control" value="{{ old('phone') }}" maxlength="30">
                             </div>
                         </div>
+
+                        <hr class="my-4">
+                        <h6 class="mb-2">Akun Pengurus UKM</h6>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="kmh-org-edit-account-email" class="form-label">Email Akun</label>
+                                <input id="kmh-org-edit-account-email" type="email" name="account_email" class="form-control" value="{{ old('account_email') }}" maxlength="120">
+                                <small class="text-muted d-block mt-1">Email login pengurus UKM.</small>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="kmh-org-edit-account-password" class="form-label">Ubah Password (opsional)</label>
+                                <input id="kmh-org-edit-account-password" type="password" name="account_password" class="form-control" minlength="6" maxlength="40" autocomplete="new-password">
+                                <small class="text-muted d-block mt-1">Kosongkan jika tidak ingin mengubah password.</small>
+                            </div>
+                        </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Batal</button>
@@ -594,6 +642,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var editTypeInput = document.getElementById('kmh-org-edit-type');
     var editLevelInput = document.getElementById('kmh-org-edit-level');
     var editFieldInput = document.getElementById('kmh-org-edit-field');
+    var editAccountEmailInput = document.getElementById('kmh-org-edit-account-email');
+    var editAccountPasswordInput = document.getElementById('kmh-org-edit-account-password');
     var detailName = document.getElementById('kmh-org-detail-name');
     var detailShortname = document.getElementById('kmh-org-detail-shortname');
     var detailStatus = document.getElementById('kmh-org-detail-status');
@@ -852,6 +902,8 @@ document.addEventListener('DOMContentLoaded', function () {
         if (editTypeInput) editTypeInput.value = row.getAttribute('data-org-type') || '';
         if (editLevelInput) editLevelInput.value = row.getAttribute('data-org-level') || row.getAttribute('data-org-scope') || '';
         if (editFieldInput) editFieldInput.value = row.getAttribute('data-org-field') || '';
+        if (editAccountEmailInput) editAccountEmailInput.value = row.getAttribute('data-org-account-email') || '';
+        if (editAccountPasswordInput) editAccountPasswordInput.value = '';
 
         var status = (row.getAttribute('data-org-status') || 'active').toLowerCase();
         if (editStatusInput) editStatusInput.value = ['active', 'inactive', 'suspended'].indexOf(status) !== -1 ? status : 'active';

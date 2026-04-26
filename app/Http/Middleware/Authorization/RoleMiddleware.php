@@ -6,25 +6,13 @@ use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * Middleware untuk memeriksa role user dari session('user')
- * 
- * Penggunaan di routes:
- * Route::group(['middleware' => 'role:kemahasiswaan,pengurus'], function () {
- *     // Routes yang hanya bisa diakses kemahasiswaan atau pengurus
- * });
- * 
- * Atau:
- * Route::get('/path', Controller@method)->middleware('role:kemahasiswaan');
- * Route::get('/path', Controller@method)->middleware('role:pengurus,kemahasiswaan');
- */
 class RoleMiddleware
 {
     /**
      * Handle an incoming request.
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
-     * @param  string  ...$roles Role-role yang diizinkan (comma-separated atau multiple parameters)
+     * @param  string  ...$roles Role-role yang diizinkan
      */
     public function handle(Request $request, Closure $next, ...$roles): Response
     {
@@ -35,7 +23,7 @@ class RoleMiddleware
             return redirect()->route('login');
         }
 
-        $userRole = strtolower((string) ($sessionUser['role'] ?? ''));
+        $userRole = strtolower(trim((string) ($sessionUser['role'] ?? '')));
 
         // Jika middleware role tidak diberi argumen, cukup pastikan user sudah login.
         if ($roles === []) {
@@ -52,7 +40,7 @@ class RoleMiddleware
         }
         $allowedRoles = array_values(array_unique(array_filter($allowedRoles)));
 
-        if (!in_array($userRole, $allowedRoles, true)) {
+        if ($userRole === '' || !in_array($userRole, $allowedRoles, true)) {
             abort(403, 'Unauthorized. User role tidak memiliki akses ke halaman ini.');
         }
 

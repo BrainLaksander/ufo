@@ -145,8 +145,21 @@ return new class extends Migration
                 ->delete();
         }
 
-        $indexExists = collect(DB::select("SHOW INDEX FROM kemahasiswaan_ukm_accounts WHERE Key_name = 'kmsa_account_org_unique'"))
-            ->isNotEmpty();
+        $indexExists = false;
+        try {
+            $indexExists = collect(Schema::getIndexes('kemahasiswaan_ukm_accounts'))
+                ->pluck('name')
+                ->contains('kmsa_account_org_unique');
+        } catch (\Exception $e) {
+            // Fallback for older Laravel or specific drivers if needed
+            $indices = DB::select("PRAGMA index_list('kemahasiswaan_ukm_accounts')");
+            foreach ($indices as $index) {
+                if ($index->name === 'kmsa_account_org_unique') {
+                    $indexExists = true;
+                    break;
+                }
+            }
+        }
 
         if (!$indexExists) {
             Schema::table('kemahasiswaan_ukm_accounts', function (Blueprint $table) {
@@ -161,8 +174,20 @@ return new class extends Migration
             return;
         }
 
-        $indexExists = collect(DB::select("SHOW INDEX FROM kemahasiswaan_ukm_accounts WHERE Key_name = 'kmsa_account_org_unique'"))
-            ->isNotEmpty();
+        $indexExists = false;
+        try {
+            $indexExists = collect(Schema::getIndexes('kemahasiswaan_ukm_accounts'))
+                ->pluck('name')
+                ->contains('kmsa_account_org_unique');
+        } catch (\Exception $e) {
+            $indices = DB::select("PRAGMA index_list('kemahasiswaan_ukm_accounts')");
+            foreach ($indices as $index) {
+                if ($index->name === 'kmsa_account_org_unique') {
+                    $indexExists = true;
+                    break;
+                }
+            }
+        }
 
         if ($indexExists) {
             Schema::table('kemahasiswaan_ukm_accounts', function (Blueprint $table) {

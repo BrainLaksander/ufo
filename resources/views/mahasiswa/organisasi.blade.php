@@ -124,7 +124,8 @@
 
         var filtered = organizations.filter(function (org) {
             var matchesSearch = (org.name || '').toLowerCase().includes(query);
-            var matchesCategory = currentCategory === '' || org.category === currentCategory;
+            var allCategoryLabel = categoryButtons.length > 0 ? categoryButtons[0].getAttribute('data-org-category') : '';
+            var matchesCategory = currentCategory === allCategoryLabel || currentCategory === '' || org.category === currentCategory;
             return matchesSearch && matchesCategory;
         });
 
