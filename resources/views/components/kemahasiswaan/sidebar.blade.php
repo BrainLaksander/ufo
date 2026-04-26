@@ -30,13 +30,13 @@
             <li>
                 <a href="{{ route('portal.kemahasiswaan.pengajuan') }}" class="nav-link {{ request()->is('kemahasiswaan/pengajuan') ? 'active' : '' }}" data-close>
                     <span class="nav-icon" aria-hidden="true"><i class="bi bi-file-earmark-text-fill"></i></span>
-                    <span class="nav-text">Manajemen Pengajuan Kegiatan &amp; Laporan</span>
+                    <span class="nav-text">Manajemen Pengajuan Kegiatan & Laporan</span>
                 </a>
             </li>
             <li>
                 <a href="{{ route('portal.kemahasiswaan.pengumuman') }}" class="nav-link {{ request()->is('kemahasiswaan/pengumuman') ? 'active' : '' }}" data-close>
                     <span class="nav-icon" aria-hidden="true"><i class="bi bi-megaphone-fill"></i></span>
-                    <span class="nav-text">Manajemen Pengumuman &amp; Distribusi Email</span>
+                    <span class="nav-text">Manajemen Pengumuman & Distribusi Email</span>
                 </a>
             </li>
             <li>

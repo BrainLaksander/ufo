@@ -8,12 +8,26 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\Rule;
 
 class AuthController extends Controller
 {
-    public function showLogin()
+    public function showLogin(Request $request)
     {
-        return view('auth.login');
+        $roleOptions = User::INTERNAL_LOGIN_ROLE_LABELS;
+        $allowedRoles = array_keys($roleOptions);
+        $requestedRole = (string) $request->query('role', '');
+        $oldRole = (string) old('role', '');
+        $selectedRole = in_array($oldRole, $allowedRoles, true)
+            ? $oldRole
+            : (in_array($requestedRole, $allowedRoles, true) ? $requestedRole : '');
+
+        return view('auth.login', [
+            'showDemoCredentials' => $this->isLocalDemoEnabled(),
+            'demoAccounts' => (array) config('auth.demo_accounts', []),
+            'roleOptions' => $roleOptions,
+            'selectedRole' => $selectedRole,
+        ]);
     }
 
     public function login(Request $request)
@@ -21,18 +35,18 @@ class AuthController extends Controller
         $data = $request->validate([
             'email' => ['required','email'],
             'password' => ['required'],
-            'role' => ['required', 'in:kemahasiswaan,pengurus'],
+            'role' => ['required', Rule::in(User::INTERNAL_LOGIN_ROLES)],
         ]);
 
         $email = strtolower($data['email']);
         $password = $data['password'];
         $selectedRole = $data['role'];
 
-        if ($selectedRole === 'pengurus') {
+        if ($selectedRole === User::ROLE_PENGURUS) {
             return $this->attemptPengurusLogin($request, $email, $password);
         }
 
-        if ($selectedRole !== 'kemahasiswaan') {
+        if ($selectedRole !== User::ROLE_KEMAHASISWAAN) {
             return back()
                 ->withErrors(['role' => 'Role login tidak valid.'])
                 ->onlyInput('email', 'role');
@@ -78,7 +92,7 @@ class AuthController extends Controller
             $request->session()->put('user', [
                 'name' => $ukmAccount->name,
                 'email' => $ukmAccount->email,
-                'role' => 'pengurus',
+                'role' => User::ROLE_PENGURUS,
                 'ukm_account_id' => (int) $ukmAccount->id,
                 'organization_id' => $ukmAccount->organization_id ? (int) $ukmAccount->organization_id : null,
                 'organization_name' => $ukmAccount->organization_name ?? null,
@@ -86,11 +100,11 @@ class AuthController extends Controller
 
             $request->session()->migrate(true);
 
-            return $this->redirectByRole('pengurus');
+            return $this->redirectByRole(User::ROLE_PENGURUS);
         }
 
-        if ($this->attemptLocalDemoLogin($request, $email, $password, 'pengurus')) {
-            return $this->redirectByRole('pengurus');
+        if ($this->attemptLocalDemoLogin($request, $email, $password, User::ROLE_PENGURUS)) {
+            return $this->redirectByRole(User::ROLE_PENGURUS);
         }
 
         return back()
@@ -172,11 +186,11 @@ class AuthController extends Controller
 
     private function redirectByRole(string $role)
     {
-        if ($role === 'kemahasiswaan') {
+        if ($role === User::ROLE_KEMAHASISWAAN) {
             return redirect()->route('dashboard.kemahasiswaan');
         }
 
-        if ($role === 'pengurus') {
+        if ($role === User::ROLE_PENGURUS) {
             return redirect()->route('dashboard.pengurus');
         }
 

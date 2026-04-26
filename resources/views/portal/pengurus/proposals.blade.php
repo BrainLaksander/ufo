@@ -5,7 +5,6 @@
 @php
     $pengajuanCount = count($workflowPengajuan ?? []);
     $laporanCount = count($workflowLaporan ?? []);
-    $jadwalCount = count($jadwalKegiatan ?? []);
 
     $statusToPill = function (?string $status): string {
         $value = strtolower((string) $status);
@@ -28,10 +27,334 @@
 
         return 'draft';
     };
+
+    $statusToIcon = function (?string $status) use ($statusToPill): string {
+        return match ($statusToPill($status)) {
+            'approved' => 'bi-check-circle',
+            'pending' => 'bi-clock',
+            'rejected' => 'bi-x-circle',
+            'revision' => 'bi-exclamation-circle',
+            default => 'bi-dot',
+        };
+    };
+
+    $formatDate = function (?string $date): string {
+        if (!$date) {
+            return '-';
+        }
+
+        try {
+            return \Carbon\Carbon::parse($date)->format('Y-m-d');
+        } catch (\Throwable) {
+            return (string) $date;
+        }
+    };
+
+    $formatCurrency = function ($amount): string {
+        if ($amount === null || $amount === '') {
+            return '-';
+        }
+
+        if (is_numeric($amount)) {
+            return 'Rp ' . number_format((float) $amount, 0, ',', '.');
+        }
+
+        $stringAmount = trim((string) $amount);
+        if ($stringAmount === '') {
+            return '-';
+        }
+
+        return str_starts_with(strtolower($stringAmount), 'rp') ? $stringAmount : 'Rp ' . $stringAmount;
+    };
 @endphp
 
 @push('styles')
 <style>
+    .ufo-proposal-page {
+        display: grid;
+        gap: 0.92rem;
+    }
+
+    .ufo-proposal-hero,
+    .ufo-proposal-board {
+        border-radius: 12px;
+        border: 1px solid #d9dde3;
+        background: #f4f5f7;
+        box-shadow: 0 1px 2px rgba(24, 39, 75, 0.06);
+    }
+
+    .ufo-proposal-hero {
+        padding: 1.05rem 1.15rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .ufo-proposal-hero-icon {
+        width: 46px;
+        height: 46px;
+        border-radius: 8px;
+        background: #ff5f00;
+        color: #fff;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.2rem;
+    }
+
+    .ufo-proposal-hero h1 {
+        margin: 0;
+        font-size: 1.95rem;
+        line-height: 1.1;
+        color: #3f2469;
+        font-weight: 600;
+    }
+
+    .ufo-proposal-hero p {
+        margin: 0.22rem 0 0;
+        color: #5f6b7a;
+        font-size: 0.89rem;
+    }
+
+    .ufo-proposal-board {
+        overflow: hidden;
+    }
+
+    .ufo-proposal-tabs {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        border-bottom: 1px solid #d9dde3;
+        margin: 0;
+        padding: 0;
+        background: #f7f7f8;
+    }
+
+    .ufo-proposal-tabs .nav-item {
+        margin: 0;
+        display: flex;
+    }
+
+    .ufo-proposal-tabs .nav-link {
+        width: 100%;
+        border: 0;
+        border-bottom: 2px solid transparent;
+        border-radius: 0;
+        margin: 0;
+        background: transparent;
+        color: #4e5c6f;
+        padding: 0.86rem 1rem;
+        font-size: 0.99rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.38rem;
+    }
+
+    .ufo-proposal-tabs .nav-link.active {
+        color: #3d2167;
+        background: #f7f7f8;
+        border-bottom-color: #3d2167;
+    }
+
+    .ufo-proposal-count {
+        min-width: 18px;
+        height: 18px;
+        border-radius: 999px;
+        font-size: 0.71rem;
+        font-weight: 700;
+        color: #8e6a00;
+        background: #f8e8a8;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        line-height: 1;
+        padding: 0 0.28rem;
+    }
+
+    .ufo-proposal-pane {
+        padding: 1rem;
+    }
+
+    .ufo-proposal-pane-head {
+        margin-bottom: 0.92rem;
+    }
+
+    .ufo-proposal-btn {
+        border: 0;
+        border-radius: 6px;
+        background: #4b2a72;
+        color: #fff;
+        font-size: 0.91rem;
+        font-weight: 500;
+        padding: 0.52rem 0.82rem;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.4rem;
+    }
+
+    .ufo-proposal-btn:hover {
+        background: #3f2360;
+    }
+
+    .ufo-proposal-list {
+        display: grid;
+        gap: 0.72rem;
+    }
+
+    .ufo-proposal-card {
+        border: 1px solid #e0e4ea;
+        border-radius: 8px;
+        background: #f5f6f8;
+        padding: 0.78rem 0.72rem;
+    }
+
+    .ufo-proposal-card-shell {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 0.7rem;
+    }
+
+    .ufo-proposal-card-head {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.48rem;
+        margin-bottom: 0.55rem;
+    }
+
+    .ufo-proposal-card-title {
+        margin: 0;
+        color: #38245c;
+        font-size: 1.08rem;
+        font-weight: 500;
+    }
+
+    .ufo-proposal-status {
+        border-radius: 999px;
+        border: 1px solid transparent;
+        padding: 0.18rem 0.55rem;
+        font-size: 0.77rem;
+        font-weight: 500;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.26rem;
+        line-height: 1;
+    }
+
+    .ufo-proposal-status.pending {
+        color: #8a6100;
+        background: #fff1c2;
+        border-color: #eed27f;
+    }
+
+    .ufo-proposal-status.approved {
+        color: #0f7d3f;
+        background: #ccf3da;
+        border-color: #94dfb3;
+    }
+
+    .ufo-proposal-status.rejected,
+    .ufo-proposal-status.revision {
+        color: #ac2e2e;
+        background: #ffd8d8;
+        border-color: #f2b0b0;
+    }
+
+    .ufo-proposal-status.draft {
+        color: #2c5fa3;
+        background: #e5efff;
+        border-color: #b5cef5;
+    }
+
+    .ufo-proposal-meta-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 0.5rem;
+    }
+
+    .ufo-proposal-meta {
+        margin: 0;
+        font-size: 0.91rem;
+        color: #5a6777;
+    }
+
+    .ufo-proposal-feedback {
+        margin-top: 0.58rem;
+        border: 1px solid #bbd4ff;
+        background: #e4efff;
+        color: #2456a3;
+        border-radius: 6px;
+        padding: 0.5rem 0.66rem;
+        font-size: 0.88rem;
+    }
+
+    .ufo-proposal-card-actions {
+        display: inline-flex;
+        gap: 0.56rem;
+        align-items: flex-start;
+        padding-top: 0.35rem;
+    }
+
+    .ufo-proposal-icon-action {
+        width: 28px;
+        height: 28px;
+        border: 0;
+        padding: 0;
+        background: transparent;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.95rem;
+        text-decoration: none;
+    }
+
+    .ufo-proposal-icon-action.view {
+        color: #2a64df;
+    }
+
+    .ufo-proposal-icon-action.download {
+        color: #159b43;
+    }
+
+    .ufo-proposal-icon-action.disabled {
+        color: #9ba7b7;
+        cursor: not-allowed;
+    }
+
+    .ufo-proposal-empty {
+        margin: 0;
+        color: #687686;
+        font-size: 0.9rem;
+        padding: 0.4rem 0;
+    }
+
+    @media (max-width: 992px) {
+        .ufo-proposal-meta-grid {
+            grid-template-columns: 1fr 1fr;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .ufo-proposal-hero h1 {
+            font-size: 1.45rem;
+        }
+
+        .ufo-proposal-card-shell {
+            grid-template-columns: 1fr;
+        }
+
+        .ufo-proposal-card-actions {
+            justify-content: flex-end;
+            padding-top: 0;
+        }
+
+        .ufo-proposal-meta-grid {
+            grid-template-columns: 1fr;
+            gap: 0.28rem;
+        }
+    }
+
     /* Modal Tab Styling */
     #proposalReportModal .nav-tabs {
         border-bottom: 2px solid #e9ecef;
@@ -68,25 +391,14 @@
 @endpush
 
 @section('content')
-<div class="ufo-kboard-page">
-    <section class="ufo-kboard-section">
-        <div class="ufo-kboard-item-head">
-            <div>
-                <h1 class="ufo-kboard-heading">Pengajuan &amp; Laporan Kegiatan</h1>
-                <p class="ufo-kboard-lead">Ajukan izin kegiatan dan kirim laporan ke Kemahasiswaan.</p>
-            </div>
-
-            <div class="ufo-kboard-item-actions mt-0">
-                <button class="ufo-kboard-btn primary" type="button" data-bs-toggle="modal" data-bs-target="#proposalReportModal" data-bs-tab="pengajuan">
-                    <i class="bi bi-plus-lg"></i>
-                    Ajukan Proposal Baru
-                </button>
-                <button class="ufo-kboard-btn gold" type="button" data-bs-toggle="modal" data-bs-target="#proposalReportModal" data-bs-tab="laporan">
-                    <i class="bi bi-file-earmark-arrow-up"></i>
-                    Upload Laporan Baru
-                </button>
-            </div>
+<div class="ufo-proposal-page">
+    <section class="ufo-proposal-hero">
+        <span class="ufo-proposal-hero-icon"><i class="bi bi-file-earmark-text"></i></span>
+        <div>
+            <h1>Pengajuan &amp; Laporan</h1>
+            <p>Kelola proposal dan laporan kegiatan</p>
         </div>
+    </section>
 
         @if(session('success'))
             <div class="alert alert-success mt-3 mb-0" role="alert">{{ session('success') }}</div>
@@ -106,192 +418,148 @@
             </div>
         @endif
 
-        <div class="ufo-kboard-row three mt-3">
-            <article class="ufo-kboard-stat blue">
-                <h3>{{ $pengajuanCount }}</h3>
-                <p>Total Pengajuan</p>
-            </article>
-            <article class="ufo-kboard-stat green">
-                <h3>{{ $laporanCount }}</h3>
-                <p>Total Laporan</p>
-            </article>
-            <article class="ufo-kboard-stat purple">
-                <h3>{{ $jadwalCount }}</h3>
-                <p>Jadwal Terkait</p>
-            </article>
-        </div>
-    </section>
-
-    <section class="ufo-kboard-section">
-        <ul class="nav nav-pills mb-3" id="proposalTabs" role="tablist">
+    <section class="ufo-proposal-board">
+        <ul class="nav ufo-proposal-tabs" id="proposalTabs" role="tablist">
             <li class="nav-item" role="presentation">
                 <button class="nav-link active" id="pengajuan-tab" data-bs-toggle="pill" data-bs-target="#pengajuan-pane" type="button" role="tab" aria-controls="pengajuan-pane" aria-selected="true">
-                    Pengajuan Kegiatan ({{ $pengajuanCount }})
+                    <i class="bi bi-file-earmark-text"></i> Proposal Kegiatan <span class="ufo-proposal-count">{{ $pengajuanCount }}</span>
                 </button>
             </li>
             <li class="nav-item" role="presentation">
                 <button class="nav-link" id="laporan-tab" data-bs-toggle="pill" data-bs-target="#laporan-pane" type="button" role="tab" aria-controls="laporan-pane" aria-selected="false">
-                    Laporan Kegiatan ({{ $laporanCount }})
+                    <i class="bi bi-upload"></i> Laporan Kegiatan <span class="ufo-proposal-count">{{ $laporanCount }}</span>
                 </button>
             </li>
         </ul>
 
         <div class="tab-content" id="proposalTabsContent">
             <div class="tab-pane fade show active" id="pengajuan-pane" role="tabpanel" aria-labelledby="pengajuan-tab" tabindex="0">
-                <div class="ufo-kboard-list">
+                <div class="ufo-proposal-pane">
+                    <div class="ufo-proposal-pane-head">
+                        <button class="ufo-proposal-btn" type="button" data-bs-toggle="modal" data-bs-target="#proposalReportModal" data-bs-tab="pengajuan">
+                            <i class="bi bi-plus-lg"></i>
+                            Ajukan Proposal Baru
+                        </button>
+                    </div>
+
+                    <div class="ufo-proposal-list">
                     @forelse(($workflowPengajuan ?? []) as $item)
                         @php
                             $pill = $statusToPill($item['status'] ?? '');
                             $status = (string) ($item['status'] ?? '');
+                            $submittedDate = $formatDate($item['tanggal_kegiatan'] ?? null);
+                            $budgetLabel = $formatCurrency($item['budget'] ?? $item['anggaran'] ?? null);
+                            $fileName = (string) ($item['file_name'] ?? $item['lampiran'] ?? '-');
+                            $downloadUrl = (string) ($item['download_url'] ?? $item['file_url'] ?? $item['file'] ?? '');
                         @endphp
 
-                        <article class="ufo-kboard-item">
-                            <div class="ufo-kboard-item-head">
+                        <article class="ufo-proposal-card">
+                            <div class="ufo-proposal-card-shell">
                                 <div>
-                                    <h3 class="ufo-kboard-item-title">{{ $item['judul'] }}</h3>
-                                    <p class="ufo-kboard-item-meta">{{ $item['organisasi'] }} • {{ \Carbon\Carbon::parse($item['tanggal_kegiatan'])->translatedFormat('d M Y') }}</p>
+                                    <div class="ufo-proposal-card-head">
+                                        <h3 class="ufo-proposal-card-title">{{ $item['judul'] }}</h3>
+                                        <span class="ufo-proposal-status {{ $pill }}"><i class="bi {{ $statusToIcon($status) }}"></i> {{ $status }}</span>
+                                    </div>
+
+                                    <div class="ufo-proposal-meta-grid">
+                                        <p class="ufo-proposal-meta">Diajukan: {{ $submittedDate }}</p>
+                                        <p class="ufo-proposal-meta">Budget: {{ $budgetLabel }}</p>
+                                        <p class="ufo-proposal-meta">File: {{ $fileName !== '' ? $fileName : '-' }}</p>
+                                    </div>
+
+                                    @if(!empty($item['catatan_departemen']))
+                                        <p class="ufo-proposal-feedback">Feedback: {{ $item['catatan_departemen'] }}</p>
+                                    @endif
                                 </div>
-                                <span class="ufo-kboard-pill {{ $pill }}">{{ $status }}</span>
-                            </div>
 
-                            @if(!empty($item['catatan_departemen']))
-                                <div class="ufo-pg-review-note">
-                                    <strong>Catatan Kemahasiswaan:</strong>
-                                    <span>{{ $item['catatan_departemen'] }}</span>
+                                <div class="ufo-proposal-card-actions">
+                                    <button class="ufo-proposal-icon-action view" type="button" data-bs-toggle="modal" data-bs-target="#proposalDetailModal" data-proposal-detail='@json($item)' title="Lihat detail">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+
+                                    @if($downloadUrl !== '')
+                                        <a class="ufo-proposal-icon-action download" href="{{ $downloadUrl }}" target="_blank" rel="noopener" title="Unduh berkas">
+                                            <i class="bi bi-download"></i>
+                                        </a>
+                                    @else
+                                        <span class="ufo-proposal-icon-action disabled" title="Berkas tidak tersedia">
+                                            <i class="bi bi-download"></i>
+                                        </span>
+                                    @endif
                                 </div>
-                            @endif
-
-                            <div class="ufo-kboard-item-actions">
-                                <button class="ufo-kboard-btn ghost" type="button" data-bs-toggle="modal" data-bs-target="#proposalDetailModal" data-proposal-detail='@json($item)'>Lihat Detail</button>
-
-                                @if(in_array($status, ['Draft', 'Revisi'], true))
-                                    <form method="POST" action="{{ route('portal.pengurus.proposals.submit', ['id' => $item['id']]) }}">
-                                        @csrf
-                                        <button type="submit" class="ufo-kboard-btn gold">Kirim</button>
-                                    </form>
-                                @endif
-
-                                @if($status === 'Disetujui')
-                                    <button class="ufo-kboard-btn primary" type="button" data-bs-toggle="modal" data-bs-target="#reportCreateModal">Kirim Laporan</button>
-                                @endif
                             </div>
                         </article>
                     @empty
-                        <p class="ufo-kboard-item-meta">Belum ada data pengajuan kegiatan.</p>
+                        <p class="ufo-proposal-empty">Belum ada data proposal kegiatan.</p>
                     @endforelse
+                    </div>
                 </div>
             </div>
 
             <div class="tab-pane fade" id="laporan-pane" role="tabpanel" aria-labelledby="laporan-tab" tabindex="0">
-                <div class="ufo-kboard-list">
+                <div class="ufo-proposal-pane">
+                    <div class="ufo-proposal-pane-head">
+                        <button class="ufo-proposal-btn" type="button" data-bs-toggle="modal" data-bs-target="#proposalReportModal" data-bs-tab="laporan">
+                            <i class="bi bi-plus-lg"></i>
+                            Upload Laporan Baru
+                        </button>
+                    </div>
+
+                    <div class="ufo-proposal-list">
                     @forelse(($workflowLaporan ?? []) as $item)
                         @php
                             $pill = $statusToPill($item['status'] ?? '');
                             $status = (string) ($item['status'] ?? '');
+                            $eventDate = $formatDate($item['tanggal_event'] ?? $item['tanggal_kegiatan'] ?? null);
+                            $submitDate = $formatDate($item['tanggal_laporan'] ?? null);
+                            $realisasiBudget = $formatCurrency($item['realisasi_budget'] ?? $item['budget_realisasi'] ?? null);
+                            $downloadUrl = (string) ($item['download_url'] ?? $item['file_url'] ?? $item['file'] ?? '');
                         @endphp
 
-                        <article class="ufo-kboard-item">
-                            <div class="ufo-kboard-item-head">
+                        <article class="ufo-proposal-card">
+                            <div class="ufo-proposal-card-shell">
                                 <div>
-                                    <h3 class="ufo-kboard-item-title">{{ $item['judul'] }}</h3>
-                                    <p class="ufo-kboard-item-meta">{{ $item['organisasi'] }} • {{ \Carbon\Carbon::parse($item['tanggal_laporan'])->translatedFormat('d M Y') }}</p>
+                                    <div class="ufo-proposal-card-head">
+                                        <h3 class="ufo-proposal-card-title">{{ $item['judul'] }}</h3>
+                                        <span class="ufo-proposal-status {{ $pill }}"><i class="bi {{ $statusToIcon($status) }}"></i> {{ $status }}</span>
+                                    </div>
+
+                                    <div class="ufo-proposal-meta-grid">
+                                        <p class="ufo-proposal-meta">Tanggal Event: {{ $eventDate }}</p>
+                                        <p class="ufo-proposal-meta">Disubmit: {{ $submitDate }}</p>
+                                        <p class="ufo-proposal-meta">Realisasi Budget: {{ $realisasiBudget }}</p>
+                                    </div>
+
+                                    @if(!empty($item['catatan_departemen']))
+                                        <p class="ufo-proposal-feedback">Feedback: {{ $item['catatan_departemen'] }}</p>
+                                    @endif
                                 </div>
-                                <span class="ufo-kboard-pill {{ $pill }}">{{ $status }}</span>
-                            </div>
 
-                            @if(!empty($item['catatan_departemen']))
-                                <div class="ufo-pg-review-note">
-                                    <strong>Catatan Kemahasiswaan:</strong>
-                                    <span>{{ $item['catatan_departemen'] }}</span>
+                                <div class="ufo-proposal-card-actions">
+                                    <button class="ufo-proposal-icon-action view" type="button" data-bs-toggle="modal" data-bs-target="#reportDetailModal" data-report-detail='@json($item)' title="Lihat detail">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+
+                                    @if($downloadUrl !== '')
+                                        <a class="ufo-proposal-icon-action download" href="{{ $downloadUrl }}" target="_blank" rel="noopener" title="Unduh berkas">
+                                            <i class="bi bi-download"></i>
+                                        </a>
+                                    @else
+                                        <span class="ufo-proposal-icon-action disabled" title="Berkas tidak tersedia">
+                                            <i class="bi bi-download"></i>
+                                        </span>
+                                    @endif
                                 </div>
-                            @endif
-
-                            <div class="ufo-kboard-item-actions">
-                                <button class="ufo-kboard-btn ghost" type="button" data-bs-toggle="modal" data-bs-target="#reportDetailModal" data-report-detail='@json($item)'>Lihat Laporan</button>
-
-                                @if(in_array($status, ['Draft', 'Revisi'], true))
-                                    <form method="POST" action="{{ route('portal.pengurus.reports.submit', ['id' => $item['id']]) }}">
-                                        @csrf
-                                        <button type="submit" class="ufo-kboard-btn gold">Kirim</button>
-                                    </form>
-                                @endif
                             </div>
                         </article>
                     @empty
-                        <p class="ufo-kboard-item-meta">Belum ada data laporan kegiatan.</p>
+                        <p class="ufo-proposal-empty">Belum ada data laporan kegiatan.</p>
                     @endforelse
+                    </div>
                 </div>
             </div>
         </div>
     </section>
-
-    <div class="ufo-kboard-row two">
-        <section class="ufo-kboard-section">
-            <div class="ufo-kboard-item-head">
-                <h3 class="ufo-kboard-item-title">Jadwal Kegiatan Organisasi</h3>
-                <span class="ufo-kboard-pill approved">{{ count($jadwalKegiatan ?? []) }} Jadwal</span>
-            </div>
-
-            <div class="ufo-kboard-table-wrap">
-                <table class="ufo-kboard-table">
-                    <thead>
-                        <tr>
-                            <th>Kegiatan</th>
-                            <th>Tanggal</th>
-                            <th>Lokasi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse(($jadwalKegiatan ?? []) as $jadwal)
-                            <tr>
-                                <td>
-                                    <strong>{{ $jadwal['judul'] }}</strong>
-                                    <div class="ufo-kboard-item-meta">{{ $jadwal['organisasi'] }}</div>
-                                </td>
-                                <td>{{ \Carbon\Carbon::parse($jadwal['tanggal'])->translatedFormat('d M Y') }}</td>
-                                <td>{{ $jadwal['lokasi'] }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="3">Belum ada jadwal kegiatan.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <section class="ufo-kboard-section">
-            <div class="ufo-kboard-item-head">
-                <h3 class="ufo-kboard-item-title">Kontak Pengurus UKM</h3>
-                <span class="ufo-kboard-pill draft">{{ count($kontakPengurus ?? []) }} Kontak</span>
-            </div>
-
-            <div class="ufo-kboard-list">
-                @forelse(($kontakPengurus ?? []) as $kontak)
-                    <article class="ufo-kboard-item">
-                        <div class="ufo-kboard-item-head">
-                            <div>
-                                <h4 class="ufo-kboard-item-title">{{ $kontak['nama'] }}</h4>
-                                <p class="ufo-kboard-item-meta">{{ $kontak['jabatan'] }} • {{ $kontak['organisasi'] }}</p>
-                            </div>
-                            @php
-                                $contactStatus = (string) ($kontak['status'] ?? '');
-                            @endphp
-                            @if($contactStatus !== '')
-                                <span class="ufo-kboard-pill approved">{{ $contactStatus }}</span>
-                            @endif
-                        </div>
-
-                        <p class="ufo-kboard-item-text"><i class="bi bi-telephone"></i> {{ $kontak['kontak'] }}</p>
-                        <p class="ufo-kboard-item-text"><i class="bi bi-envelope"></i> {{ $kontak['email'] }}</p>
-                    </article>
-                @empty
-                    <p class="ufo-kboard-item-meta">Belum ada kontak pengurus.</p>
-                @endforelse
-            </div>
-        </section>
-    </div>
 
     <!-- Combined Proposal & Report Modal with Tabs -->
     <div class="modal fade" id="proposalReportModal" tabindex="-1" aria-labelledby="proposalReportModalLabel" aria-hidden="true">

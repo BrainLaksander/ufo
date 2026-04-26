@@ -43,6 +43,14 @@ class User extends Authenticatable
     public const ROLE_KEMAHASISWAAN = 'kemahasiswaan';
     public const ROLE_PENGURUS = 'pengurus';
     public const ROLE_MAHASISWA = 'mahasiswa';
+    public const INTERNAL_LOGIN_ROLES = [
+        self::ROLE_KEMAHASISWAAN,
+        self::ROLE_PENGURUS,
+    ];
+    public const INTERNAL_LOGIN_ROLE_LABELS = [
+        self::ROLE_KEMAHASISWAAN => 'Departemen Kemahasiswaan',
+        self::ROLE_PENGURUS => 'Pengurus UKM',
+    ];
 
     public function organization(): BelongsTo
     {
