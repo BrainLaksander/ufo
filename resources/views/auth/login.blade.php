@@ -10,11 +10,7 @@
 
 @section('content')
 @php
-    $showDemoCredentials = app()->environment('local') && config('auth.demo_mode');
-    $demoAccounts = config('auth.demo_accounts', []);
-    $requestedRole = request()->query('role');
-    $allowedRoles = ['kemahasiswaan', 'pengurus'];
-    $selectedRole = old('role', in_array($requestedRole, $allowedRoles, true) ? $requestedRole : '');
+    $errors = $errors ?? new \Illuminate\Support\ViewErrorBag();
 @endphp
 <section class="ufo-login-shell">
     <div class="ufo-login-wrap">
@@ -87,8 +83,9 @@
                             <i class="bi bi-person-check"></i>
                             <select id="role" name="role" class="form-select @error('role') is-invalid @enderror" required>
                                 <option value="" disabled {{ $selectedRole ? '' : 'selected' }}>Pilih role Anda</option>
-                                <option value="kemahasiswaan" {{ $selectedRole === 'kemahasiswaan' ? 'selected' : '' }}>Departemen Kemahasiswaan</option>
-                                <option value="pengurus" {{ $selectedRole === 'pengurus' ? 'selected' : '' }}>Pengurus UKM</option>
+                                @foreach ($roleOptions as $role)
+                                    <option value="{{ $role['value'] }}" {{ $selectedRole === $role['value'] ? 'selected' : '' }}>{{ $role['label'] }}</option>
+                                @endforeach
                             </select>
                         </div>
                         @error('role')
@@ -98,35 +95,8 @@
 
                     <button type="submit" class="btn btn-primary w-100 ufo-login-btn">Masuk</button>
                 </form>
-
-                <div class="ufo-login-foot">
-                    Sistem Administrasi &amp; Kontrol Organisasi Mahasiswa<br>
-                    Departemen Kemahasiswaan Universitas Klabat
-                </div>
             </div>
         </div>
-
-        @if($showDemoCredentials)
-            <div class="ufo-demo-box">
-                <div><strong>Demo Accounts</strong></div>
-                <hr>
-
-                @php
-                    $roleLabels = [
-                        'kemahasiswaan' => 'Kemahasiswaan',
-                        'pengurus' => 'Login sebagai Pengurus UKM',
-                    ];
-                @endphp
-
-                @foreach($roleLabels as $roleKey => $roleLabel)
-                    @php $email = data_get($demoAccounts, $roleKey . '.email'); @endphp
-                    @if(!empty($email))
-                        <div><strong>{{ $roleLabel }}:</strong> <code>{{ $email }}</code></div>
-                    @endif
-                @endforeach
-            </div>
-        @endif
-
         <a href="{{ route('home') }}" class="ufo-back-link">Kembali ke halaman mahasiswa</a>
     </div>
 </section>

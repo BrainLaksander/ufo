@@ -13,13 +13,13 @@
     @stack('styles')
 </head>
 <body class="ufo-app-shell @yield('bodyClass', '')">
-    @include('partials.header')
+    @includeIf('partials.header')
 
     <main class="@yield('mainClass', 'container')">
         @yield('content')
     </main>
 
-    @include('partials.footer')
+    @includeIf('partials.footer')
 
     <script src="{{ asset('vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
     <script src="{{ asset('js/core/utils.js') }}"></script>

@@ -41,13 +41,21 @@
         @if($showActions ?? false)
             <hr class="my-2">
             <div class="d-flex gap-2 justify-content-between">
-                <a href="{{ route('events.show', $event) }}" class="btn btn-sm btn-soft-primary">
-                    <i class="bi bi-eye"></i> Lihat
-                </a>
+                <x-shared.action-button
+                    :link="route('events.show', $event)"
+                    label="Lihat"
+                    style="soft-primary"
+                    size="sm"
+                    icon="bi bi-eye"
+                />
                 @if(auth()->user()->can('update', $event))
-                    <a href="{{ route('events.edit', $event) }}" class="btn btn-sm btn-primary">
-                        <i class="bi bi-pencil"></i> Edit
-                    </a>
+                    <x-shared.action-button
+                        :link="route('events.edit', $event)"
+                        label="Edit"
+                        style="primary"
+                        size="sm"
+                        icon="bi bi-pencil"
+                    />
                 @endif
             </div>
         @endif

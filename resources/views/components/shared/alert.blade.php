@@ -34,7 +34,7 @@
         <br>
     @endif
     
-    {{ $message ?? slot }}
+    {{ $message ?? $slot }}
     
     @if($dismissible ?? true)
         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>

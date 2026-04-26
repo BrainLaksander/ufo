@@ -7,7 +7,7 @@
 <header class="header kemahasiswaan-header">
     <div class="header-container kmh-shell-header-container">
         <div class="kmh-shell-header-left">
-            <button type="button" class="sidebar-toggle" data-kmh-sidebar-toggle aria-controls="sidebar" aria-expanded="true" aria-label="Minimize sidebar">
+            <button id="sidebar-toggle" type="button" class="sidebar-toggle" data-kmh-sidebar-toggle aria-controls="sidebar" aria-expanded="false" aria-label="Tampilkan sidebar">
                 <i class="bi bi-list"></i>
             </button>
             <div class="kmh-shell-heading">

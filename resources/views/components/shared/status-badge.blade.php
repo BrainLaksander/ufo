@@ -7,6 +7,8 @@
 --}}
 
 @php
+    $status = strtolower(trim((string) $status));
+    $fallbackText = $status !== '' ? ucfirst($status) : '-';
     $statusMap = [
         // Event & Announcement Status
         'draft' => ['badge' => 'bg-secondary', 'icon' => 'bi-pencil', 'text' => 'Draft'],
@@ -33,7 +35,7 @@
         'replied' => ['badge' => 'bg-success', 'icon' => 'bi-arrow-counterclockwise', 'text' => 'Dibalas'],
     ];
     
-    $config = $statusMap[$status] ?? ['badge' => 'bg-secondary', 'icon' => 'bi-dash-circle', 'text' => ucfirst($status)];
+    $config = $statusMap[$status] ?? ['badge' => 'bg-secondary', 'icon' => 'bi-dash-circle', 'text' => $fallbackText];
     $displayText = $text ?? $config['text'];
 @endphp
 

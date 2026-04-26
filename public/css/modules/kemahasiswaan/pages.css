@@ -1,8 +1,9 @@
 /* Kemahasiswaan pages (design parity) */
 
 body.kemahasiswaan-layout .kmh-page {
-    width: min(1320px, 100%);
-    margin: 0 auto;
+    width: 100%;
+    max-width: none;
+    margin: 0;
     display: grid;
     gap: 1.15rem;
 }
@@ -391,15 +392,18 @@ body.kemahasiswaan-layout .kmh-inline-review .btn {
 /* Dashboard (rebuilt, layout-preserving) */
 body.kemahasiswaan-layout .kmh-dashboard-page {
     gap: 1rem;
+    align-content: start;
+    min-width: 0;
 }
 
 body.kemahasiswaan-layout .kmh-dashboard-stats {
     grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: 1rem;
+    gap: 0.95rem;
 }
 
 body.kemahasiswaan-layout .kmh-dashboard-stats .kmh-stat-card {
-    min-height: 140px;
+    min-height: 134px;
+    align-items: center;
 }
 
 body.kemahasiswaan-layout .kmh-dashboard-stats .kmh-stat-content {
@@ -408,9 +412,10 @@ body.kemahasiswaan-layout .kmh-dashboard-stats .kmh-stat-content {
 
 body.kemahasiswaan-layout .kmh-dashboard-main-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) 330px;
-    gap: 1rem;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 360px);
+    gap: 0.95rem;
     align-items: start;
+    min-width: 0;
 }
 
 body.kemahasiswaan-layout .kmh-dashboard-chart-card,
@@ -420,7 +425,7 @@ body.kemahasiswaan-layout .kmh-dashboard-announce-card {
 }
 
 body.kemahasiswaan-layout .kmh-chart-shell {
-    height: 320px;
+    height: 340px;
     position: relative;
 }
 
@@ -431,29 +436,36 @@ body.kemahasiswaan-layout .kmh-chart-shell canvas {
 
 body.kemahasiswaan-layout .kmh-quick-actions {
     display: grid;
-    gap: 0.65rem;
+    gap: 0.72rem;
 }
 
 body.kemahasiswaan-layout .kmh-quick-btn {
     border: 0;
-    border-radius: 0.58rem;
-    min-height: 2.8rem;
+    border-radius: 0.62rem;
+    min-height: 2.95rem;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0;
-    font-size: 0.86rem;
+    font-size: 0.96rem;
     font-weight: 700;
     text-decoration: none;
+    width: 100%;
 }
 
 body.kemahasiswaan-layout .kmh-dashboard-side-panel {
     display: flex;
     flex-direction: column;
+    overflow: hidden;
+    min-width: 0;
+}
+
+body.kemahasiswaan-layout .kmh-dashboard-side-panel .kmh-side-block + .kmh-side-block {
+    border-top: 1px solid rgba(0, 0, 0, 0.08);
 }
 
 body.kemahasiswaan-layout .kmh-side-section-head {
-    border-top: 1px solid rgba(0, 0, 0, 0.08);
+    border-top: 0;
 }
 
 body.kemahasiswaan-layout .kmh-side-section-head h3 {
@@ -549,28 +561,30 @@ body.kemahasiswaan-layout .kmh-page-pengumuman .kmh-card .kmh-toolbar-field:focu
 
 body.kemahasiswaan-layout .kmh-event-list {
     display: grid;
-    gap: 0.65rem;
-    padding: 0.95rem;
+    gap: 0.72rem;
+    padding: 1rem;
+    max-height: 448px;
+    overflow-y: auto;
 }
 
 body.kemahasiswaan-layout .kmh-event-item {
-    padding: 0.62rem 0.72rem;
+    padding: 0.82rem 0.85rem;
     border: 1px solid #ebedf0;
-    border-radius: 0.58rem;
+    border-radius: 0.7rem;
     background: #f3f4f6;
 }
 
 body.kemahasiswaan-layout .kmh-event-item h4 {
     margin: 0;
     color: #1f2937;
-    font-size: 0.9rem;
+    font-size: 0.92rem;
     font-weight: 600;
 }
 
 body.kemahasiswaan-layout .kmh-event-item p {
-    margin: 0.22rem 0 0;
+    margin: 0.28rem 0 0;
     color: #6b7280;
-    font-size: 0.8rem;
+    font-size: 0.86rem;
 }
 
 body.kemahasiswaan-layout .kmh-event-item.is-empty {
@@ -583,7 +597,7 @@ body.kemahasiswaan-layout .kmh-dashboard-table-body {
 }
 
 body.kemahasiswaan-layout .kmh-announcement-table-wrap .kmh-table {
-    min-width: 640px;
+    min-width: 560px;
 }
 
 body.kemahasiswaan-layout .kmh-dashboard-announce-card .kmh-table tbody td:nth-child(2) {
@@ -1618,16 +1632,28 @@ body.kemahasiswaan-layout .kmh-notification-action:focus-visible {
 
 /* Responsive */
 @media (max-width: 1200px) {
+    body.kemahasiswaan-layout .kmh-page-organisasi .kmh-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    body.kemahasiswaan-layout .kmh-page-organisasi .kmh-org-table thead th:nth-child(1) {
+        min-width: 14rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-organisasi .kmh-org-table thead th:nth-child(4) {
+        min-width: 11rem;
+    }
+
     body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stats-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
 
     body.kemahasiswaan-layout .kmh-page-dashboard .kmh-dashboard-main-grid {
-        grid-template-columns: minmax(0, 1fr) 300px;
+        grid-template-columns: minmax(0, 1fr) minmax(280px, 320px);
     }
 
     body.kemahasiswaan-layout .kmh-page-dashboard .kmh-chart-shell {
-        height: 300px;
+        height: 312px;
     }
 
     body.kemahasiswaan-layout .kmh-grid-2.is-4-6 {
@@ -1652,20 +1678,56 @@ body.kemahasiswaan-layout .kmh-notification-action:focus-visible {
         grid-template-columns: minmax(0, 1fr);
     }
 
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-dashboard-side-panel {
+        order: 1;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-dashboard-chart-card {
+        order: 2;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-dashboard-announce-card {
+        order: 3;
+    }
+
     body.kemahasiswaan-layout .kmh-page-dashboard .kmh-chart-shell {
-        height: 288px;
+        height: 290px;
     }
 
     body.kemahasiswaan-layout .kmh-page-dashboard .kmh-event-list {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: 1fr;
+        max-height: none;
     }
 
     body.kemahasiswaan-layout .kmh-page-dashboard .kmh-announcement-table-wrap .kmh-table {
-        min-width: 580px;
+        min-width: 540px;
     }
 }
 
 @media (max-width: 900px) {
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-quick-btn {
+        min-height: 2.78rem;
+        font-size: 0.9rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-event-item {
+        padding: 0.72rem 0.76rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-organisasi .kmh-toolbar-group,
+    body.kemahasiswaan-layout .kmh-page-organisasi .kmh-toolbar-end {
+        width: 100%;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-organisasi .kmh-org-add-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
     body.kemahasiswaan-layout .kmh-stats-grid.is-three,
     body.kemahasiswaan-layout .kmh-stats-grid.is-two,
     body.kemahasiswaan-layout .kmh-grid-2 {
@@ -1770,7 +1832,48 @@ body.kemahasiswaan-layout .kmh-notification-action:focus-visible {
     }
 }
 
+@media (max-width: 768px) {
+    body.kemahasiswaan-layout .kmh-page-dashboard {
+        gap: 0.85rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stats-grid {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.72rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stat-card {
+        min-height: 112px;
+        padding: 0.78rem 0.82rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stat-card p {
+        font-size: 0.8rem;
+        max-width: none;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stat-value {
+        font-size: clamp(1.5rem, 6.4vw, 1.8rem);
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-card-head {
+        padding: 0.72rem 0.78rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-card-body {
+        padding: 0.78rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-chart-shell {
+        height: 220px;
+    }
+}
+
 @media (max-width: 640px) {
+    body.kemahasiswaan-layout .kmh-page-organisasi .kmh-stats-grid {
+        grid-template-columns: 1fr;
+    }
+
     body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stats-grid {
         grid-template-columns: 1fr;
     }
@@ -1784,7 +1887,7 @@ body.kemahasiswaan-layout .kmh-notification-action:focus-visible {
     }
 
     body.kemahasiswaan-layout .kmh-page-dashboard .kmh-chart-shell {
-        height: 240px;
+        height: 230px;
     }
 
     body.kemahasiswaan-layout .kmh-page-dashboard .kmh-event-list {
@@ -1792,28 +1895,28 @@ body.kemahasiswaan-layout .kmh-notification-action:focus-visible {
     }
 
     body.kemahasiswaan-layout .kmh-page-dashboard .kmh-event-list {
-        padding: 0.8rem;
+        padding: 0.85rem;
     }
 
     body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stat-card {
-        min-height: 126px;
+        min-height: 118px;
     }
 
     body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stat-card p {
-        font-size: 0.86rem;
-    }
-
-    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stat-value {
-        font-size: clamp(1.7rem, 6vw, 1.95rem);
-    }
-
-    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-quick-btn {
-        min-height: 2.65rem;
         font-size: 0.82rem;
     }
 
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stat-value {
+        font-size: clamp(1.62rem, 7.5vw, 1.9rem);
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-quick-btn {
+        min-height: 2.6rem;
+        font-size: 0.84rem;
+    }
+
     body.kemahasiswaan-layout .kmh-page-dashboard .kmh-announcement-table-wrap .kmh-table {
-        min-width: 520px;
+        min-width: 480px;
     }
 
     body.kemahasiswaan-layout .kmh-notification-head {
@@ -1890,5 +1993,118 @@ body.kemahasiswaan-layout .kmh-notification-action:focus-visible {
 
     body.kemahasiswaan-layout .kmh-contact-member-card h4 {
         font-size: 1rem;
+    }
+}
+
+
+/* Mobile rebuild hard overrides */
+@media (max-width: 1024px), (hover: none) and (pointer: coarse) and (max-width: 1366px) {
+    body.kemahasiswaan-layout .kmh-page-dashboard {
+        gap: 0.85rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stats-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 0.72rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-dashboard-main-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 0.85rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-dashboard-side-panel,
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-dashboard-chart-card,
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-dashboard-announce-card {
+        order: initial !important;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-dashboard-main-grid > * {
+        min-width: 0;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-chart-shell {
+        height: 220px;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-event-list {
+        max-height: none;
+        overflow: visible;
+    }
+}
+
+@media (max-width: 640px), (hover: none) and (pointer: coarse) and (max-width: 430px) {
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stats-grid {
+        grid-template-columns: 1fr !important;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stat-card {
+        min-height: 108px;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-chart-shell {
+        height: 200px;
+    }
+}
+
+/* Final mobile lock: keep dashboard readable on all small screens */
+@media (max-width: 1200px) {
+    body.kemahasiswaan-layout .kmh-page.kmh-dashboard-page {
+        width: 100%;
+        max-width: 100%;
+        min-width: 0;
+        overflow-x: hidden;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-dashboard-stats {
+        grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+        gap: 0.72rem !important;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-dashboard-main-grid {
+        grid-template-columns: minmax(0, 1fr) !important;
+        gap: 0.78rem !important;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-dashboard-main-grid > * {
+        min-width: 0;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stat-card {
+        min-width: 0;
+        min-height: 112px;
+        padding: 0.75rem 0.78rem;
+        gap: 0.6rem;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stat-card p {
+        max-width: none;
+        font-size: 0.8rem;
+        line-height: 1.25;
+        word-break: break-word;
+        overflow-wrap: anywhere;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-stat-value {
+        font-size: clamp(1.45rem, 5.8vw, 1.85rem);
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-chart-shell {
+        height: 210px;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-event-list {
+        max-height: none;
+        overflow: visible;
+    }
+}
+
+@media (max-width: 700px) {
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-dashboard-stats {
+        grid-template-columns: 1fr !important;
+    }
+
+    body.kemahasiswaan-layout .kmh-page-dashboard .kmh-chart-shell {
+        height: 190px;
     }
 }
