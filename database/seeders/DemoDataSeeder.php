@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -25,6 +26,8 @@ class DemoDataSeeder extends Seeder
                 return;
             }
 
+            $ukmAccounts = $this->seedUkmAccountsWithDefaultPassword($organizations, $now);
+
             $users = DB::table('users')->select(['id', 'role', 'name', 'email'])->orderBy('id')->get();
             $departmentUser = $users->firstWhere('role', 'kemahasiswaan') ?: $users->first();
             $reporterUser = $users->first();
@@ -32,17 +35,6 @@ class DemoDataSeeder extends Seeder
             $departmentUserId = $departmentUser?->id ? (int) $departmentUser->id : null;
             $reporterUserId = $reporterUser?->id ? (int) $reporterUser->id : null;
             $claimerUserId = $claimerUser?->id ? (int) $claimerUser->id : null;
-
-            $ukmAccounts = [];
-            if (Schema::hasTable('kemahasiswaan_ukm_accounts')) {
-                $ukmAccounts = DB::table('kemahasiswaan_ukm_accounts')
-                    ->select(['id', 'organization_id'])
-                    ->whereNotNull('organization_id')
-                    ->get()
-                    ->keyBy('organization_id')
-                    ->map(fn ($row) => (int) $row->id)
-                    ->all();
-            }
 
             $memberIdsByOrganization = [];
             $eventIdsByOrganization = [];
@@ -150,6 +142,98 @@ class DemoDataSeeder extends Seeder
                 );
             }
         });
+    }
+
+    private function seedUkmAccountsWithDefaultPassword($organizations, Carbon $now): array
+    {
+        if (!Schema::hasTable('kemahasiswaan_ukm_accounts')) {
+            return [];
+        }
+
+        $passwordColumn = null;
+        if (Schema::hasColumn('kemahasiswaan_ukm_accounts', 'password_hash')) {
+            $passwordColumn = 'password_hash';
+        } elseif (Schema::hasColumn('kemahasiswaan_ukm_accounts', 'password')) {
+            $passwordColumn = 'password';
+        }
+
+        $existingAccounts = DB::table('kemahasiswaan_ukm_accounts')
+            ->select(['id', 'organization_id', 'email'])
+            ->whereNotNull('organization_id')
+            ->orderBy('organization_id')
+            ->get();
+
+        $accountsByOrganization = $existingAccounts
+            ->keyBy('organization_id')
+            ->all();
+
+        $usedEmails = $existingAccounts
+            ->pluck('email')
+            ->filter()
+            ->map(fn ($email) => strtolower((string) $email))
+            ->values()
+            ->all();
+        $usedEmailMap = array_fill_keys($usedEmails, true);
+
+        $defaultPasswordHash = Hash::make('password');
+
+        foreach ($organizations as $organization) {
+            $organizationId = (int) $organization->id;
+
+            if (isset($accountsByOrganization[$organizationId])) {
+                continue;
+            }
+
+            $shortname = $this->organizationShortname($organization);
+            $baseKey = $shortname !== '' ? $shortname : trim((string) $organization->name);
+            $baseLocalPart = strtolower(preg_replace('/[^a-z0-9]+/i', '', $baseKey) ?? '');
+            if ($baseLocalPart === '') {
+                $baseLocalPart = 'org' . $organizationId;
+            }
+
+            $email = $baseLocalPart . '@unklab.ac.id';
+            $attempt = 1;
+            while (isset($usedEmailMap[$email])) {
+                $email = $baseLocalPart . $attempt . '@unklab.ac.id';
+                $attempt++;
+            }
+            $usedEmailMap[$email] = true;
+
+            $displayName = $shortname !== '' ? $shortname : trim((string) $organization->name);
+
+            $newId = (int) DB::table('kemahasiswaan_ukm_accounts')->insertGetId([
+                'organization_id' => $organizationId,
+                'user_id' => null,
+                'name' => 'Pengurus ' . $displayName,
+                'email' => $email,
+                'position' => 'Ketua',
+                'status' => 'active',
+                'created_at' => $now,
+                'updated_at' => $now,
+            ] + ($passwordColumn ? [$passwordColumn => $defaultPasswordHash] : []));
+
+            $accountsByOrganization[$organizationId] = (object) [
+                'id' => $newId,
+                'organization_id' => $organizationId,
+            ];
+        }
+
+        if ($passwordColumn !== null) {
+            DB::table('kemahasiswaan_ukm_accounts')
+                ->whereNotNull('organization_id')
+                ->update([
+                    $passwordColumn => $defaultPasswordHash,
+                    'updated_at' => $now,
+                ]);
+        }
+
+        return DB::table('kemahasiswaan_ukm_accounts')
+            ->select(['id', 'organization_id'])
+            ->whereNotNull('organization_id')
+            ->get()
+            ->keyBy('organization_id')
+            ->map(fn ($row) => (int) $row->id)
+            ->all();
     }
 
     private function backfillOrganizationProfile(int $organizationId, object $organization, int $index, Carbon $now): void
