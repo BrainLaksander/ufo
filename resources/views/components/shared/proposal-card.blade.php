@@ -38,7 +38,7 @@
                         {{ ucfirst($proposal->type) }}
                     </span>
                 </div>
-                @include('components.shared.status-badge', ['status' => $proposal->status])
+                <x-shared.status-badge :status="$proposal->status" />
             </div>
         </div>
 
@@ -46,23 +46,33 @@
             <hr class="my-2">
             <div class="d-flex gap-2 justify-content-between">
                 <div>
-                    <a href="{{ route('proposals.show', $proposal) }}" class="btn btn-sm btn-soft-primary">
-                        <i class="bi bi-eye"></i> Lihat
-                    </a>
+                    <x-shared.action-button
+                        :link="route('proposals.show', $proposal)"
+                        label="Lihat"
+                        style="soft-primary"
+                        size="sm"
+                        icon="bi bi-eye"
+                    />
                     @if(auth()->user()->can('update', $proposal) && $proposal->status === 'draft')
-                        <a href="{{ route('proposals.edit', $proposal) }}" class="btn btn-sm btn-primary">
-                            <i class="bi bi-pencil"></i> Edit
-                        </a>
+                        <x-shared.action-button
+                            :link="route('proposals.edit', $proposal)"
+                            label="Edit"
+                            style="primary"
+                            size="sm"
+                            icon="bi bi-pencil"
+                        />
                     @endif
                 </div>
 
                 @if(auth()->user()->can('update', $proposal) && $proposal->status === 'draft')
-                    <form action="{{ route('proposals.submit', $proposal) }}" method="POST" class="d-inline">
-                        @csrf
-                        <button type="submit" class="btn btn-sm btn-success">
-                            <i class="bi bi-send"></i> Submit untuk Review
-                        </button>
-                    </form>
+                    <x-shared.action-button
+                        :link="route('proposals.submit', $proposal)"
+                        method="POST"
+                        label="Submit untuk Review"
+                        style="success"
+                        size="sm"
+                        icon="bi bi-send"
+                    />
                 @endif
             </div>
         @endif

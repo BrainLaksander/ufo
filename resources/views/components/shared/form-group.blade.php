@@ -16,8 +16,12 @@
 --}}
 
 @php
+    $type = $type ?? 'text';
+    $currentValue = old($name, $value ?? '');
     $fieldError = $errors->get($name);
-    $hasError = count($fieldError) > 0;
+    $hasError = !empty($fieldError);
+    $inputClass = $type === 'select' ? 'form-select' : 'form-control';
+    $inputClass .= $hasError ? ' is-invalid' : '';
 @endphp
 
 <div class="mb-3">
@@ -30,15 +34,15 @@
         </label>
     @endif
 
-    @switch($type ?? 'text')
+    @switch($type)
         @case('textarea')
             <textarea 
                 id="{{ $name }}" 
                 name="{{ $name }}" 
-                class="form-control {{ $hasError ? 'is-invalid' : '' }}"
+                class="{{ $inputClass }}"
                 placeholder="{{ $placeholder ?? '' }}"
-                {{ ($required ?? false) ? 'required' : '' }}
-                {{ ($disabled ?? false) ? 'disabled' : '' }}
+                @if($required ?? false) required @endif
+                @if($disabled ?? false) disabled @endif
                 rows="{{ $rows ?? 4 }}">{{ old($name, $value ?? '') }}</textarea>
             @break
 
@@ -46,15 +50,14 @@
             <select 
                 id="{{ $name }}" 
                 name="{{ $name }}" 
-                class="form-select {{ $hasError ? 'is-invalid' : '' }}"
-                {{ ($required ?? false) ? 'required' : '' }}
-                {{ ($disabled ?? false) ? 'disabled' : '' }}>
+                class="{{ $inputClass }}"
+                @if($required ?? false) required @endif
+                @if($disabled ?? false) disabled @endif>
                 
-                <option value="">{{ 'Pilih ' . ($label ?? 'opsi') }}</option>
+                <option value="" @selected($currentValue === '' || $currentValue === null)>{{ $placeholder ?? ('Pilih ' . ($label ?? 'opsi')) }}</option>
                 
                 @foreach(($options ?? []) as $optValue => $optLabel)
-                    <option value="{{ $optValue }}" 
-                        @selected(old($name, $value ?? '') == $optValue)>
+                    <option value="{{ $optValue }}" @selected((string) $currentValue === (string) $optValue)>
                         {{ $optLabel }}
                     </option>
                 @endforeach
@@ -63,14 +66,14 @@
 
         @default
             <input 
-                type="{{ $type ?? 'text' }}" 
+                type="{{ $type }}" 
                 id="{{ $name }}" 
                 name="{{ $name }}" 
-                class="form-control {{ $hasError ? 'is-invalid' : '' }}"
-                value="{{ old($name, $value ?? '') }}"
+                class="{{ $inputClass }}"
+                value="{{ $currentValue }}"
                 placeholder="{{ $placeholder ?? '' }}"
-                {{ ($required ?? false) ? 'required' : '' }}
-                {{ ($disabled ?? false) ? 'disabled' : '' }}>
+                @if($required ?? false) required @endif
+                @if($disabled ?? false) disabled @endif>
     @endswitch
 
     @if($hint ?? false)

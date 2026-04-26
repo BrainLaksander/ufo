@@ -20,9 +20,10 @@
     ];
     
     $bgClass = $bgColorMap[$bgColor ?? 'primary'] ?? 'bg-primary';
+    $cardClass = 'card card-stat position-relative';
 @endphp
 
-<div class="card card-stat">
+<div class="{{ $cardClass }}">
     <div class="card-body d-flex align-items-center">
         <div class="flex-shrink-0 me-3">
             <div class="p-3 rounded-3 {{ $bgClass }} text-white" style="width: 60px; height: 60px; display: flex; align-items: center; justify-content: center;">

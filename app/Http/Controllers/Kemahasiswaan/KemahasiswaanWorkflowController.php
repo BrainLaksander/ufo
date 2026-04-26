@@ -920,11 +920,13 @@ class KemahasiswaanWorkflowController extends Controller
         if (Schema::hasTable('events')) {
             $isSqlite = DB::getDriverName() === 'sqlite';
             $monthFunction = $isSqlite ? "strftime('%m', start_date)" : "MONTH(start_date)";
+            $castType = $isSqlite ? 'INTEGER' : 'UNSIGNED';
+            $monthExpression = "CAST($monthFunction AS $castType)";
             
             $counts = DB::table('events')
-                ->selectRaw("CAST($monthFunction AS INTEGER) as month_number, COUNT(*) as total")
+                ->selectRaw("$monthExpression as month_number, COUNT(*) as total")
                 ->whereYear('start_date', now()->year)
-                ->groupByRaw($monthFunction)
+                ->groupByRaw($monthExpression)
                 ->pluck('total', 'month_number');
         }
 

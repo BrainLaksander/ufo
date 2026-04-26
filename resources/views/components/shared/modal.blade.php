@@ -24,8 +24,7 @@
     $sizeClass = $sizeMap[$size ?? 'md'] ?? '';
 @endphp
 
-<div class="modal fade" id="{{ $id }}" tabindex="-1" aria-labelledby="{{ $id }}Label"
-    aria-hidden="true">
+<div class="modal fade" id="{{ $id }}" tabindex="-1" aria-labelledby="{{ $id }}Label" aria-hidden="true">
     <div class="modal-dialog {{ $sizeClass }}">
         <div class="modal-content">
             <div class="modal-header">
@@ -39,15 +38,18 @@
                 {{ $slot }}
             </div>
 
-            @if($footer ?? true)
+            @if(($footer ?? true) || trim((string) ($footer ?? '')) !== '')
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                        {{ $cancelButtonLabel ?? 'Batal' }}
-                    </button>
-                    <button type="button" class="btn btn-{{ $submitButtonStyle ?? 'primary' }}"
-                        id="{{ $id }}-submit">
-                        {{ $submitButtonLabel ?? 'Simpan' }}
-                    </button>
+                    @if(is_string($footer ?? null) && trim($footer) !== '')
+                        {!! $footer !!}
+                    @else
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                            {{ $cancelButtonLabel ?? 'Batal' }}
+                        </button>
+                        <button type="button" class="btn btn-{{ $submitButtonStyle ?? 'primary' }}" id="{{ $id }}-submit">
+                            {{ $submitButtonLabel ?? 'Simpan' }}
+                        </button>
+                    @endif
                 </div>
             @endif
         </div>

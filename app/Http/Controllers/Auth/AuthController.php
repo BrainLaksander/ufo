@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Validation\Rule;
 use Illuminate\View\View;
 
 class AuthController extends Controller
@@ -20,7 +21,25 @@ class AuthController extends Controller
             $request->session()->forget('user');
         }
 
-        return view('auth.login');
+        $selectedRole = old('role', $request->query('role'));
+
+        if (!in_array($selectedRole, User::INTERNAL_LOGIN_ROLES, true)) {
+            $selectedRole = '';
+        }
+
+        $roleOptions = [];
+
+        foreach (User::INTERNAL_LOGIN_ROLES as $role) {
+            $roleOptions[] = [
+                'value' => $role,
+                'label' => User::INTERNAL_LOGIN_ROLE_LABELS[$role] ?? ucfirst($role),
+            ];
+        }
+
+        return view('auth.login', [
+            'roleOptions' => $roleOptions,
+            'selectedRole' => $selectedRole,
+        ]);
     }
 
     public function login(Request $request)
@@ -28,7 +47,7 @@ class AuthController extends Controller
         $data = $request->validate([
             'email' => ['required','email'],
             'password' => ['required'],
-            'role' => ['required', 'in:kemahasiswaan,pengurus'],
+            'role' => ['required', Rule::in(User::INTERNAL_LOGIN_ROLES)],
         ]);
 
         $email = strtolower($data['email']);

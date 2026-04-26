@@ -24,24 +24,34 @@
 @section('content')
 <div class="kmh-page kmh-dashboard-page">
     <section class="kmh-stats-grid kmh-dashboard-stats" aria-label="Ringkasan statistik dashboard">
-        @foreach ($stats as $item)
+        @forelse ($stats as $item)
             <article class="kmh-stat-card tone-{{ $item['tone'] ?? '' }}">
                 <div class="kmh-stat-content">
                     <p>{{ $item['label'] ?? '' }}</p>
                     <strong class="kmh-stat-value">{{ $item['value'] ?? '' }}</strong>
                 </div>
-                <span class="kmh-stat-icon">
+                <span class="kmh-stat-icon" aria-hidden="true">
                     <i class="bi {{ $item['icon'] ?? '' }}"></i>
                 </span>
             </article>
-        @endforeach
+        @empty
+            <article class="kmh-stat-card tone-muted">
+                <div class="kmh-stat-content">
+                    <p>Belum ada data statistik</p>
+                    <strong class="kmh-stat-value">0</strong>
+                </div>
+                <span class="kmh-stat-icon" aria-hidden="true">
+                    <i class="bi bi-bar-chart"></i>
+                </span>
+            </article>
+        @endforelse
     </section>
 
     <section class="kmh-dashboard-main-grid" aria-label="Konten utama dashboard">
         <article class="kmh-card kmh-dashboard-chart-card">
             <header class="kmh-card-head">
                 <div class="d-inline-flex align-items-center gap-2">
-                    <i class="bi bi-graph-up-arrow text-primary"></i>
+                    <i class="bi bi-graph-up-arrow text-primary" aria-hidden="true"></i>
                     <h2 class="mb-0">{{ $ui['chart_title'] ?? '' }} {{ now()->year }}</h2>
                 </div>
             </header>
@@ -53,39 +63,43 @@
         </article>
 
         <aside class="kmh-card kmh-dashboard-side-panel" aria-label="Panel aksi dan kegiatan mendatang">
-            <header class="kmh-card-head">
-                <h3>{{ $ui['quick_actions_title'] ?? '' }}</h3>
-            </header>
-            <div class="kmh-card-body">
-                <div class="kmh-quick-actions">
-                    <a href="{{ route('portal.kemahasiswaan.pengajuan') }}" class="kmh-quick-btn is-primary">
-                        <span>{{ $ui['quick_action_review'] ?? '' }}</span>
-                    </a>
-                    <a href="{{ route('portal.kemahasiswaan.pengumuman') }}" class="kmh-quick-btn is-accent">
-                        <span>{{ $ui['quick_action_announcement'] ?? '' }}</span>
-                    </a>
+            <section class="kmh-side-block" aria-label="Quick actions">
+                <header class="kmh-card-head">
+                    <h3>{{ $ui['quick_actions_title'] ?? '' }}</h3>
+                </header>
+                <div class="kmh-card-body">
+                    <div class="kmh-quick-actions">
+                        <a href="{{ route('portal.kemahasiswaan.pengajuan') }}" class="kmh-quick-btn is-primary">
+                            <span>{{ $ui['quick_action_review'] ?? '' }}</span>
+                        </a>
+                        <a href="{{ route('portal.kemahasiswaan.pengumuman') }}" class="kmh-quick-btn is-accent">
+                            <span>{{ $ui['quick_action_announcement'] ?? '' }}</span>
+                        </a>
+                    </div>
                 </div>
-            </div>
+            </section>
 
-            <header class="kmh-card-head kmh-side-section-head">
-                <h3>
-                    <i class="bi bi-calendar3" aria-hidden="true"></i>
-                    {{ $ui['upcoming_events_title'] ?? '' }}
-                </h3>
-            </header>
-            <div class="kmh-event-list" role="list">
-                @forelse ($upcomingEvents as $event)
-                    <article class="kmh-event-item" role="listitem">
-                        <h4>{{ $event['title'] ?? '' }}</h4>
-                        <p>{{ $event['date'] ?? '' }}</p>
-                    </article>
-                @empty
-                    <article class="kmh-event-item is-empty" role="listitem">
-                        <h4>{{ $ui['upcoming_empty_title'] ?? '' }}</h4>
-                        <p>{{ $ui['upcoming_empty_message'] ?? '' }}</p>
-                    </article>
-                @endforelse
-            </div>
+            <section class="kmh-side-block" aria-label="Kegiatan mendatang">
+                <header class="kmh-card-head kmh-side-section-head">
+                    <h3>
+                        <i class="bi bi-calendar3" aria-hidden="true"></i>
+                        {{ $ui['upcoming_events_title'] ?? '' }}
+                    </h3>
+                </header>
+                <div class="kmh-event-list" role="list">
+                    @forelse ($upcomingEvents as $event)
+                        <article class="kmh-event-item" role="listitem">
+                            <h4>{{ $event['title'] ?? '' }}</h4>
+                            <p>{{ $event['date'] ?? '' }}</p>
+                        </article>
+                    @empty
+                        <article class="kmh-event-item is-empty" role="listitem">
+                            <h4>{{ $ui['upcoming_empty_title'] ?? '' }}</h4>
+                            <p>{{ $ui['upcoming_empty_message'] ?? '' }}</p>
+                        </article>
+                    @endforelse
+                </div>
+            </section>
         </aside>
     </section>
 
@@ -116,7 +130,7 @@
                             @endphp
                             <tr>
                                 <td>{{ $announcement['judul'] ?? '' }}</td>
-                                <td>({{ $announcement['tanggal'] ?? '' }})</td>
+                                <td>{{ $announcement['tanggal'] ?? '' }}</td>
                                 <td>
                                     <span class="kmh-status-pill {{ $statusClass }}">{{ $announcement['status'] ?? '' }}</span>
                                 </td>

@@ -1,4 +1,4 @@
-<aside id="sidebar" class="sidebar kemahasiswaan-sidebar" aria-hidden="false">
+<aside id="sidebar" class="sidebar kemahasiswaan-sidebar" aria-hidden="true">
     @php
         $notificationCount = (int) ($headerNotificationCount ?? 0);
         $isDashboard = request()->routeIs('portal.kemahasiswaan.dashboard') || request()->routeIs('dashboard.kemahasiswaan') || request()->is('kemahasiswaan');
@@ -11,6 +11,9 @@
             <h2>Departemen Kemahasiswaan</h2>
             <div class="university">Universitas Klabat</div>
         </div>
+        <button id="sidebar-close" type="button" class="kmh-sidebar-close" aria-label="Tutup sidebar">
+            <i class="bi bi-x-lg"></i>
+        </button>
     </div>
 
     <nav class="sidebar-nav">
