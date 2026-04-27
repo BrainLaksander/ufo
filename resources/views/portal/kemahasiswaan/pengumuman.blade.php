@@ -287,21 +287,30 @@
                     </thead>
                     <tbody>
                         @forelse($emailReviewQueue as $item)
+                            @php
+                                $itemId = (int) ($item['id'] ?? 0);
+                                $itemJudul = (string) ($item['judul'] ?? '');
+                                $itemRingkasan = (string) ($item['ringkasan'] ?? '');
+                                $itemUkmName = (string) ($item['ukm_account_name'] ?? '-');
+                                $itemOrganisasi = (string) ($item['organisasi'] ?? '-');
+                                $itemStatus = (string) ($item['status'] ?? '-');
+                                $itemEmailReviewStatus = (string) ($item['email_review_status'] ?? '-');
+                            @endphp
                             <tr>
                                 <td>
-                                    <div class="fw-semibold">{{ $item['judul'] }}</div>
-                                    <small class="text-muted">{{ $item['ringkasan'] }}</small>
+                                    <div class="fw-semibold">{{ $itemJudul }}</div>
+                                    <small class="text-muted">{{ $itemRingkasan }}</small>
                                 </td>
-                                <td>{{ $item['ukm_account_name'] }}</td>
-                                <td>{{ $item['organisasi'] }}</td>
+                                <td>{{ $itemUkmName }}</td>
+                                <td>{{ $itemOrganisasi }}</td>
                                 <td>
-                                    <span class="kmh-status-pill {{ $statusClass($item['status']) }}">{{ $item['status'] }}</span>
+                                    <span class="kmh-status-pill {{ $statusClass($itemStatus) }}">{{ $itemStatus }}</span>
                                 </td>
                                 <td>
-                                    <span class="kmh-status-pill {{ $reviewClass($item['email_review_status']) }}">{{ $item['email_review_status'] }}</span>
+                                    <span class="kmh-status-pill {{ $reviewClass($itemEmailReviewStatus) }}">{{ $itemEmailReviewStatus }}</span>
                                 </td>
                                 <td class="text-center">
-                                    <form method="POST" action="{{ route('portal.kemahasiswaan.pengumuman.email-review', ['id' => $item['id']]) }}" class="kmh-inline-review">
+                                    <form method="POST" action="{{ route('portal.kemahasiswaan.pengumuman.email-review', ['id' => $itemId]) }}" class="kmh-inline-review">
                                         @csrf
                                         <select name="decision" class="form-select form-select-sm">
                                             <option value="setujui">Setujui</option>
@@ -347,25 +356,33 @@
                     <tbody>
                         @forelse($workflowPengumuman as $item)
                             @php
+                                $itemId = (int) ($item['id'] ?? 0);
+                                $itemJudul = (string) ($item['judul'] ?? '-');
+                                $itemKategori = (string) ($item['kategori'] ?? '-');
+                                $itemTarget = (string) ($item['target'] ?? '-');
+                                $itemOrganisasi = (string) ($item['organisasi'] ?? '-');
+                                $itemStatus = (string) ($item['status'] ?? '-');
+                                $itemEmailReviewStatus = (string) ($item['email_review_status'] ?? '-');
+                                $itemStatusCode = (string) ($item['status_code'] ?? '');
                                 $rowSearch = \Illuminate\Support\Str::lower(implode(' ', [
-                                    (string) ($item['judul'] ?? ''),
-                                    (string) ($item['kategori'] ?? ''),
-                                    (string) ($item['target'] ?? ''),
-                                    (string) ($item['organisasi'] ?? ''),
+                                    $itemJudul,
+                                    $itemKategori,
+                                    $itemTarget,
+                                    $itemOrganisasi,
                                     (string) ($item['ringkasan'] ?? ''),
                                 ]));
-                                $canEditSchedule = ($item['status_code'] ?? '') === 'scheduled';
-                                $canDelete = in_array((string) ($item['status_code'] ?? ''), ['draft', 'scheduled'], true);
+                                $canEditSchedule = $itemStatusCode === 'scheduled';
+                                $canDelete = in_array($itemStatusCode, ['draft', 'scheduled'], true);
                             @endphp
                             <tr
                                 data-pengumuman-row
                                 data-pengumuman-search="{{ $rowSearch }}"
-                                data-pengumuman-status="{{ $item['status_code'] }}"
+                                data-pengumuman-status="{{ $itemStatusCode }}"
                             >
-                                <td>{{ $item['judul'] }}</td>
-                                <td>{{ $item['kategori'] }}</td>
-                                <td>{{ $item['target'] }}</td>
-                                <td>{{ $item['organisasi'] }}</td>
+                                <td>{{ $itemJudul }}</td>
+                                <td>{{ $itemKategori }}</td>
+                                <td>{{ $itemTarget }}</td>
+                                <td>{{ $itemOrganisasi }}</td>
                                 <td>
                                     @if(!empty($item['publish_at']))
                                         {{ \Carbon\Carbon::parse($item['publish_at'])->format('d M Y') }}
@@ -374,11 +391,11 @@
                                     @endif
                                 </td>
                                 <td>
-                                    <span class="kmh-status-pill {{ $statusClass($item['status']) }}">{{ $item['status'] }}</span>
+                                    <span class="kmh-status-pill {{ $statusClass($itemStatus) }}">{{ $itemStatus }}</span>
                                 </td>
                                 <td>
                                     <div>
-                                        <span class="kmh-status-pill {{ $reviewClass($item['email_review_status']) }}">{{ $item['email_review_status'] }}</span>
+                                        <span class="kmh-status-pill {{ $reviewClass($itemEmailReviewStatus) }}">{{ $itemEmailReviewStatus }}</span>
                                     </div>
                                     @if(!empty($item['email_review_note']))
                                         <small class="text-muted d-block mt-1">{{ $item['email_review_note'] }}</small>
@@ -391,7 +408,7 @@
                                                 type="button"
                                                 class="btn btn-sm btn-outline-primary"
                                                 data-pengumuman-edit
-                                                data-pengumuman-id="{{ $item['id'] }}"
+                                                data-pengumuman-id="{{ $itemId }}"
                                                 data-bs-toggle="modal"
                                                 data-bs-target="#kmh-pengumuman-modal"
                                             >
@@ -400,7 +417,7 @@
                                         @endif
 
                                         @if($canDelete)
-                                            <form method="POST" action="{{ route('portal.kemahasiswaan.pengumuman.destroy', ['id' => $item['id']]) }}" onsubmit="return confirm('Hapus pengumuman ini?');">
+                                            <form method="POST" action="{{ route('portal.kemahasiswaan.pengumuman.destroy', ['id' => $itemId]) }}" onsubmit="return confirm('Hapus pengumuman ini?');">
                                                 @csrf
                                                 @method('DELETE')
                                                 <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>

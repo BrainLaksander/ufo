@@ -115,4 +115,10 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    'announcement_targets' => [
+        'all_students' => env('ANNOUNCEMENT_MAILING_STUDENTS', ''),
+        'selected_students' => env('ANNOUNCEMENT_MAILING_SELECTED', ''),
+        'default' => env('ANNOUNCEMENT_MAILING_DEFAULT', ''),
+    ],
+
 ];

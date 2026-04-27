@@ -239,8 +239,8 @@
                                 data-org-email="{{ $org['email'] ?? '' }}"
                                 data-org-phone="{{ $org['phone'] ?? '' }}"
                                 data-org-status="{{ $org['status'] ?? '' }}"
-                                data-org-scope="{{ $org['scope'] ?? '' }}"
-                                data-org-level="{{ $org['scope'] ?? '' }}"
+                                data-org-scope="{{ $org['scope'] ?? $org['level'] ?? '' }}"
+                                data-org-level="{{ $org['level'] ?? $org['scope'] ?? '' }}"
                                 data-org-type="{{ $org['type'] ?? '' }}"
                                 data-org-field="{{ $org['field'] ?? '' }}"
                                 data-org-advisor="{{ $org['advisor'] ?? '' }}"
@@ -254,7 +254,7 @@
                                         </span>
                                         <div>
                                             <div class="kmh-org-name">{{ $org['name'] }}</div>
-                                            <small class="text-muted d-block">{{ $org['scope'] }}</small>
+                                            <small class="text-muted d-block">{{ $org['scope'] ?? $org['level'] ?? '-' }}</small>
                                         </div>
                                     </div>
                                 </td>
@@ -268,7 +268,7 @@
                                 </td>
                                 <td>{{ $org['field'] }}</td>
                                 <td>{{ $org['advisor'] ?? '-' }}</td>
-                                <td>{{ $org['leader'] }}</td>
+                                <td>{{ $org['leader'] ?? $org['leader_name'] ?? '-' }}</td>
                                 <td class="text-center">
                                     <div class="kmh-action-links justify-content-center kmh-org-actions">
                                         <button class="kmh-action-link is-primary" type="button" title="Lihat Detail" data-org-detail-trigger>
