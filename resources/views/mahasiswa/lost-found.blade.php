@@ -113,19 +113,17 @@
                         <label>{{ $ui['form_type_label'] ?? '' }} <span class="figma-required">*</span></label>
                         <div class="figma-lf-form-type-group" role="tablist" aria-label="{{ $ui['form_type_label'] ?? '' }}">
                             <button type="button" class="figma-lf-form-type is-active" data-lf-form-type="lost">{{ $ui['form_type_lost'] ?? '' }}</button>
-                            <button type="button" class="figma-lf-form-type" data-lf-form-type="found">{{ $ui['form_type_found'] ?? '' }}</button>
+                            <button type="button" class="figma-lf-form-type" disabled title="Laporan barang ditemukan diproses oleh BEM">{{ $ui['form_type_found'] ?? '' }}</button>
                         </div>
                         <input id="lf-type" type="hidden" name="type" value="lost">
+                        <small class="text-muted d-block mt-1">Laporan barang ditemukan diproses langsung melalui BEM agar verifikasi lebih aman.</small>
                     </div>
 
                     <div>
-                        <label for="lf-image">{{ $ui['form_image_label'] ?? '' }} <span class="figma-required">*</span></label>
-                        <label for="lf-image" class="figma-lf-upload-zone">
-                            <i class="bi bi-upload"></i>
-                            <strong>{{ $ui['form_image_hint_title'] ?? '' }}</strong>
-                            <small>{{ $ui['form_image_hint_subtitle'] ?? '' }}</small>
-                        </label>
-                        <input id="lf-image" type="file" name="image" accept="image/png,image/jpeg" required hidden>
+                        <label class="form-label">Foto</label>
+                        <div class="alert alert-info mb-0">
+                            Upload foto dari halaman mahasiswa dinonaktifkan. Jika barang ditemukan, silakan langsung lapor ke BEM untuk dokumentasi foto real-time.
+                        </div>
                     </div>
 
                     <div>
