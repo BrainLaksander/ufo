@@ -25,7 +25,7 @@ class AccountAdminController extends Controller
     {
         $this->ensureDefaultBemUkmAccount();
 
-        return view('portal.kemahasiswaan.akun', [
+        return view('pages.kemahasiswaan.akun', [
             'ukmAccounts' => $this->getAkunUKM(),
             'accountActivityLogs' => $this->getActivityLogs(),
             'organizations' => $this->getOrganizations(),

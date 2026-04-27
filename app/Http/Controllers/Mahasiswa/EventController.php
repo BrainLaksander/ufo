@@ -34,7 +34,7 @@ class EventController extends Controller
             ->values()
             ->all();
 
-        return view('mahasiswa.event', [
+        return view('pages.mahasiswa.event', [
             'pageContent' => $this->loadMahasiswaPublicUiContent('event'),
             'categories' => $data['event_categories'],
             'events' => $data['events'],
@@ -51,7 +51,7 @@ class EventController extends Controller
 
         abort_if($event === null, 404);
 
-        return view('mahasiswa.event-detail', [
+        return view('pages.mahasiswa.event-detail', [
             'pageContent' => $this->loadMahasiswaPublicUiContent('event_detail'),
             'event' => $event,
             'notifications' => $data['notifications'],
@@ -104,7 +104,7 @@ class EventController extends Controller
             ->values()
             ->all();
 
-        return view('mahasiswa.kalendar-kegiatan', [
+        return view('pages.mahasiswa.kalendar-kegiatan', [
             'calendarEvents' => $calendarEvents,
             'notifications' => $data['notifications'],
         ]);

@@ -73,7 +73,7 @@ class DashboardController extends Controller
 
         [$profileStatusValue, $profileStatusLabel] = $this->getProfileStatus($organizationId);
 
-        return view('portal.pengurus.dashboard', [
+        return view('pages.pengurus.dashboard', [
             'activities' => $events,
             'summaryCards' => $summaryCards,
             'legendItems' => $legendItems,
@@ -276,7 +276,7 @@ class DashboardController extends Controller
                 ->first();
         }
 
-        return view('portal.pengurus.settings', [
+        return view('pages.pengurus.settings', [
             'hasOrganizationContext' => $org !== null,
             'orgData' => [
                 'id' => $org->id ?? null,

@@ -27,7 +27,7 @@ class AnnouncementController extends Controller
 
         $eventOptions = $this->loadAnnouncementEventOptions($organizationId);
 
-        return view('portal.pengurus.announcements', [
+        return view('pages.pengurus.announcements', [
             'activeAnnouncements' => $activeAnnouncements,
             'allAnnouncements' => $allAnnouncements,
             'eventOptions' => $eventOptions,
@@ -36,7 +36,7 @@ class AnnouncementController extends Controller
 
     public function form(Request $request): View
     {
-        return view('portal.pengurus.announcements.form');
+        return view('pages.pengurus.announcements.form');
     }
 
     public function store(Request $request): RedirectResponse

@@ -55,7 +55,7 @@ class OrganizationAdminController extends Controller
             'categories' => collect($organizationDirectory)->pluck('category')->filter()->unique()->count(),
         ];
 
-        return view('portal.kemahasiswaan.organisasi', [
+        return view('pages.kemahasiswaan.organisasi', [
             'ukmAccounts' => $this->getAkunUKM(),
             'accountActivityLogs' => $this->getActivityLogs(),
             'organizations' => $this->getOrganizations(),

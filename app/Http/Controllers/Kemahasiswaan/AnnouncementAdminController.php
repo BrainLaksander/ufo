@@ -36,7 +36,7 @@ class AnnouncementAdminController extends Controller
             fn (array $item) => in_array($item['email_review_code'], $pendingEmailReviewStatuses, true)
         ));
 
-        return view('portal.kemahasiswaan.pengumuman', [
+        return view('pages.kemahasiswaan.pengumuman', [
             'workflowPengumuman' => $pengumuman,
             'emailReviewQueue' => $reviewQueue,
             'ukmAccounts' => $this->getAkunUKM(),

@@ -27,7 +27,7 @@ class SubmissionController extends Controller
         $kontakPengurus = $this->loadContactCards($organizationId);
         $eventOptions = $this->loadEventOptions($organizationId);
 
-        return view('portal.pengurus.proposals', [
+        return view('pages.pengurus.proposals', [
             'workflowPengajuan' => $workflowPengajuan,
             'workflowLaporan' => $workflowLaporan,
             'jadwalKegiatan' => $jadwalKegiatan,

@@ -79,11 +79,23 @@ class MahasiswaDataProvider
             return [];
         }
 
+        $select = ['id', 'name', 'description', 'vision', 'mission', 'logo', 'email', 'phone', 'banner', 'status'];
+
+        if (Schema::hasColumn('organizations', 'shortname')) {
+            $select[] = 'shortname';
+        }
+        if (Schema::hasColumn('organizations', 'instagram')) {
+            $select[] = 'instagram';
+        }
+        // support both 'line' and 'line_id' legacy names
+        if (Schema::hasColumn('organizations', 'line')) {
+            $select[] = 'line';
+        } elseif (Schema::hasColumn('organizations', 'line_id')) {
+            $select[] = 'line_id';
+        }
+
         $rows = DB::table('organizations')
-            ->select([
-                'id', 'name', 'shortname', 'description', 'vision', 'mission',
-                'logo', 'email', 'phone', 'banner', 'instagram', 'line', 'status',
-            ])
+            ->select($select)
             ->where('status', 'active')
             ->orderBy('name')
             ->when(Schema::hasColumn('organizations', 'profile_values_json'), fn ($query) => $query->addSelect('profile_values_json'))
@@ -246,9 +258,9 @@ class MahasiswaDataProvider
             'id' => $orgId,
             'name' => $row->name,
             'category' => $category,
-            'logo_text' => $this->acronym($row->shortname, $row->name),
+            'logo_text' => $this->acronym((string) ($row->shortname ?? ''), $row->name),
             'logo' => $logoUrl,
-            'tagline' => $row->description ? Str::limit((string) $row->description, 110, '...') : ($row->shortname ?: null),
+            'tagline' => $row->description ? Str::limit((string) $row->description, 110, '...') : ((string) ($row->shortname ?? '') ?: null),
             'banner' => $bannerUrl ?: $this->placeholderImage((string) $row->name),
             'visi' => $row->vision ?: $row->description,
             'misi' => $mission,

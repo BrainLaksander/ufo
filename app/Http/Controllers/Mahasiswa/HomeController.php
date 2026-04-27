@@ -23,7 +23,7 @@ class HomeController extends Controller
     {
         $data = $this->dataProvider->loadAllData();
 
-        return view('mahasiswa.beranda', [
+        return view('pages.mahasiswa.beranda', [
             'pageContent' => $this->loadMahasiswaHomeContent(),
             'carousel_images' => $data['carousel_images'],
             'organizations' => array_values($data['organizations']),
@@ -37,7 +37,7 @@ class HomeController extends Controller
     {
         $data = $this->dataProvider->loadAllData();
 
-        return view('mahasiswa.tentang', [
+        return view('pages.mahasiswa.tentang', [
             'pageContent' => $this->loadMahasiswaAboutContent(),
             'organizations' => array_values($data['organizations']),
             'organization_categories' => $data['organization_categories'],

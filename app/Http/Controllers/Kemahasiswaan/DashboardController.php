@@ -66,7 +66,7 @@ class DashboardController extends Controller
             ->values()
             ->all();
 
-        return view('portal.kemahasiswaan.dashboard', [
+        return view('pages.kemahasiswaan.dashboard', [
             'stats' => $stats,
             'monthlyActivity' => $monthlyActivity,
             'upcomingEvents' => $this->getUpcomingEvents(),
@@ -106,7 +106,7 @@ class DashboardController extends Controller
             ->values()
             ->all();
 
-        return view('portal.kemahasiswaan.notifikasi', [
+        return view('pages.kemahasiswaan.notifikasi', [
             'notifikasiItems' => $filteredNotifications,
             'notifikasiFilter' => $selectedFilter,
             'notifikasiTypes' => $types,
@@ -123,7 +123,7 @@ class DashboardController extends Controller
     {
         $kontakPengurus = $this->getKontakPengurusUkm();
 
-        return view('portal.kemahasiswaan.kontak', [
+        return view('pages.kemahasiswaan.kontak', [
             'kontakPengurus' => $kontakPengurus,
             'contactSummary' => [
                 'total_kontak' => count($kontakPengurus),
@@ -141,7 +141,7 @@ class DashboardController extends Controller
         $kalenderKegiatan = $this->getKalenderKegiatanKampus();
         $now = now();
 
-        return view('portal.kemahasiswaan.kalender', [
+        return view('pages.kemahasiswaan.kalender', [
             'kalenderKegiatan' => $kalenderKegiatan,
             'organizations' => $this->getOrganizations(),
             'kalenderSummary' => [

@@ -29,7 +29,7 @@ class LostFoundController extends Controller
         $items = (array) data_get($data, 'lost_found.items', []);
         $categories = (array) data_get($data, 'lost_found_categories', []);
 
-        return view('mahasiswa.lost-found', [
+        return view('pages.mahasiswa.lost-found', [
             'pageContent' => $this->loadMahasiswaPublicUiContent('lost_found'),
             'categories' => $categories,
             'urgent_items' => $urgentItems,

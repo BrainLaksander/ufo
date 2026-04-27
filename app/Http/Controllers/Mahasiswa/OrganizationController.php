@@ -28,7 +28,7 @@ class OrganizationController extends Controller
     {
         $data = $this->dataProvider->loadAllData();
 
-        return view('mahasiswa.organisasi', [
+        return view('pages.mahasiswa.organisasi', [
             'pageContent' => $this->loadMahasiswaPublicUiContent('organisasi'),
             'carouselImages' => $data['carousel_images'],
             'categories' => $data['organization_categories'],
@@ -44,7 +44,7 @@ class OrganizationController extends Controller
 
         abort_if($org === null, 404);
 
-        return view('mahasiswa.organisasi-detail', [
+        return view('pages.mahasiswa.organisasi-detail', [
             'pageContent' => $this->loadMahasiswaPublicUiContent('organisasi_detail'),
             'org' => $org,
             'notifications' => $data['notifications'],
@@ -58,7 +58,7 @@ class OrganizationController extends Controller
 
         abort_if($org === null, 404);
 
-        return view('mahasiswa.organisasi-daftar', [
+        return view('pages.mahasiswa.organisasi-daftar', [
             'pageContent' => $this->loadMahasiswaPublicUiContent('organisasi_daftar'),
             'org' => $org,
             'registration' => $org['registration'] ?? [],
@@ -76,7 +76,7 @@ class OrganizationController extends Controller
         $event = collect($org['events'] ?? [])->firstWhere('id', $eventId);
         abort_if($event === null, 404);
 
-        return view('mahasiswa.organisasi-event-detail', [
+        return view('pages.mahasiswa.organisasi-event-detail', [
             'pageContent' => $this->loadMahasiswaPublicUiContent('organisasi_event_detail'),
             'org' => $org,
             'event' => $event,

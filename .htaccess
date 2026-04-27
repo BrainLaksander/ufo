@@ -1,0 +1,24 @@
+# Hostinger-friendly .htaccess for public_html root
+# Place this file in your public_html (rename to .htaccess after upload)
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    # Redirect all requests to index.php if the file/directory does not exist
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteRule ^ index.php [L]
+</IfModule>
+
+# Deny direct access to Laravel application folder if present inside public_html
+<IfModule mod_alias.c>
+    RedirectMatch 403 ^/laravel/.*$
+</IfModule>
+
+# Protect environment and sensitive files
+<FilesMatch "\.(env|env\.example|json|lock)$">
+    Require all denied
+</FilesMatch>
+
+# Disable directory listings
+Options -Indexes

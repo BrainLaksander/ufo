@@ -22,7 +22,7 @@ class AnnouncementController extends Controller
     {
         $data = $this->dataProvider->loadAllData();
 
-        return view('mahasiswa.pengumuman', [
+        return view('pages.mahasiswa.pengumuman', [
             'pageContent' => $this->loadMahasiswaPublicUiContent('pengumuman'),
             'categories' => $data['announcement_categories'],
             'announcements' => $data['announcements'],
@@ -37,7 +37,7 @@ class AnnouncementController extends Controller
 
         abort_if($announcement === null, 404);
 
-        return view('mahasiswa.pengumuman-detail', [
+        return view('pages.mahasiswa.pengumuman-detail', [
             'pageContent' => $this->loadMahasiswaPublicUiContent('pengumuman_detail'),
             'announcement' => $announcement,
             'notifications' => $data['notifications'],

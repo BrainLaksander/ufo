@@ -30,7 +30,7 @@ class EventController extends Controller
             return in_array($event['raw_status'], ['completed', 'selesai'], true);
         }));
 
-        return view('portal.pengurus.events', [
+        return view('pages.pengurus.events', [
             'activeEvents' => $activeEvents,
             'completedEvents' => $completedEvents,
         ]);
@@ -44,7 +44,7 @@ class EventController extends Controller
 
         abort_if($event === null, 404);
 
-        return view('portal.pengurus.events.detail', [
+        return view('pages.pengurus.events.detail', [
             'event' => $event,
         ]);
     }
@@ -52,7 +52,7 @@ class EventController extends Controller
     public function form(Request $request): View
     {
         $context = $this->resolvePengurusContext($request);
-        return view('portal.pengurus.events.form', [
+        return view('pages.pengurus.events.form', [
             'hasApprovedIzin' => false,
         ]);
     }

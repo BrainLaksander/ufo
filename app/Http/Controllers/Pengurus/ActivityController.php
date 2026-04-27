@@ -28,14 +28,14 @@ class ActivityController extends Controller
             ? trim((string) ($sessionUser['name'] ?? ''))
             : '';
 
-        return view('portal.pengurus.members', $viewData);
+        return view('pages.pengurus.members', $viewData);
     }
 
     public function applications(Request $request): View
     {
         $context = $this->resolvePengurusContext($request);
 
-        return view('portal.pengurus.applications', [
+        return view('pages.pengurus.applications', [
             'kontakPengurus' => $this->loadContactMiniCards((int) ($context['organization_id'] ?? 0)),
         ]);
     }
@@ -55,7 +55,7 @@ class ActivityController extends Controller
         $foundItems = array_values(array_filter($items, static fn (array $item): bool => $item['type'] === 'found'));
         $openLostOptions = array_values(array_filter($lostItems, static fn (array $item): bool => in_array((string) ($item['status'] ?? ''), ['active'], true)));
 
-        return view('portal.pengurus.lostandfound', [
+        return view('pages.pengurus.lostandfound', [
             'isBem' => Str::contains(Str::lower($organizationName), 'bem'),
             'items' => $items,
             'lostItems' => $lostItems,
@@ -238,34 +238,39 @@ class ActivityController extends Controller
         $columns = Schema::getColumnListing('lost_found_items');
         $hasColumn = static fn (string $column): bool => in_array($column, $columns, true);
 
-        $query = DB::table('lost_found_items as item')
-            ->leftJoin('users as reporter', 'reporter.id', '=', 'item.reported_by')
-            ->where(function ($query) use ($organizationId) {
-                $query->where('item.organization_id', $organizationId)
-                    ->orWhereNull('item.organization_id');
-            })
-            ->orderByDesc('item.created_at')
-            ->limit(50);
+        try {
+            $query = DB::table('lost_found_items as item')
+                ->leftJoin('users as reporter', 'reporter.id', '=', 'item.reported_by')
+                ->where(function ($query) use ($organizationId) {
+                    $query->where('item.organization_id', $organizationId)
+                        ->orWhereNull('item.organization_id');
+                })
+                ->orderByDesc('item.created_at')
+                ->limit(50);
 
-        if ($hasColumn('linked_lost_item_id')) {
-            $query->leftJoin('lost_found_items as linked', 'linked.id', '=', 'item.linked_lost_item_id');
+            if ($hasColumn('linked_lost_item_id')) {
+                $query->leftJoin('lost_found_items as linked', 'linked.id', '=', 'item.linked_lost_item_id');
+            }
+
+            $rows = $query->get([
+                    'item.id',
+                    'item.item_name',
+                    'item.description',
+                    'item.location_found',
+                    'item.type',
+                    'item.status',
+                    $hasColumn('image') ? 'item.image' : DB::raw('NULL as image'),
+                    $hasColumn('reporter_name') ? 'item.reporter_name as item_reporter_name' : DB::raw('NULL as item_reporter_name'),
+                    $hasColumn('reporter_contact') ? 'item.reporter_contact' : DB::raw('NULL as reporter_contact'),
+                    $hasColumn('linked_lost_item_id') ? 'item.linked_lost_item_id' : DB::raw('NULL as linked_lost_item_id'),
+                    'item.created_at',
+                    'reporter.name as user_reporter_name',
+                    $hasColumn('linked_lost_item_id') ? 'linked.item_name as linked_item_name' : DB::raw('NULL as linked_item_name'),
+                ]);
+        } catch (\Throwable $e) {
+            logger()->error('loadLostFoundCards query failed', ['error' => $e->getMessage()]);
+            return [];
         }
-
-        $rows = $query->get([
-                'item.id',
-                'item.item_name',
-                'item.description',
-                'item.location_found',
-                'item.type',
-                'item.status',
-                $hasColumn('image') ? 'item.image' : DB::raw('NULL as image'),
-                $hasColumn('reporter_name') ? 'item.reporter_name as item_reporter_name' : DB::raw('NULL as item_reporter_name'),
-                $hasColumn('reporter_contact') ? 'item.reporter_contact' : DB::raw('NULL as reporter_contact'),
-                $hasColumn('linked_lost_item_id') ? 'item.linked_lost_item_id' : DB::raw('NULL as linked_lost_item_id'),
-                'item.created_at',
-                'reporter.name as user_reporter_name',
-                $hasColumn('linked_lost_item_id') ? 'linked.item_name as linked_item_name' : DB::raw('NULL as linked_item_name'),
-            ]);
 
         return $rows->map(function ($row) {
             $itemStatus = Str::lower((string) ($row->status ?? 'active'));

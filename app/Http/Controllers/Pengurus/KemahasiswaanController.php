@@ -20,7 +20,7 @@ class KemahasiswaanController extends Controller
             ? (int) ($sessionUser['organization_id'] ?? 0)
             : 0;
 
-        return view('portal.kemahasiswaan.pengajuan', [
+        return view('pages.kemahasiswaan.pengajuan', [
             'workflowPengajuan' => $this->loadKemahasiswaanSubmissions($organizationId),
             'workflowLaporan' => $this->loadKemahasiswaanReports($organizationId),
             'jadwalKegiatan' => $this->loadKemahasiswaanSchedules($organizationId),
