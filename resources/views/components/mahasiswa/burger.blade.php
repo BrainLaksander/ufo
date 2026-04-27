@@ -30,10 +30,6 @@
             <i class="bi bi-megaphone"></i>
             <span>Pengumuman</span>
         </a>
-        <a href="{{ route('mahasiswa.tentang') }}" class="figma-ufo-menu-link {{ request()->is('tentang') ? 'is-active' : '' }}">
-            <i class="bi bi-info-circle"></i>
-            <span>Tentang UFO</span>
-        </a>
     </nav>
 
     <div class="figma-ufo-burger-portal" aria-label="Login portal internal">
