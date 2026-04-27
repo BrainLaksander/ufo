@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Str;
 
 class Organization extends Model
 {
@@ -204,5 +205,31 @@ class Organization extends Model
             ->where('status', 'approved')
             ->where('end_date', '>', now())
             ->count();
+    }
+
+    public static function isUniversityBem(?string $organizationName, ?string $organizationLevel): bool
+    {
+        $name = Str::lower(trim((string) $organizationName));
+        $level = Str::lower(trim((string) $organizationLevel));
+
+        $isBemName = $name !== '' && Str::contains($name, 'bem');
+        $isBemLevel = $level !== '' && Str::contains($level, 'bem');
+        $isBem = $isBemName || $isBemLevel;
+
+        if (!$isBem) {
+            return false;
+        }
+
+        $isFacultyContext = Str::contains($name, ['fakultas', 'faculty'])
+            || Str::contains($level, ['fakultas', 'faculty', 'prodi', 'jurusan']);
+
+        if ($isFacultyContext) {
+            return false;
+        }
+
+        $isUniversityLevel = Str::contains($level, ['universitas', 'university']);
+        $isUniversityName = Str::contains($name, ['bem unklab', 'bem universitas']);
+
+        return $isUniversityLevel || $isUniversityName;
     }
 }
