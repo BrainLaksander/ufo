@@ -31,11 +31,8 @@ return new class extends Migration {
             'pengurus_event_news_description_placeholder' => 'Ceritakan bagaimana event {organization} berlangsung dan highlight-nya.',
             'pengurus_event_news_highlight_placeholder' => 'Sorot momen utama, capaian, atau hasil paling penting dari kegiatan.',
             'pengurus_support_info_title' => 'Informasi Tambahan',
-            'pengurus_support_info_icon_1' => '📍',
             'pengurus_support_info_text_1' => 'Silakan hubungi kontak organisasi yang tersedia untuk koordinasi lanjutan.',
-            'pengurus_support_info_icon_2' => '🕐',
             'pengurus_support_info_text_2' => 'Pastikan waktu komunikasi disesuaikan dengan jam operasional pihak terkait.',
-            'pengurus_support_info_icon_3' => '💡',
             'pengurus_support_info_text_3' => 'Untuk kebutuhan mendesak, gunakan kanal kontak utama organisasi.',
         ];
 
