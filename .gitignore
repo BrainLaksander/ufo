@@ -1,55 +1,38 @@
-*.log
-.DS_Store
 .env
-.env.*
-!.env.example
-.phpactor.json
-.phpunit.result.cache
-/.fleet
 /.idea
-/.nova
-/.phpunit.cache
 /.vscode
-/.zed
-/auth.json
+.phpunit.result.cache
+.phpactor.json
+.history
+.historyFiles
+/.phpunit.cache
+
+# Laravel specific
+/vendor
 /node_modules
-/public/build
-/public/hot
 /public/storage
 /storage/*.key
-/storage/pail
-/vendor
-Homestead.json
-Homestead.yaml
+
+# OS/system files
+*.DS_Store
 Thumbs.db
 
-# VS Code history (file backups with timestamps)
-.history/
-.historyFiles/
+# Composer
+/composer.phar
+
+# Build output
+/public/build
+/public/hot
+
+# Local env files
+/.env.local
+.env.*
 
 # Backup files
 *.backup
-*_backup.jsx
-*_backup.js
-*.swp
-*.swo
-
-# Local history / temp that can contain merge markers
-.lh/
 *.orig
 *.rej
 *~
 
-# UML workspace folder
-/uml/
-
-# Local secret material
-/secrets/
-*.pem
-*.key
-
-/docs
-/design
-/deploy
-/_backup
-/vendor
+# Logs
+*.log
