@@ -206,10 +206,6 @@
                     <p>{{ $ui['calendar_subtitle'] ?? '' }}</p>
                 </div>
                 <div class="d-flex flex-wrap gap-2">
-                    <button type="button" class="kmh-calendar-add-btn" data-bs-toggle="modal" data-bs-target="#kmh-calendar-import-modal">
-                        <i class="bi bi-file-earmark-arrow-up" aria-hidden="true"></i>
-                        <span>Import PDF</span>
-                    </button>
                     <button type="button" class="kmh-calendar-add-btn" data-bs-toggle="modal" data-bs-target="#kmh-calendar-manual-modal">
                         <i class="bi bi-plus-lg" aria-hidden="true"></i>
                         <span>{{ $ui['add_activity'] ?? '' }}</span>
@@ -400,47 +396,6 @@
             @endif
         </div>
     </section>
-</div>
-
-<div class="modal fade" id="kmh-calendar-import-modal" tabindex="-1" aria-labelledby="kmh-calendar-import-modal-title" aria-hidden="true">
-    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable kmh-calendar-modal-dialog">
-        <div class="modal-content kmh-calendar-modal-content">
-            <div class="modal-header">
-                <div>
-                    <h5 class="modal-title" id="kmh-calendar-import-modal-title">Import Otomatis Dari PDF Kalender</h5>
-                    <p class="modal-subtitle mb-0">Upload PDF kalender akademik/sekolah dan sistem akan mengisi otomatis daftar kegiatan.</p>
-                </div>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
-            </div>
-            <div class="modal-body">
-                @unless(count($organizations) > 0)
-                    <div class="alert alert-warning" role="alert">
-                        {{ $ui['schedule_form_warning'] ?? '' }}
-                    </div>
-                @endunless
-
-                <form method="POST" action="{{ route('portal.kemahasiswaan.kalender.import-pdf') }}" enctype="multipart/form-data" class="row g-3">
-                    @csrf
-
-                    <div class="col-12">
-                        <label class="form-label" for="kmh-calendar-pdf">File PDF Kalender</label>
-                        <input
-                            type="file"
-                            id="kmh-calendar-pdf"
-                            name="calendar_pdf"
-                            class="form-control"
-                            accept="application/pdf"
-                            required
-                        >
-                    </div>
-
-                    <div class="col-12 d-flex justify-content-end">
-                        <button type="submit" class="btn btn-primary" @disabled(count($organizations) === 0)>Import PDF Otomatis</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 </div>
 
 <div class="modal fade" id="kmh-calendar-manual-modal" tabindex="-1" aria-labelledby="kmh-calendar-manual-modal-title" aria-hidden="true">
