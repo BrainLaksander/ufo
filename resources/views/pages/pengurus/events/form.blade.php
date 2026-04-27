@@ -58,7 +58,7 @@
 
                 <div class="ufo-pg-field-group ufo-pg-col-span-3">
                     <label for="event-start">Mulai</label>
-                    <input id="event-start" type="datetime-local" name="start_date" value="{{ old('start_date', $todayDate) }}" min="{{ $todayDate }}" required @disabled(!$canCreateEvent)>
+                    <input id="event-start" type="datetime-local" name="start_date" value="{{ old('start_date', $todayDate) }}" required @disabled(!$canCreateEvent)>
                 </div>
 
                 <div class="ufo-pg-field-group ufo-pg-col-span-3">
