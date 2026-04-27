@@ -36,7 +36,8 @@ class ActivityController extends Controller
         $context = $this->resolvePengurusContext($request);
 
         return view('pages.pengurus.applications', [
-            'kontakPengurus' => $this->loadContactMiniCards((int) ($context['organization_id'] ?? 0)),
+            // view expects `$contacts` variable
+            'contacts' => $this->loadContactMiniCards((int) ($context['organization_id'] ?? 0)),
         ]);
     }
 
