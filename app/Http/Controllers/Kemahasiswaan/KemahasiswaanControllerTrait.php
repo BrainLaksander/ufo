@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Kemahasiswaan;
 
 use App\Services\ReferenceValueService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
@@ -10,6 +11,58 @@ use Illuminate\Support\Str;
 trait KemahasiswaanControllerTrait
 {
     protected ReferenceValueService $referenceService;
+
+    protected function uiText(string $code): string
+    {
+        // Try database first if service is available
+        if (isset($this->referenceService)) {
+            $dbText = $this->referenceService->getLabel('ui_text', $code);
+            if (!empty($dbText)) {
+                return $dbText;
+            }
+        }
+
+        // Fallback to database with direct query
+        try {
+            $label = DB::table('workflow_reference_values')
+                ->where('domain', 'ui_text')
+                ->where('code', $code)
+                ->where('is_active', true)
+                ->value('label');
+
+            if (!empty($label)) {
+                return (string) $label;
+            }
+        } catch (\Throwable $e) {
+            // Database error, continue to config fallback
+        }
+
+        // Final fallback to config/ui_text.php
+        return config("ui_text.ui_text.{$code}", '');
+    }
+
+    /**
+     * Fallback to config/ui_text.php when database is empty
+     */
+    protected function uiTextWithFallback(string $code): string
+    {
+        return $this->uiText($code);
+    }
+
+    /**
+     * @param  array<string, string>  $keyCodeMap
+     * @return array<string, string>
+     */
+    protected function uiTextMap(array $keyCodeMap): array
+    {
+        $labels = [];
+
+        foreach ($keyCodeMap as $key => $code) {
+            $labels[$key] = $this->uiText((string) $code);
+        }
+
+        return $labels;
+    }
 
     // ============ Account Data Helpers ============
 
@@ -115,6 +168,28 @@ trait KemahasiswaanControllerTrait
             'description' => $payload['description'] ?? '',
             'created_at' => now(),
         ]);
+    }
+
+    protected function resolveSessionUserId(Request $request): ?int
+    {
+        $userId = $request->user()?->id;
+        if (is_numeric($userId)) {
+            return (int) $userId;
+        }
+
+        $authId = auth()->id();
+        if (is_numeric($authId)) {
+            return (int) $authId;
+        }
+
+        foreach (['user_id', 'id', 'auth_user_id'] as $sessionKey) {
+            $sessionValue = $request->session()->get($sessionKey);
+            if (is_numeric($sessionValue)) {
+                return (int) $sessionValue;
+            }
+        }
+
+        return null;
     }
 
     protected function ensureDefaultBemUkmAccount(): void

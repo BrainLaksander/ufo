@@ -1,31 +1,13 @@
-<?php
+from pathlib import Path
+import re
+import subprocess
 
-namespace App\Http\Controllers\Kemahasiswaan;
+source = subprocess.check_output([
+    'git', 'show', 'HEAD:app/Http/Controllers/Kemahasiswaan/AnnouncementAdminController.php'
+], text=True)
+text = source
 
-use App\Http\Controllers\Controller;
-use App\Services\Kemahasiswaan\AnnouncementEmailService;
-use App\Services\ReferenceValueService;
-use Carbon\Carbon;
-use Illuminate\Mail\Message;
-use Illuminate\Http\RedirectResponse;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Str;
-use Illuminate\View\View;
-use Throwable;
-
-class AnnouncementAdminController extends Controller
-{
-    use KemahasiswaanControllerTrait;
-
-    public function __construct(ReferenceValueService $referenceService)
-    {
-        $this->referenceService = $referenceService;
-    }
-
-    public function pengumumanIndex(): View
+pengumuman_index = '''    public function pengumumanIndex(): View
     {
         $this->ensureDefaultBemUkmAccount();
 
@@ -58,7 +40,9 @@ class AnnouncementAdminController extends Controller
         ]);
     }
 
-    public function storePengumuman(Request $request): RedirectResponse
+    public function storePengumuman(Request $request): RedirectResponse'''
+
+store_method = '''    public function storePengumuman(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'judul' => 'required|string|max:140',
@@ -154,7 +138,9 @@ class AnnouncementAdminController extends Controller
         return back()->with('success', $message);
     }
 
-    public function updatePengumuman(Request $request, int $id): RedirectResponse
+    public function updatePengumuman(Request $request, int $id): RedirectResponse'''
+
+update_method = '''    public function updatePengumuman(Request $request, int $id): RedirectResponse
     {
         $announcement = DB::table('kemahasiswaan_announcements')->where('id', $id)->first();
         if (!$announcement) {
@@ -247,7 +233,9 @@ class AnnouncementAdminController extends Controller
         return back()->with('success', $message);
     }
 
-    public function destroyPengumuman(int $id): RedirectResponse
+    public function destroyPengumuman(int $id): RedirectResponse'''
+
+destroy_review = '''    public function destroyPengumuman(int $id): RedirectResponse
     {
         $announcement = DB::table('kemahasiswaan_announcements')->where('id', $id)->first();
         if (!$announcement) {
@@ -343,135 +331,9 @@ class AnnouncementAdminController extends Controller
     }
 
     // ============ Private Helpers ============
+'''
 
-    /**
-     * @return array<int, string>
-     */
-    private function pendingEmailReviewStatuses(): array
-    {
-        $statuses = $this->referenceService->getStatusOptions('pending_email_review_status');
-        if (empty($statuses)) {
-            return ['pending', 'revision'];
-        }
-
-        return array_values(array_filter(
-            array_map(static fn ($code) => Str::lower(trim((string) $code)), $statuses),
-            static fn (string $code) => $code !== ''
-        ));
-    }
-
-    private function defaultPendingEmailReviewStatus(): string
-    {
-        $pendingStatuses = $this->pendingEmailReviewStatuses();
-
-        if (in_array('pending', $pendingStatuses, true)) {
-            return 'pending';
-        }
-
-        return $pendingStatuses[0] ?? 'pending';
-    }
-
-    /**
-     * @return array<string, array<string, mixed>>
-     */
-    private function reviewAnnouncementDecisionMap(): array
-    {
-        return [
-            'setujui' => [
-                'review_status' => 'approved',
-                'publish_status' => 'published',
-                'publish_status_scheduled' => 'scheduled',
-                'requires_note' => false,
-            ],
-            'tolak' => [
-                'review_status' => 'rejected',
-                'publish_status' => 'draft',
-                'requires_note' => true,
-            ],
-            'revisi' => [
-                'review_status' => 'revision',
-                'publish_status' => 'draft',
-                'requires_note' => true,
-            ],
-        ];
-    }
-
-
-    private function ensureDefaultBemUkmAccount(): void
-    {
-        if (!Schema::hasTable('organizations') || !Schema::hasTable('kemahasiswaan_ukm_accounts')) {
-            return;
-        }
-
-        $organizationRow = DB::table('organizations')
-            ->select(['id', 'name', 'shortname'])
-            ->whereRaw('LOWER(name) = ?', ['bem unklab'])
-            ->orWhereRaw('LOWER(shortname) = ?', ['bem'])
-            ->first();
-
-        if (!$organizationRow) {
-            $organizationId = DB::table('organizations')->insertGetId([
-                'name' => 'BEM UNKLAB',
-                'shortname' => 'bem',
-                'description' => 'Badan Eksekutif Mahasiswa UNKLAB',
-                'status' => $this->organizationActiveStatus(),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ]);
-        } else {
-            $organizationId = (int) $organizationRow->id;
-        }
-
-        $query = DB::table('kemahasiswaan_ukm_accounts')
-            ->select(['id', 'organization_id', 'name', 'status'])
-            ->whereRaw('LOWER(email) = ?', ['bem@unklab.ac.id']);
-
-        if (Schema::hasColumn('kemahasiswaan_ukm_accounts', 'password_hash')) {
-            $query->addSelect('password_hash');
-        }
-
-        $existingBemAccount = $query->first();
-
-        if (!$existingBemAccount) {
-            $insertPayload = [
-                'organization_id' => $organizationId,
-                'user_id' => null,
-                'name' => 'Pengurus BEM UNKLAB',
-                'email' => 'bem@unklab.ac.id',
-                'status' => $this->defaultAccountStatus(),
-                'created_at' => now(),
-                'updated_at' => now(),
-            ];
-
-            DB::table('kemahasiswaan_ukm_accounts')->insert($insertPayload);
-
-            return;
-        }
-
-        $updates = [];
-
-        if (empty($existingBemAccount->organization_id)) {
-            $updates['organization_id'] = $organizationId;
-        }
-
-        if (empty($existingBemAccount->name)) {
-            $updates['name'] = 'Pengurus BEM UNKLAB';
-        }
-
-        if (($existingBemAccount->status ?? '') !== $this->defaultAccountStatus()) {
-            $updates['status'] = $this->defaultAccountStatus();
-        }
-
-        if (!empty($updates)) {
-            $updates['updated_at'] = now();
-
-            DB::table('kemahasiswaan_ukm_accounts')
-                ->where('id', $existingBemAccount->id)
-                ->update($updates);
-        }
-    }
-
-    private function getPengumuman(): array
+get_pengumuman = '''    private function getPengumuman(): array
     {
         $publishLabels = [
             'draft' => 'Draft',
@@ -638,4 +500,20 @@ class AnnouncementAdminController extends Controller
             'note_placeholder' => 'kmh_common_review_note_placeholder',
         ]);
     }
-}
+'''
+
+patterns = [
+    (r"    public function pengumumanIndex\(\): View\n    \{.*?    public function storePengumuman\(Request \$request\): RedirectResponse", pengumuman_index),
+    (r"    public function storePengumuman\(Request \$request\): RedirectResponse\n    \{.*?    public function updatePengumuman\(Request \$request, int \$id\): RedirectResponse", store_method),
+    (r"    public function updatePengumuman\(Request \$request, int \$id\): RedirectResponse\n    \{.*?    public function destroyPengumuman\(int \$id\): RedirectResponse", update_method),
+    (r"    public function destroyPengumuman\(int \$id\): RedirectResponse\n    \{.*?    // ============ Private Helpers ============", destroy_review),
+    (r"    private function getPengumuman\(\): array\n    \{.*?    private function buildPengumumanUiText\(\): array", get_pengumuman),
+]
+
+for pattern, replacement in patterns:
+    text, count = re.subn(pattern, lambda match: replacement, text, flags=re.S)
+    if count != 1:
+        raise SystemExit(f'Pattern replacement failed for {pattern}: {count}')
+
+Path('app/Http/Controllers/Kemahasiswaan/AnnouncementAdminController.php').write_text(text)
+print('controller rewritten')

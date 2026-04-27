@@ -9,17 +9,21 @@
     $ui = $ui ?? [];
     $workflowPengumuman = $workflowPengumuman ?? [];
     $emailReviewQueue = $emailReviewQueue ?? [];
+    $scheduledEmailQueue = $scheduledEmailQueue ?? [];
+    $sentEmailQueue = $sentEmailQueue ?? [];
     $ukmAccounts = $ukmAccounts ?? [];
 
     $publishedCount = collect($workflowPengumuman)->where('status_code', 'published')->count();
     $scheduledCount = collect($workflowPengumuman)->where('status_code', 'scheduled')->count();
     $draftCount = collect($workflowPengumuman)->where('status_code', 'draft')->count();
+    $defaultStudentRecipient = config('mail.announcement_default_student_recipient', 'student252@student.unklab.ac.id');
     $hasAccounts = !empty($ukmAccounts);
     $defaultAnnouncementAccountId = $ukmAccounts[0]['id'] ?? null;
     $minPublishAt = now()->format('Y-m-d\TH:i');
     $hasCreateAnnouncementErrors = $errors->has('judul')
         || $errors->has('kategori')
         || $errors->has('target')
+        || $errors->has('manual_recipients')
         || $errors->has('konten')
         || $errors->has('publish_at')
         || $errors->has('submit_action');
@@ -35,10 +39,13 @@
                     'id' => (int) ($item['id'] ?? 0),
                     'judul' => (string) ($item['judul'] ?? ''),
                     'kategori' => (string) ($item['kategori'] ?? ''),
-                    'target' => (string) ($item['target'] ?? ''),
+                    'target_mode' => (string) ($item['target_mode'] ?? ''),
+                    'recipient_mode' => (string) ($item['recipient_mode'] ?? ''),
+                    'recipient_emails' => (string) ($item['recipient_emails'] ?? ''),
                     'konten' => (string) ($item['konten'] ?? ''),
                     'publish_at' => $publishAt,
                     'status_code' => (string) ($item['status_code'] ?? ''),
+                    'email_delivery_status' => (string) ($item['email_delivery_status'] ?? ''),
                 ],
             ];
         })
@@ -52,10 +59,8 @@
     ];
 
     $announcementTargetOptions = [
-        'Semua Organisasi',
-        'Organisasi Tertentu',
-        'Semua Mahasiswa',
-        'Mahasiswa Tertentu',
+        'all_students' => 'Semua Mahasiswa',
+        'manual' => 'Manual',
     ];
 
     $statusClass = function (string $status): string {
@@ -224,17 +229,33 @@
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">{{ $ui['field_target'] ?? 'Target Distribusi' }} <span class="text-danger">*</span></label>
+                                <label class="form-label">{{ $ui['field_target'] ?? 'Target Distribusi Email' }} <span class="text-danger">*</span></label>
                                 <select id="kmh-pengumuman-target" name="target" class="form-select" required>
-                                    <option value="">{{ $ui['field_target_placeholder'] ?? 'Pilih target distribusi' }}</option>
-                                    @foreach($announcementTargetOptions as $target)
-                                        <option value="{{ $target }}" @selected(old('target') === $target)>{{ $target }}</option>
+                                    <option value="">{{ $ui['field_target_placeholder'] ?? 'Pilih target pengiriman' }}</option>
+                                    @foreach($announcementTargetOptions as $targetValue => $targetLabel)
+                                        <option value="{{ $targetValue }}" @selected(old('target', 'all_students') === $targetValue)>{{ $targetLabel }}</option>
                                     @endforeach
                                 </select>
+                                <small id="kmh-pengumuman-target-note" class="form-text text-muted d-block mt-2">
+                                    {{ $ui['default_student_recipient_label'] ?? 'Default semua mahasiswa: ' . $defaultStudentRecipient }}
+                                </small>
+                            </div>
+
+                            <div class="col-md-6 d-none" id="kmh-pengumuman-manual-recipients-wrap">
+                                <label class="form-label">{{ $ui['field_manual_recipients'] ?? 'Email Manual' }} <span class="text-danger">*</span></label>
+                                <textarea
+                                    id="kmh-pengumuman-manual-recipients"
+                                    name="manual_recipients"
+                                    class="form-control"
+                                    rows="4"
+                                    maxlength="4000"
+                                    placeholder="{{ $ui['field_manual_recipients_placeholder'] ?? 'Pisahkan email dengan koma atau baris baru' }}"
+                                >{{ old('manual_recipients') }}</textarea>
+                                <small class="form-text text-muted d-block mt-2">Pisahkan beberapa alamat dengan koma atau baris baru.</small>
                             </div>
 
                             <div class="col-md-6">
-                                <label class="form-label">{{ $ui['field_publish_date'] ?? 'Jadwal Publish (Opsional)' }}</label>
+                                <label class="form-label">{{ $ui['field_publish_date'] ?? 'Jadwal Publish' }}</label>
                                 <input
                                     id="kmh-pengumuman-publish-at"
                                     type="datetime-local"
@@ -266,6 +287,78 @@
         <strong>{{ $ui['distribution_info_title'] ?? '' }}</strong>
         {{ $ui['distribution_info_body'] ?? '' }}
     </div>
+
+    <section class="kmh-card">
+        <header class="kmh-card-head">
+            <h2>{{ $ui['queue_title'] ?? 'Antrian Email Terjadwal' }}</h2>
+            <small>{{ count($scheduledEmailQueue) }} {{ $ui['queue_count_suffix'] ?? 'item menunggu kirim' }}</small>
+        </header>
+        <div class="kmh-card-body pt-0">
+            <div class="table-responsive">
+                <table class="table kmh-table">
+                    <thead>
+                        <tr>
+                            <th>Judul</th>
+                            <th>Target</th>
+                            <th>Jadwal Publish</th>
+                            <th>Status Kirim</th>
+                            <th>Kesalahan</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($scheduledEmailQueue as $item)
+                            <tr>
+                                <td>{{ $item['judul'] ?? '-' }}</td>
+                                <td>{{ $item['target'] ?? '-' }}</td>
+                                <td>{{ !empty($item['publish_at']) ? \Carbon\Carbon::parse($item['publish_at'])->format('d M Y H:i') : '-' }}</td>
+                                <td><span class="kmh-status-pill {{ $statusClass($item['status'] ?? 'Draft') }}">{{ $item['email_delivery_label'] ?? 'Menunggu Kirim' }}</span></td>
+                                <td>{{ $item['email_delivery_error'] ?? '-' }}</td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="kmh-empty-row">{{ $ui['queue_empty'] ?? 'Tidak ada antrian email terjadwal.' }}</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <section class="kmh-card">
+        <header class="kmh-card-head">
+            <h2>{{ $ui['sent_title'] ?? 'Email Terkirim' }}</h2>
+            <small>{{ count($sentEmailQueue) }} {{ $ui['sent_count_suffix'] ?? 'item sudah terkirim' }}</small>
+        </header>
+        <div class="kmh-card-body pt-0">
+            <div class="table-responsive">
+                <table class="table kmh-table">
+                    <thead>
+                        <tr>
+                            <th>Judul</th>
+                            <th>Target</th>
+                            <th>Waktu Kirim</th>
+                            <th>Status Kirim</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($sentEmailQueue as $item)
+                            <tr>
+                                <td>{{ $item['judul'] ?? '-' }}</td>
+                                <td>{{ $item['target'] ?? '-' }}</td>
+                                <td>{{ !empty($item['email_dispatched_at']) ? \Carbon\Carbon::parse($item['email_dispatched_at'])->format('d M Y H:i') : '-' }}</td>
+                                <td><span class="kmh-status-pill {{ $statusClass($item['status'] ?? 'Draft') }}">{{ $item['email_delivery_label'] ?? 'Terkirim' }}</span></td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="4" class="kmh-empty-row">{{ $ui['sent_empty'] ?? 'Belum ada email yang terkirim.' }}</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
 
     <section class="kmh-card">
         <header class="kmh-card-head">
@@ -462,6 +555,9 @@ document.addEventListener('DOMContentLoaded', function () {
     var fieldJudul = document.getElementById('kmh-pengumuman-judul');
     var fieldKategori = document.getElementById('kmh-pengumuman-kategori');
     var fieldTarget = document.getElementById('kmh-pengumuman-target');
+    var fieldManualRecipientsWrap = document.getElementById('kmh-pengumuman-manual-recipients-wrap');
+    var fieldManualRecipients = document.getElementById('kmh-pengumuman-manual-recipients');
+    var fieldTargetNote = document.getElementById('kmh-pengumuman-target-note');
     var fieldKonten = document.getElementById('kmh-pengumuman-konten');
     var fieldPublishAt = document.getElementById('kmh-pengumuman-publish-at');
     var primarySubmitButton = document.getElementById('kmh-pengumuman-submit-primary');
@@ -482,6 +578,22 @@ document.addEventListener('DOMContentLoaded', function () {
         primarySubmitButton.textContent = hasScheduleValue
             ? 'Simpan di Jadwal Publikasi'
             : 'Publikasikan Sekarang';
+    }
+
+    function syncTargetRecipientFields() {
+        if (!fieldTarget || !fieldManualRecipientsWrap || !fieldManualRecipients) {
+            return;
+        }
+
+        var isManual = String(fieldTarget.value || '') === 'manual';
+        fieldManualRecipientsWrap.classList.toggle('d-none', !isManual);
+        fieldManualRecipients.required = isManual;
+        if (fieldTargetNote) {
+            fieldTargetNote.classList.toggle('d-none', isManual);
+        }
+        if (!isManual) {
+            fieldManualRecipients.setCustomValidity('');
+        }
     }
 
     function validatePublishDateNotPast() {
@@ -520,6 +632,14 @@ document.addEventListener('DOMContentLoaded', function () {
             modalTitle.textContent = 'Buat Pengumuman Baru';
         }
 
+        if (fieldTarget) {
+            fieldTarget.value = 'all_students';
+        }
+        if (fieldManualRecipients) {
+            fieldManualRecipients.value = '';
+        }
+
+        syncTargetRecipientFields();
         updatePrimaryActionLabel();
     }
 
@@ -544,10 +664,12 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (fieldJudul) fieldJudul.value = payload.judul || '';
         if (fieldKategori) fieldKategori.value = payload.kategori || '';
-        if (fieldTarget) fieldTarget.value = payload.target || '';
+        if (fieldTarget) fieldTarget.value = payload.target_mode || payload.recipient_mode || 'all_students';
+        if (fieldManualRecipients) fieldManualRecipients.value = payload.recipient_emails || '';
         if (fieldKonten) fieldKonten.value = payload.konten || '';
         if (fieldPublishAt) fieldPublishAt.value = payload.publish_at || '';
 
+        syncTargetRecipientFields();
         validatePublishDateNotPast();
         updatePrimaryActionLabel();
     }
@@ -577,6 +699,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     searchInput.addEventListener('input', applyFilter);
     statusSelect.addEventListener('change', applyFilter);
+    if (fieldTarget) {
+        fieldTarget.addEventListener('change', function () {
+            syncTargetRecipientFields();
+        });
+    }
     if (fieldPublishAt) {
         fieldPublishAt.addEventListener('input', function () {
             validatePublishDateNotPast();
@@ -590,7 +717,20 @@ document.addEventListener('DOMContentLoaded', function () {
 
     if (form) {
         form.addEventListener('submit', function (event) {
+            syncTargetRecipientFields();
             validatePublishDateNotPast();
+
+            if (fieldTarget && String(fieldTarget.value || '') === 'manual' && fieldManualRecipients && String(fieldManualRecipients.value || '').trim() === '') {
+                event.preventDefault();
+                fieldManualRecipients.setCustomValidity('Silakan isi minimal satu alamat email manual.');
+                fieldManualRecipients.reportValidity();
+                return;
+            }
+
+            if (fieldManualRecipients) {
+                fieldManualRecipients.setCustomValidity('');
+            }
+
             if (fieldPublishAt && !fieldPublishAt.checkValidity()) {
                 event.preventDefault();
                 fieldPublishAt.reportValidity();
@@ -616,6 +756,7 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     applyFilter();
+    syncTargetRecipientFields();
     updatePrimaryActionLabel();
 
     @if($hasCreateAnnouncementErrors)

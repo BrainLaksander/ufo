@@ -1,9 +1,11 @@
 <?php
 
+use App\Services\Kemahasiswaan\AnnouncementEmailService;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
+use Illuminate\Support\Facades\Schedule;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
@@ -453,3 +455,14 @@ Artisan::command('calendar:import {path=data/calendar.json : Relative path to JS
 
     return self::SUCCESS;
 })->purpose('Import data kalender JSON ke kemahasiswaan_schedules agar sinkron lintas portal');
+
+Artisan::command('pengumuman:dispatch-scheduled', function () {
+    $result = app(AnnouncementEmailService::class)->processScheduledAnnouncements();
+
+    $this->info('Pengumuman terjadwal diproses.');
+    $this->line('Dipindai: ' . $result['processed']);
+    $this->line('Terkirim: ' . $result['sent']);
+    $this->line('Gagal: ' . $result['failed']);
+})->purpose('Kirim pengumuman yang jadwal publish-nya sudah jatuh tempo');
+
+Schedule::command('pengumuman:dispatch-scheduled')->everyMinute()->withoutOverlapping();

@@ -28,6 +28,30 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
         }
 
+        // Register uiText helper function globally
+        if (!function_exists('uiText')) {
+            $getUiText = function (string $code): string {
+                try {
+                    $label = DB::table('workflow_reference_values')
+                        ->where('domain', 'ui_text')
+                        ->where('code', $code)
+                        ->where('is_active', true)
+                        ->value('label');
+
+                    if (!empty($label)) {
+                        return (string) $label;
+                    }
+                } catch (\Throwable $e) {
+                    // Database error, continue to fallback
+                }
+
+                return config("ui_text.ui_text.{$code}", '');
+            };
+
+            // Make it available to all views
+            \Illuminate\Support\Facades\View::share('uiText', $getUiText);
+        }
+
         View::composer([
             'components.pengurus.sidebar',
             'components.pengurus.burger',

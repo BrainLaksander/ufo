@@ -121,4 +121,7 @@ return [
         'default' => env('ANNOUNCEMENT_MAILING_DEFAULT', ''),
     ],
 
+    'announcement_default_student_recipient' => env('ANNOUNCEMENT_DEFAULT_STUDENT_RECIPIENT', 'student252@student.unklab.ac.id'),
+    'announcement_footer_address' => env('ANNOUNCEMENT_FOOTER_ADDRESS', ''),
+
 ];
