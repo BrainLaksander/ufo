@@ -1,17 +1,30 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Mahasiswa\MahasiswaController;
+use App\Http\Controllers\Mahasiswa\HomeController;
+use App\Http\Controllers\Mahasiswa\OrganizationController;
+use App\Http\Controllers\Mahasiswa\EventController;
+use App\Http\Controllers\Mahasiswa\LostFoundController;
+use App\Http\Controllers\Mahasiswa\AnnouncementController;
 use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Pengurus\IzinKegiatanWorkflowController;
-use App\Http\Controllers\Kemahasiswaan\KemahasiswaanWorkflowController;
+use App\Http\Controllers\Pengurus\DashboardController as PengurusDashboardController;
+use App\Http\Controllers\Pengurus\EventController as PengurusEventController;
+use App\Http\Controllers\Pengurus\AnnouncementController as PengurusAnnouncementController;
+use App\Http\Controllers\Pengurus\SubmissionController as PengurusSubmissionController;
+use App\Http\Controllers\Pengurus\ReportController as PengurusReportController;
+use App\Http\Controllers\Pengurus\ActivityController as PengurusActivityController;
+use App\Http\Controllers\Pengurus\KemahasiswaanController as PengurusKemahasiswaanController;
+use App\Http\Controllers\Kemahasiswaan\OrganizationAdminController;
+use App\Http\Controllers\Kemahasiswaan\AccountAdminController;
+use App\Http\Controllers\Kemahasiswaan\AnnouncementAdminController;
+use App\Http\Controllers\Kemahasiswaan\DashboardController as KemahasiswaanDashboardController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 
-Route::get('/', [MahasiswaController::class, 'organisasiIndex'])->name('home');
+Route::get('/', [HomeController::class, 'indexRedirect'])->name('home');
 
 /*
 |--------------------------------------------------------------------------
@@ -20,6 +33,8 @@ Route::get('/', [MahasiswaController::class, 'organisasiIndex'])->name('home');
 */
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('login.perform');
+Route::get('/logout', [AuthController::class, 'logout']);
+Route::get('/ufo/logout', [AuthController::class, 'logout']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
 /*
@@ -46,16 +61,16 @@ Route::post('/internal-login', [AuthController::class, 'login'])->name('portal.l
 | Dashboard Routes (Named Targets)
 |--------------------------------------------------------------------------
 */
-Route::get('/dashboard', [IzinKegiatanWorkflowController::class, 'pengurusDashboard'])
+Route::get('/dashboard', [PengurusDashboardController::class, 'dashboard'])
     ->middleware(['auth', 'role:pengurus'])
     ->name('dashboard');
-Route::get('/dashboard/kemahasiswaan', [KemahasiswaanWorkflowController::class, 'dashboard'])
+Route::get('/dashboard/kemahasiswaan', [KemahasiswaanDashboardController::class, 'dashboard'])
     ->middleware(['auth', 'role:kemahasiswaan'])
     ->name('dashboard.kemahasiswaan');
-Route::get('/dashboard/pengurus', [IzinKegiatanWorkflowController::class, 'pengurusDashboard'])
+Route::get('/dashboard/pengurus', [PengurusDashboardController::class, 'dashboard'])
     ->middleware(['auth', 'role:pengurus'])
     ->name('dashboard.pengurus');
-Route::get('/dashboard/mahasiswa', [MahasiswaController::class, 'beranda'])->name('dashboard.mahasiswa');
+Route::get('/dashboard/mahasiswa', [HomeController::class, 'beranda'])->name('dashboard.mahasiswa');
 
 /*
 |--------------------------------------------------------------------------
@@ -63,62 +78,66 @@ Route::get('/dashboard/mahasiswa', [MahasiswaController::class, 'beranda'])->nam
 |--------------------------------------------------------------------------
 */
 Route::prefix('kemahasiswaan')->name('portal.kemahasiswaan.')->middleware(['auth', 'role:kemahasiswaan'])->group(function () {
-    Route::get('/', [KemahasiswaanWorkflowController::class, 'dashboard'])->name('dashboard');
-    Route::get('/organisasi', [KemahasiswaanWorkflowController::class, 'organisasiIndex'])->name('organisasi');
-    Route::post('/organisasi', [KemahasiswaanWorkflowController::class, 'storeOrganisasi'])->name('organisasi.store');
-    Route::post('/organisasi/{id}/update', [KemahasiswaanWorkflowController::class, 'updateOrganisasi'])->name('organisasi.update');
-    Route::delete('/organisasi/{id}', [KemahasiswaanWorkflowController::class, 'deactivateOrganisasi'])->name('organisasi.destroy');
-    Route::get('/kontak', [KemahasiswaanWorkflowController::class, 'kontakPengurusIndex'])->name('kontak');
-    Route::get('/kalender', [KemahasiswaanWorkflowController::class, 'kalenderKegiatanIndex'])->name('kalender');
-    Route::post('/organisasi/akun', [KemahasiswaanWorkflowController::class, 'storeAkunUKM'])->name('organisasi.akun.store');
-    Route::post('/organisasi/akun/{id}/update', [KemahasiswaanWorkflowController::class, 'updateAkunUKM'])->name('organisasi.akun.update');
-    Route::post('/organisasi/akun/{id}/reset-password', [KemahasiswaanWorkflowController::class, 'resetPasswordAkunUKM'])->name('organisasi.akun.reset-password');
-    Route::post('/organisasi/akun/{id}/deactivate', [KemahasiswaanWorkflowController::class, 'deactivateAkunUKM'])->name('organisasi.akun.deactivate');
-    Route::get('/pengajuan', [IzinKegiatanWorkflowController::class, 'kemahasiswaanIndex'])->name('pengajuan');
-    Route::post('/pengajuan/{id}/review', [IzinKegiatanWorkflowController::class, 'review'])->name('pengajuan.review');
-    Route::post('/laporan/{id}/review', [IzinKegiatanWorkflowController::class, 'reviewLaporan'])->name('laporan.review');
-    Route::post('/jadwal', [IzinKegiatanWorkflowController::class, 'storeJadwal'])->name('jadwal.store');
-    Route::get('/pengumuman', [KemahasiswaanWorkflowController::class, 'pengumumanIndex'])->name('pengumuman');
-    Route::post('/pengumuman', [KemahasiswaanWorkflowController::class, 'storePengumuman'])->name('pengumuman.store');
-    Route::post('/pengumuman/{id}/email-review', [KemahasiswaanWorkflowController::class, 'reviewIzinPengumumanEmail'])->name('pengumuman.email-review');
-    Route::get('/notifikasi', [KemahasiswaanWorkflowController::class, 'notifikasiIndex'])->name('notifikasi');
+    Route::get('/', [KemahasiswaanDashboardController::class, 'dashboard'])->name('dashboard');
+    Route::get('/organisasi', [OrganizationAdminController::class, 'organisasiIndex'])->name('organisasi');
+    Route::post('/organisasi', [OrganizationAdminController::class, 'storeOrganisasi'])->name('organisasi.store');
+    Route::post('/organisasi/{id}/update', [OrganizationAdminController::class, 'updateOrganisasi'])->name('organisasi.update');
+    Route::delete('/organisasi/{id}', [OrganizationAdminController::class, 'deactivateOrganisasi'])->name('organisasi.destroy');
+    Route::get('/kontak', [KemahasiswaanDashboardController::class, 'kontakPengurusIndex'])->name('kontak');
+    Route::get('/kalender', [KemahasiswaanDashboardController::class, 'kalenderKegiatanIndex'])->name('kalender');
+    Route::get('/akun', [AccountAdminController::class, 'akunIndex'])->name('akun');
+    Route::post('/organisasi/akun', [AccountAdminController::class, 'storeAkunUKM'])->name('organisasi.akun.store');
+    Route::post('/organisasi/akun/{id}/update', [AccountAdminController::class, 'updateAkunUKM'])->name('organisasi.akun.update');
+    Route::post('/organisasi/akun/{id}/reset-password', [AccountAdminController::class, 'resetPasswordAkunUKM'])->name('organisasi.akun.reset-password');
+    Route::post('/organisasi/akun/{id}/deactivate', [AccountAdminController::class, 'deactivateAkunUKM'])->name('organisasi.akun.deactivate');
+    Route::get('/pengajuan', [PengurusKemahasiswaanController::class, 'index'])->name('pengajuan');
+    Route::post('/pengajuan/{id}/review', [PengurusSubmissionController::class, 'review'])->name('pengajuan.review');
+    Route::post('/laporan/{id}/review', [PengurusReportController::class, 'review'])->name('laporan.review');
+    Route::post('/jadwal', [PengurusActivityController::class, 'storeJadwal'])->name('jadwal.store');
+    Route::delete('/jadwal/{id}', [PengurusActivityController::class, 'destroyJadwal'])->name('jadwal.destroy');
+    Route::post('/kalender/import-pdf', [PengurusActivityController::class, 'importKalenderPdf'])->name('kalender.import-pdf');
+    Route::get('/pengumuman', [AnnouncementAdminController::class, 'pengumumanIndex'])->name('pengumuman');
+    Route::post('/pengumuman', [AnnouncementAdminController::class, 'storePengumuman'])->name('pengumuman.store');
+    Route::post('/pengumuman/{id}/update', [AnnouncementAdminController::class, 'updatePengumuman'])->name('pengumuman.update');
+    Route::delete('/pengumuman/{id}', [AnnouncementAdminController::class, 'destroyPengumuman'])->name('pengumuman.destroy');
+    Route::post('/pengumuman/{id}/email-review', [AnnouncementAdminController::class, 'reviewIzinPengumumanEmail'])->name('pengumuman.email-review');
+    Route::get('/notifikasi', [KemahasiswaanDashboardController::class, 'notifikasiIndex'])->name('notifikasi');
 });
 
 Route::prefix('pengurus')->name('portal.pengurus.')->middleware(['auth', 'role:pengurus'])->group(function () {
-    Route::get('/', [IzinKegiatanWorkflowController::class, 'pengurusDashboard'])->name('dashboard');
+    Route::get('/', [PengurusDashboardController::class, 'dashboard'])->name('dashboard');
     Route::redirect('/profil', '/pengurus/members')->name('profil');
     Route::redirect('/event', '/pengurus/events')->name('event');
     Route::redirect('/pengumuman', '/pengurus/announcements')->name('pengumuman');
     Route::redirect('/pengajuan-laporan', '/pengurus/proposals')->name('pengajuan-laporan');
-    Route::redirect('/kontak', '/pengurus/applications')->name('kontak');
+    Route::get('/kontak', [PengurusActivityController::class, 'applications'])->name('kontak');
     Route::redirect('/lost-found', '/pengurus/lostandfound')->name('lost-found');
 
-    Route::get('/events', [IzinKegiatanWorkflowController::class, 'pengurusEvents'])->name('events');
-    Route::get('/events/create', [IzinKegiatanWorkflowController::class, 'eventForm'])->name('events.create');
-    Route::post('/events', [IzinKegiatanWorkflowController::class, 'storeEvent'])->name('events.store');
-    Route::post('/events/{id}/update', [IzinKegiatanWorkflowController::class, 'updateEvent'])->name('events.update');
-    Route::get('/events/{id}', [IzinKegiatanWorkflowController::class, 'pengurusEventDetail'])->name('events.detail');
+    Route::get('/events', [PengurusEventController::class, 'index'])->name('events');
+    Route::get('/events/create', [PengurusEventController::class, 'form'])->name('events.create');
+    Route::post('/events', [PengurusEventController::class, 'store'])->name('events.store');
+    Route::post('/events/{id}/submit', [PengurusEventController::class, 'submit'])->name('events.submit');
+    Route::post('/events/{id}/update', [PengurusEventController::class, 'update'])->name('events.update');
+    Route::get('/events/{id}', [PengurusEventController::class, 'detail'])->name('events.detail');
 
-    Route::post('/news', [IzinKegiatanWorkflowController::class, 'storeNews'])->name('news.store');
+    Route::get('/announcements', [PengurusAnnouncementController::class, 'index'])->name('announcements');
+    Route::get('/announcements/create', [PengurusAnnouncementController::class, 'form'])->name('announcements.create');
+    Route::post('/announcements', [PengurusAnnouncementController::class, 'store'])->name('announcements.store');
+    Route::post('/announcements/{id}/update', [PengurusAnnouncementController::class, 'update'])->name('announcements.update');
 
-    Route::get('/announcements', [IzinKegiatanWorkflowController::class, 'pengurusAnnouncements'])->name('announcements');
-    Route::get('/announcements/create', [IzinKegiatanWorkflowController::class, 'pengurusAnnouncementForm'])->name('announcements.create');
-    Route::post('/announcements', [IzinKegiatanWorkflowController::class, 'storeAnnouncement'])->name('announcements.store');
-    Route::post('/announcements/{id}/update', [IzinKegiatanWorkflowController::class, 'updateAnnouncement'])->name('announcements.update');
+    Route::get('/lostandfound', [PengurusActivityController::class, 'lostFound'])->name('lostandfound');
+    Route::post('/lostandfound', [PengurusActivityController::class, 'storeLostFound'])->name('lostandfound.store');
+    Route::get('/proposals', [PengurusSubmissionController::class, 'index'])->name('proposals');
+    Route::post('/proposals', [PengurusSubmissionController::class, 'store'])->name('proposals.store');
+    Route::post('/proposals/{id}/submit', [PengurusSubmissionController::class, 'submit'])->name('proposals.submit');
+    Route::post('/reports', [PengurusReportController::class, 'store'])->name('reports.store');
+    Route::post('/reports/{id}/submit', [PengurusReportController::class, 'submit'])->name('reports.submit');
+    Route::get('/members', [PengurusActivityController::class, 'members'])->name('members');
+    Route::post('/members/profile', [PengurusDashboardController::class, 'updateMembers'])->name('members.profile.update');
+    Route::redirect('/applications', '/pengurus/kontak')->name('applications');
 
-    Route::get('/lostandfound', [IzinKegiatanWorkflowController::class, 'pengurusLostAndFound'])->name('lostandfound');
-    Route::post('/lostandfound', [IzinKegiatanWorkflowController::class, 'storeLostFound'])->name('lostandfound.store');
-    Route::get('/proposals', [IzinKegiatanWorkflowController::class, 'pengurusIndex'])->name('proposals');
-    Route::post('/proposals', [IzinKegiatanWorkflowController::class, 'storePengajuan'])->name('proposals.store');
-    Route::post('/proposals/{id}/submit', [IzinKegiatanWorkflowController::class, 'submit'])->name('proposals.submit');
-    Route::post('/reports', [IzinKegiatanWorkflowController::class, 'storeLaporan'])->name('reports.store');
-    Route::post('/reports/{id}/submit', [IzinKegiatanWorkflowController::class, 'submitLaporan'])->name('reports.submit');
-    Route::get('/members', [IzinKegiatanWorkflowController::class, 'pengurusMembers'])->name('members');
-    Route::post('/members/profile', [IzinKegiatanWorkflowController::class, 'updatePengurusMembersProfile'])->name('members.profile.update');
-    Route::get('/applications', [IzinKegiatanWorkflowController::class, 'pengurusApplications'])->name('applications');
-
-    Route::get('/settings', [IzinKegiatanWorkflowController::class, 'pengurusSettings'])->name('settings');
-    Route::post('/settings/profile', [IzinKegiatanWorkflowController::class, 'updateProfilUKM'])->name('settings.profile.update');
+    Route::get('/settings', [PengurusDashboardController::class, 'settings'])->name('settings');
+    Route::post('/settings/profile', [PengurusDashboardController::class, 'updateProfile'])->name('settings.profile.update');
     Route::redirect('/reports', '/pengurus/proposals')->name('reports');
     Route::redirect('/submissions', '/pengurus/proposals')->name('submissions');
 });
@@ -129,25 +148,28 @@ Route::prefix('pengurus')->name('portal.pengurus.')->middleware(['auth', 'role:p
 |--------------------------------------------------------------------------
 */
 Route::permanentRedirect('/mahasiswa', '/');
-Route::get('/mahasiswa/organisasi', [MahasiswaController::class, 'organisasiIndex'])->name('mahasiswa.organisasi.redirect');
+Route::get('/mahasiswa/organisasi', [OrganizationController::class, 'index'])->name('mahasiswa.organisasi.redirect');
 
-Route::get('/organisasi', [MahasiswaController::class, 'organisasiIndex'])->name('mahasiswa.organisasi.index');
-Route::get('/organisasi/{id}', [MahasiswaController::class, 'organisasiShow'])->name('mahasiswa.organisasi.show');
-Route::get('/organisasi/{id}/daftar', [MahasiswaController::class, 'organisasiDaftar'])->name('mahasiswa.organisasi.daftar');
-Route::get('/organisasi/{orgId}/event/{eventId}', [MahasiswaController::class, 'organisasiEventShow'])->name('mahasiswa.organisasi.event.detail');
+Route::get('/beranda', [HomeController::class, 'beranda'])->name('mahasiswa.beranda');
 
-Route::get('/event', [MahasiswaController::class, 'eventIndex'])->name('mahasiswa.event');
-Route::get('/event/{id}', [MahasiswaController::class, 'eventShow'])->name('mahasiswa.event.show');
+Route::get('/organisasi', [OrganizationController::class, 'index'])->name('mahasiswa.organisasi.index');
+Route::get('/organisasi/{id}', [OrganizationController::class, 'show'])->name('mahasiswa.organisasi.show');
+Route::get('/organisasi/{id}/daftar', [OrganizationController::class, 'daftar'])->name('mahasiswa.organisasi.daftar');
+Route::get('/organisasi/{orgId}/event/{eventId}', [OrganizationController::class, 'eventShow'])->name('mahasiswa.organisasi.event.detail');
 
-Route::get('/lost-found', [MahasiswaController::class, 'lostFoundIndex'])->name('mahasiswa.lost-found');
-Route::post('/lost-found/report', [MahasiswaController::class, 'reportLostFound'])->name('mahasiswa.lost-found.report');
+Route::get('/event', [EventController::class, 'index'])->name('mahasiswa.event');
+Route::get('/event/{id}', [EventController::class, 'show'])->name('mahasiswa.event.show');
+Route::get('/kalendar-kegiatan', [EventController::class, 'calendar'])->name('mahasiswa.kalendar');
 
-Route::get('/pengumuman', [MahasiswaController::class, 'pengumumanIndex'])->name('mahasiswa.pengumuman');
-Route::get('/pengumuman/{id}', [MahasiswaController::class, 'pengumumanShow'])->name('mahasiswa.pengumuman.show');
+Route::get('/lost-found', [LostFoundController::class, 'index'])->name('mahasiswa.lost-found');
+Route::post('/lost-found/report', [LostFoundController::class, 'report'])->name('mahasiswa.lost-found.report');
 
-Route::get('/tentang', [MahasiswaController::class, 'tentang'])->name('mahasiswa.tentang');
+Route::get('/pengumuman', [AnnouncementController::class, 'index'])->name('mahasiswa.pengumuman');
+Route::get('/pengumuman/{id}', [AnnouncementController::class, 'show'])->name('mahasiswa.pengumuman.show');
 
-Route::get('/kegiatan', [MahasiswaController::class, 'eventIndex'])->name('kegiatan.index');
+Route::get('/tentang', [HomeController::class, 'tentang'])->name('mahasiswa.tentang');
+
+Route::get('/kegiatan', [EventController::class, 'index'])->name('kegiatan.index');
 
 /*
 |--------------------------------------------------------------------------
@@ -162,7 +184,7 @@ Route::get('/events', function () {
     return redirect()->route('portal.pengurus.events');
 })->name('events.index');
 
-Route::get('/events/create', [IzinKegiatanWorkflowController::class, 'eventForm'])->name('events.create');
+Route::get('/events/create', [PengurusEventController::class, 'form'])->name('events.create');
 
 Route::get('/events/{event}', function ($event) {
     return redirect()->route('portal.pengurus.events.detail', ['id' => $event]);
@@ -176,17 +198,13 @@ Route::get('/announcements', function () {
     return redirect()->route('portal.pengurus.announcements');
 })->name('announcements.index');
 
-Route::get('/announcements/create', function () {
-    return app(IzinKegiatanWorkflowController::class)->pengurusAnnouncementForm(request());
-})->name('announcements.create');
+Route::get('/announcements/create', [PengurusAnnouncementController::class, 'form'])->name('announcements.create');
 
 Route::get('/announcements/{announcement}', function ($announcement) {
     return redirect()->route('portal.pengurus.announcements');
 })->name('announcements.show');
 
-Route::get('/announcements/{announcement}/edit', function ($announcement) {
-    return app(IzinKegiatanWorkflowController::class)->pengurusAnnouncementForm(request());
-})->name('announcements.edit');
+Route::get('/announcements/{announcement}/edit', [PengurusAnnouncementController::class, 'form'])->name('announcements.edit');
 
 Route::get('/proposals', function () {
     return redirect()->route('portal.pengurus.proposals');
@@ -213,7 +231,7 @@ Route::post('/proposals/{proposal}/reject', function (Request $request, $proposa
 })->name('proposals.reject');
 
 Route::get('/messages', function () {
-    return redirect()->route('portal.pengurus.applications');
+    return redirect()->route('portal.pengurus.kontak');
 })->name('messages.index');
 
 Route::get('/lostfound', function () {
