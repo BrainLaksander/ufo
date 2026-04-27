@@ -6,6 +6,7 @@
     $activeAnnouncements = $activeAnnouncements ?? [];
     $allAnnouncements = $allAnnouncements ?? [];
     $eventOptions = $eventOptions ?? [];
+    $todayDate = now()->toDateString();
 @endphp
 
 @section('content')
@@ -56,12 +57,12 @@
 
                             <label>
                                 <span class="ufo-kboard-item-meta">Tanggal Mulai Tampil</span>
-                                <input type="date" name="start_date" class="ufo-kboard-field" value="{{ date('Y-m-d') }}" required>
+                                <input type="date" name="start_date" class="ufo-kboard-field" value="{{ old('start_date', $todayDate) }}" min="{{ $todayDate }}" required>
                             </label>
 
                             <label>
                                 <span class="ufo-kboard-item-meta">Tanggal Berakhir Tampil</span>
-                                <input type="date" name="end_date" class="ufo-kboard-field" required>
+                                <input type="date" name="end_date" class="ufo-kboard-field" value="{{ old('end_date') }}" min="{{ $todayDate }}" required>
                             </label>
 
                             <label class="ufo-kboard-span-full">
@@ -223,12 +224,12 @@
 
                             <label>
                                 <span class="ufo-kboard-item-meta">Tanggal Mulai Tampil</span>
-                                <input type="date" name="start_date" id="editAnnStartDate" class="ufo-kboard-field" required>
+                                <input type="date" name="start_date" id="editAnnStartDate" class="ufo-kboard-field" min="{{ $todayDate }}" required>
                             </label>
 
                             <label>
                                 <span class="ufo-kboard-item-meta">Tanggal Berakhir Tampil</span>
-                                <input type="date" name="end_date" id="editAnnEndDate" class="ufo-kboard-field" required>
+                                <input type="date" name="end_date" id="editAnnEndDate" class="ufo-kboard-field" min="{{ $todayDate }}" required>
                             </label>
                         </div>
                     </div>
@@ -272,8 +273,27 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('formEditAnnouncement').action = `/pengurus/announcements/${data.id}/update`;
             document.getElementById('editAnnTitle').value = data.title;
             document.getElementById('editAnnContent').value = data.fullContent;
-            document.getElementById('editAnnStartDate').value = data.rawStartDate;
-            document.getElementById('editAnnEndDate').value = data.rawEndDate;
+            const startEl = document.getElementById('editAnnStartDate');
+            const endEl = document.getElementById('editAnnEndDate');
+            const today = new Date().toISOString().slice(0,10); // YYYY-MM-DD
+
+            startEl.value = data.rawStartDate || '';
+            endEl.value = data.rawEndDate || '';
+
+            // If the existing date is before today, disable the input to avoid changing past dates.
+            if (data.rawStartDate && data.rawStartDate < today) {
+                startEl.disabled = true;
+            } else {
+                startEl.disabled = false;
+                startEl.min = today;
+            }
+
+            if (data.rawEndDate && data.rawEndDate < today) {
+                endEl.disabled = true;
+            } else {
+                endEl.disabled = false;
+                endEl.min = today;
+            }
 
             editModal.show();
         });
