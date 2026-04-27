@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Pengurus;
 
 use App\Models\Core\Organization;
+use App\Services\ReferenceValueService;
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
@@ -461,6 +462,29 @@ trait PengurusControllerTrait
         return (string) (DB::table('organizations')
             ->where('id', $organizationId)
             ->value('level') ?? '');
+    }
+
+    protected function getNotificationCounter(): int
+    {
+        $referenceService = app(ReferenceValueService::class);
+        $total = 0;
+
+        if (Schema::hasTable('submissions')) {
+            $statuses = $referenceService->getStatusOptions('pending_submission_status') ?: ['submitted', 'reviewing', 'revised'];
+            $total += (int) DB::table('submissions')->whereIn('status', $statuses)->count();
+        }
+
+        if (Schema::hasTable('reports')) {
+            $statuses = $referenceService->getStatusOptions('pending_report_status') ?: ['submitted', 'reviewing', 'revision_needed'];
+            $total += (int) DB::table('reports')->whereIn('status', $statuses)->count();
+        }
+
+        if (Schema::hasTable('kemahasiswaan_announcements')) {
+            $statuses = $referenceService->getStatusOptions('pending_email_review_status') ?: ['pending', 'revision'];
+            $total += (int) DB::table('kemahasiswaan_announcements')->whereIn('email_review_status', $statuses)->count();
+        }
+
+        return $total;
     }
 
     // ============ Category Inference ============

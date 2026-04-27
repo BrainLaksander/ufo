@@ -10,6 +10,7 @@ use Illuminate\View\View;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
+use Throwable;
 
 class ActivityController extends Controller
 {
@@ -50,10 +51,16 @@ class ActivityController extends Controller
         }
 
         $items = $this->loadLostFoundCards($organizationId);
+        $lostItems = array_values(array_filter($items, static fn (array $item): bool => $item['type'] === 'lost'));
+        $foundItems = array_values(array_filter($items, static fn (array $item): bool => $item['type'] === 'found'));
+        $openLostOptions = array_values(array_filter($lostItems, static fn (array $item): bool => in_array((string) ($item['status'] ?? ''), ['active'], true)));
 
         return view('portal.pengurus.lostandfound', [
             'isBem' => Str::contains(Str::lower($organizationName), 'bem'),
             'items' => $items,
+            'lostItems' => $lostItems,
+            'foundItems' => $foundItems,
+            'openLostOptions' => $openLostOptions,
             'priorityItems' => array_values(array_filter($items, static fn (array $item): bool => !empty($item['priority']))),
             'statusLabel' => $this->lostFoundStatusLabelMap(),
             'statusPill' => $this->lostFoundStatusPillMap(),
@@ -71,12 +78,125 @@ class ActivityController extends Controller
 
         $validated = $request->validate([
             'item_name' => 'required|string|max:255',
-            'item_type' => 'required|in:lost,found',
+            'type' => 'required|in:lost,found',
             'description' => 'nullable|string|max:2000',
-            'location' => 'nullable|string|max:500',
+            'location_found' => 'required|string|max:500',
+            'reporter_name' => 'required|string|max:120',
+            'reporter_contact' => 'required|string|max:120',
+            'linked_lost_item_id' => 'nullable|integer|min:1',
+            'photo_data' => 'nullable|string',
         ]);
 
-        return back()->with('success', 'Laporan barang hilang/ditemukan berhasil disimpan.');
+        if (!Schema::hasTable('lost_found_items')) {
+            return back()->with('error', 'Tabel Lost & Found belum tersedia.');
+        }
+
+        $type = Str::lower((string) ($validated['type'] ?? 'lost'));
+        $columns = Schema::getColumnListing('lost_found_items');
+        $columnExists = static fn (string $column) => in_array($column, $columns, true);
+
+        $linkedLostItemId = null;
+        if ($type === 'found') {
+            $linkedLostItemId = (int) ($validated['linked_lost_item_id'] ?? 0);
+            if ($linkedLostItemId <= 0) {
+                return back()->withErrors([
+                    'linked_lost_item_id' => 'Pilih laporan barang hilang yang sesuai sebelum menyimpan barang ditemukan.',
+                ])->withInput();
+            }
+
+            $lostQuery = DB::table('lost_found_items')
+                ->where('id', $linkedLostItemId)
+                ->where('type', 'lost');
+
+            if ($columnExists('organization_id')) {
+                $organizationId = (int) ($context['organization_id'] ?? 0);
+                $lostQuery->where(function ($query) use ($organizationId) {
+                    $query->where('organization_id', $organizationId)
+                        ->orWhereNull('organization_id');
+                });
+            }
+
+            if (!$lostQuery->exists()) {
+                return back()->withErrors([
+                    'linked_lost_item_id' => 'Laporan barang hilang tidak ditemukan atau sudah tidak tersedia.',
+                ])->withInput();
+            }
+
+            if (trim((string) ($validated['photo_data'] ?? '')) === '') {
+                return back()->withErrors([
+                    'photo_data' => 'Foto real-time wajib diambil untuk laporan barang ditemukan.',
+                ])->withInput();
+            }
+        }
+
+        $storedImagePath = null;
+        if ($type === 'found') {
+            $storedImagePath = $this->storeRealtimePhoto((string) ($validated['photo_data'] ?? ''));
+            if ($storedImagePath === null) {
+                return back()->withErrors([
+                    'photo_data' => 'Foto real-time tidak valid. Ambil ulang foto dan coba lagi.',
+                ])->withInput();
+            }
+        }
+
+        $metaDescription = $this->buildLostFoundDescription(
+            (string) ($validated['description'] ?? ''),
+            (string) $validated['reporter_name'],
+            (string) $validated['reporter_contact'],
+            'approved'
+        );
+
+        $insertData = [
+            'item_name' => $validated['item_name'],
+            'description' => $metaDescription,
+            'location_found' => $validated['location_found'],
+            'type' => $type,
+            'status' => $type === 'found' ? 'claimed' : 'active',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+
+        if ($columnExists('organization_id')) {
+            $insertData['organization_id'] = (int) ($context['organization_id'] ?? 0) ?: null;
+        }
+
+        if ($columnExists('reported_by')) {
+            $sessionUser = $request->session()->get('user');
+            $insertData['reported_by'] = is_array($sessionUser) && isset($sessionUser['id'])
+                ? (int) $sessionUser['id']
+                : null;
+        }
+
+        if ($columnExists('image')) {
+            $insertData['image'] = $storedImagePath;
+        }
+
+        if ($columnExists('reporter_name')) {
+            $insertData['reporter_name'] = (string) $validated['reporter_name'];
+        }
+
+        if ($columnExists('reporter_contact')) {
+            $insertData['reporter_contact'] = (string) $validated['reporter_contact'];
+        }
+
+        if ($columnExists('linked_lost_item_id')) {
+            $insertData['linked_lost_item_id'] = $linkedLostItemId;
+        }
+
+        DB::table('lost_found_items')->insert($insertData);
+
+        if ($type === 'found' && $linkedLostItemId !== null) {
+            DB::table('lost_found_items')
+                ->where('id', $linkedLostItemId)
+                ->update([
+                    'status' => 'claimed',
+                    'updated_at' => now(),
+                ]);
+        }
+
+        return back()->with('success', $type === 'found'
+            ? 'Laporan barang ditemukan berhasil dikirim ke BEM dan ditautkan ke laporan kehilangan.'
+            : 'Laporan barang hilang berhasil dicatat untuk ditindaklanjuti BEM.');
     }
 
     public function storeJadwal(Request $request): RedirectResponse
@@ -115,23 +235,36 @@ class ActivityController extends Controller
             return [];
         }
 
-        $rows = DB::table('lost_found_items as item')
+        $columns = Schema::getColumnListing('lost_found_items');
+        $hasColumn = static fn (string $column): bool => in_array($column, $columns, true);
+
+        $query = DB::table('lost_found_items as item')
             ->leftJoin('users as reporter', 'reporter.id', '=', 'item.reported_by')
             ->where(function ($query) use ($organizationId) {
                 $query->where('item.organization_id', $organizationId)
                     ->orWhereNull('item.organization_id');
             })
             ->orderByDesc('item.created_at')
-            ->limit(50)
-            ->get([
+            ->limit(50);
+
+        if ($hasColumn('linked_lost_item_id')) {
+            $query->leftJoin('lost_found_items as linked', 'linked.id', '=', 'item.linked_lost_item_id');
+        }
+
+        $rows = $query->get([
                 'item.id',
                 'item.item_name',
                 'item.description',
                 'item.location_found',
                 'item.type',
                 'item.status',
+                $hasColumn('image') ? 'item.image' : DB::raw('NULL as image'),
+                $hasColumn('reporter_name') ? 'item.reporter_name as item_reporter_name' : DB::raw('NULL as item_reporter_name'),
+                $hasColumn('reporter_contact') ? 'item.reporter_contact' : DB::raw('NULL as reporter_contact'),
+                $hasColumn('linked_lost_item_id') ? 'item.linked_lost_item_id' : DB::raw('NULL as linked_lost_item_id'),
                 'item.created_at',
-                'reporter.name as reporter_name',
+                'reporter.name as user_reporter_name',
+                $hasColumn('linked_lost_item_id') ? 'linked.item_name as linked_item_name' : DB::raw('NULL as linked_item_name'),
             ]);
 
         return $rows->map(function ($row) {
@@ -146,12 +279,62 @@ class ActivityController extends Controller
                 'status' => $itemStatus,
                 'priority' => $itemStatus === 'active',
                 'date' => Carbon::parse((string) ($row->created_at ?? now()))->toDateString(),
-                'reporter' => (string) ($row->reporter_name ?? 'Anonim'),
+                'reporter' => (string) (($row->item_reporter_name ?? '') !== ''
+                    ? $row->item_reporter_name
+                    : (($row->user_reporter_name ?? '') !== '' ? $row->user_reporter_name : 'Anonim')),
+                'reporter_contact' => (string) ($row->reporter_contact ?? ''),
                 'location' => (string) ($row->location_found ?? '-'),
                 'description' => (string) ($row->description ?? ''),
+                'image' => (string) ($row->image ?? ''),
+                'linked_lost_item_id' => (int) ($row->linked_lost_item_id ?? 0),
+                'linked_item_name' => (string) ($row->linked_item_name ?? ''),
                 'notes' => '',
             ];
         })->all();
+    }
+
+    private function buildLostFoundDescription(string $description, string $reporterName, string $reporterContact, string $reviewStatus): string
+    {
+        $baseDescription = trim($description);
+        $metaLines = [
+            'Pelapor: ' . trim($reporterName),
+            'Kontak: ' . trim($reporterContact),
+            'ReviewStatus: ' . trim($reviewStatus),
+        ];
+
+        return trim($baseDescription . "\n" . implode("\n", $metaLines));
+    }
+
+    private function storeRealtimePhoto(string $photoData): ?string
+    {
+        $raw = trim($photoData);
+        if ($raw === '' || !preg_match('/^data:image\/(png|jpeg|jpg);base64,/', $raw, $matches)) {
+            return null;
+        }
+
+        $extension = $matches[1] === 'png' ? 'png' : 'jpg';
+        $base64Body = substr($raw, strpos($raw, ',') + 1);
+        $binary = base64_decode($base64Body, true);
+
+        if ($binary === false) {
+            return null;
+        }
+
+        $directory = public_path('uploads/lost-found');
+        if (!is_dir($directory) && !@mkdir($directory, 0775, true) && !is_dir($directory)) {
+            return null;
+        }
+
+        $filename = 'lf-' . now()->format('YmdHis') . '-' . Str::random(10) . '.' . $extension;
+        $absolutePath = $directory . DIRECTORY_SEPARATOR . $filename;
+
+        try {
+            file_put_contents($absolutePath, $binary);
+        } catch (Throwable) {
+            return null;
+        }
+
+        return '/uploads/lost-found/' . $filename;
     }
 
     private function lostFoundStatusLabelMap(): array

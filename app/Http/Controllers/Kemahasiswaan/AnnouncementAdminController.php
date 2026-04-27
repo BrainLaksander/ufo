@@ -5,12 +5,15 @@ namespace App\Http\Controllers\Kemahasiswaan;
 use App\Http\Controllers\Controller;
 use App\Services\ReferenceValueService;
 use Carbon\Carbon;
+use Illuminate\Mail\Message;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Throwable;
 
 class AnnouncementAdminController extends Controller
 {
@@ -103,6 +106,11 @@ class AnnouncementAdminController extends Controller
         $announcement = DB::table('kemahasiswaan_announcements')->where('id', $announcementId)->first();
         $account = $announcement ? $this->findAkunUKM((int) $announcement->ukm_account_id) : null;
 
+        $emailDispatchError = null;
+        if ($publishStatus === 'published') {
+            $emailDispatchError = $this->dispatchAnnouncementEmailById($announcementId);
+        }
+
         $this->appendActivityLog([
             'ukm_account_id' => $account['id'] ?? null,
             'organization_id' => $account['organization_id'] ?? null,
@@ -112,7 +120,14 @@ class AnnouncementAdminController extends Controller
                 : 'Draft pengumuman "' . $validated['judul'] . '" disimpan dari modal Kemahasiswaan.',
         ]);
 
-        return back()->with('success', 'Pengumuman berhasil disimpan.');
+        $message = 'Pengumuman berhasil disimpan.';
+        if ($publishStatus === 'published') {
+            $message .= $emailDispatchError === null
+                ? ' Distribusi email berhasil dikirim.'
+                : ' Distribusi email belum terkirim: ' . $emailDispatchError;
+        }
+
+        return back()->with('success', $message);
     }
 
     public function updatePengumuman(Request $request, int $id): RedirectResponse
@@ -173,6 +188,11 @@ class AnnouncementAdminController extends Controller
                 'updated_at' => now(),
             ]);
 
+        $emailDispatchError = null;
+        if ($publishStatus === 'published') {
+            $emailDispatchError = $this->dispatchAnnouncementEmailById($id);
+        }
+
         $account = $this->findAkunUKM((int) ($announcement->ukm_account_id ?? 0));
         $this->appendActivityLog([
             'ukm_account_id' => $account['id'] ?? null,
@@ -181,7 +201,14 @@ class AnnouncementAdminController extends Controller
             'description' => 'Pengumuman "' . $validated['judul'] . '" diperbarui oleh Departemen Kemahasiswaan.',
         ]);
 
-        return back()->with('success', 'Pengumuman berhasil diperbarui.');
+        $message = 'Pengumuman berhasil diperbarui.';
+        if ($publishStatus === 'published') {
+            $message .= $emailDispatchError === null
+                ? ' Distribusi email berhasil dikirim.'
+                : ' Distribusi email belum terkirim: ' . $emailDispatchError;
+        }
+
+        return back()->with('success', $message);
     }
 
     public function destroyPengumuman(int $id): RedirectResponse
@@ -256,6 +283,11 @@ class AnnouncementAdminController extends Controller
                 'updated_at' => now(),
             ]);
 
+        $emailDispatchError = null;
+        if ($publishStatus === 'published' && $reviewStatus === 'approved') {
+            $emailDispatchError = $this->dispatchAnnouncementEmailById($id);
+        }
+
         $account = $this->findAkunUKM((int) $announcement->ukm_account_id);
         $this->appendActivityLog([
             'ukm_account_id' => $account['id'] ?? null,
@@ -264,7 +296,14 @@ class AnnouncementAdminController extends Controller
             'description' => 'Review email pengumuman "' . $announcement->title . '" disimpan oleh Departemen Kemahasiswaan.',
         ]);
 
-        return back()->with('success', 'Review izin pengumuman ke email berhasil disimpan.');
+        $message = 'Review izin pengumuman ke email berhasil disimpan.';
+        if ($publishStatus === 'published' && $reviewStatus === 'approved') {
+            $message .= $emailDispatchError === null
+                ? ' Distribusi email berhasil dikirim.'
+                : ' Distribusi email belum terkirim: ' . $emailDispatchError;
+        }
+
+        return back()->with('success', $message);
     }
 
     // ============ Private Helpers ============
@@ -364,7 +403,9 @@ class AnnouncementAdminController extends Controller
                 'ann.id',
                 'ann.title',
                 'ann.category',
+                'ann.target_audience',
                 'ann.summary',
+                'ann.content',
                 'ann.publish_status',
                 'ann.publish_at',
                 'ann.email_review_status',
@@ -378,15 +419,26 @@ class AnnouncementAdminController extends Controller
             ->get();
 
         return $rows->map(function ($row) use ($publishLabels, $reviewLabels) {
+            $publishCode = (string) ($row->publish_status ?? 'draft');
+            $reviewCode = (string) ($row->email_review_status ?? 'pending');
+
             return [
                 'id' => (int) $row->id,
                 'judul' => $row->title,
                 'kategori' => $row->category,
+                'target' => (string) ($row->target_audience ?? ''),
+                'konten' => (string) ($row->content ?? ''),
                 'summary' => $row->summary,
-                'publish_code' => $row->publish_status,
-                'publish_label' => $publishLabels[$row->publish_status] ?? $row->publish_status,
-                'email_review_code' => $row->email_review_status,
-                'email_review_label' => $reviewLabels[$row->email_review_status] ?? $row->email_review_status,
+                'ringkasan' => $row->summary,
+                'organisasi' => (string) ($row->account_name ?? '-'),
+                'ukm_account_name' => (string) ($row->account_name ?? '-'),
+                'publish_code' => $publishCode,
+                'publish_label' => $publishLabels[$publishCode] ?? $publishCode,
+                'status_code' => $publishCode,
+                'status' => $publishLabels[$publishCode] ?? $publishCode,
+                'email_review_code' => $reviewCode,
+                'email_review_label' => $reviewLabels[$reviewCode] ?? $reviewCode,
+                'email_review_status' => $reviewLabels[$reviewCode] ?? $reviewCode,
                 'email_review_note' => $row->email_review_note,
                 'publish_at' => $row->publish_at,
                 'created_at' => $row->created_at,
@@ -395,6 +447,142 @@ class AnnouncementAdminController extends Controller
                 'organization_id' => $row->organization_id,
             ];
         })->all();
+    }
+
+    private function dispatchAnnouncementEmailById(int $announcementId): ?string
+    {
+        if ($announcementId <= 0 || !Schema::hasTable('kemahasiswaan_announcements')) {
+            return 'Data pengumuman tidak valid.';
+        }
+
+        $row = DB::table('kemahasiswaan_announcements as ann')
+            ->leftJoin('kemahasiswaan_ukm_accounts as akun', 'akun.id', '=', 'ann.ukm_account_id')
+            ->select([
+                'ann.id',
+                'ann.title',
+                'ann.category',
+                'ann.target_audience',
+                'ann.summary',
+                'ann.content',
+                'ann.publish_status',
+                'ann.publish_at',
+                'ann.ukm_account_id',
+                'akun.name as account_name',
+                'akun.email as account_email',
+            ])
+            ->where('ann.id', $announcementId)
+            ->first();
+
+        if (!$row) {
+            return 'Data pengumuman tidak ditemukan.';
+        }
+
+        if ((string) ($row->publish_status ?? '') !== 'published') {
+            return null;
+        }
+
+        $recipients = $this->resolveAnnouncementRecipients($row);
+        if (empty($recipients)) {
+            return 'Target email belum dikonfigurasi. Isi mailing list di pengaturan env.';
+        }
+
+        $subject = '[UFO] ' . trim((string) ($row->title ?? 'Pengumuman Kampus'));
+        $summary = trim((string) ($row->summary ?? ''));
+        $content = trim((string) ($row->content ?? ''));
+        $category = trim((string) ($row->category ?? 'Umum'));
+        $targetAudience = trim((string) ($row->target_audience ?? 'Umum'));
+        $publishAt = !empty($row->publish_at)
+            ? Carbon::parse((string) $row->publish_at)->format('d M Y H:i')
+            : now()->format('d M Y H:i');
+
+        if ($summary === '' && $content !== '') {
+            $summary = Str::limit(trim(preg_replace('/\s+/u', ' ', strip_tags($content)) ?? $content), 240, '...');
+        }
+
+        $safeSummary = e($summary);
+        $safeContentHtml = $content !== '' ? nl2br(e($content)) : $safeSummary;
+        $safeCategory = e($category);
+        $safeTarget = e($targetAudience);
+        $safePublishAt = e($publishAt);
+
+        $html = "
+            <div style='font-family: Arial, sans-serif; line-height: 1.6; color: #222;'>
+                <h2 style='margin-bottom: 8px;'>" . e((string) ($row->title ?? 'Pengumuman')) . "</h2>
+                <p style='margin: 0 0 14px 0; color: #555;'>Kategori: {$safeCategory} | Target: {$safeTarget} | Publish: {$safePublishAt}</p>
+                <div style='padding: 12px; background: #f8f9fb; border: 1px solid #e6e8ef; border-radius: 8px; margin-bottom: 14px;'>{$safeSummary}</div>
+                <div>{$safeContentHtml}</div>
+                <hr style='margin: 18px 0; border: none; border-top: 1px solid #e6e8ef;'>
+                <small style='color: #6b7280;'>Email ini dikirim otomatis oleh sistem UFO Kemahasiswaan.</small>
+            </div>
+        ";
+
+        try {
+            $firstRecipient = array_shift($recipients);
+            $bccRecipients = array_values(array_filter($recipients));
+
+            Mail::html($html, function (Message $message) use ($subject, $firstRecipient, $bccRecipients) {
+                $message->to($firstRecipient)->subject($subject);
+                if (!empty($bccRecipients)) {
+                    $message->bcc($bccRecipients);
+                }
+            });
+
+            return null;
+        } catch (Throwable $exception) {
+            return $exception->getMessage();
+        }
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function resolveAnnouncementRecipients(object $announcement): array
+    {
+        $target = Str::lower(trim((string) ($announcement->target_audience ?? '')));
+        $configuredTargets = config('mail.announcement_targets', []);
+
+        $emails = [];
+
+        if (str_contains($target, '@')) {
+            $emails = $this->parseEmailList($target);
+        } elseif ($target === 'semua mahasiswa') {
+            $emails = $this->parseEmailList((string) ($configuredTargets['all_students'] ?? ''));
+        } elseif ($target === 'mahasiswa tertentu') {
+            $emails = $this->parseEmailList((string) ($configuredTargets['selected_students'] ?? ''));
+        } elseif ($target === 'semua organisasi') {
+            if (Schema::hasTable('kemahasiswaan_ukm_accounts')) {
+                $emails = DB::table('kemahasiswaan_ukm_accounts')
+                    ->where('status', $this->defaultAccountStatus())
+                    ->whereNotNull('email')
+                    ->pluck('email')
+                    ->filter(fn ($email) => filter_var((string) $email, FILTER_VALIDATE_EMAIL) !== false)
+                    ->map(fn ($email) => Str::lower(trim((string) $email)))
+                    ->unique()
+                    ->values()
+                    ->all();
+            }
+        } elseif ($target === 'organisasi tertentu') {
+            $emails = $this->parseEmailList((string) ($announcement->account_email ?? ''));
+        }
+
+        if (empty($emails)) {
+            $emails = $this->parseEmailList((string) ($configuredTargets['default'] ?? ''));
+        }
+
+        return array_values(array_unique(array_filter($emails)));
+    }
+
+    /**
+     * @return array<int, string>
+     */
+    private function parseEmailList(string $raw): array
+    {
+        $items = preg_split('/[,;\n\r]+/', $raw) ?: [];
+
+        return array_values(array_filter(array_map(function ($item) {
+            $email = Str::lower(trim((string) $item));
+            return filter_var($email, FILTER_VALIDATE_EMAIL) ? $email : null;
+        }, $items)));
     }
 
     private function getAkunUKM(): array

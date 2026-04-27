@@ -480,6 +480,7 @@ class OrganizationAdminController extends Controller
                     'phone' => $organizationRow->phone,
                     'category' => $organizationRow->category ?? null,
                     'type' => $organizationRow->type ?? null,
+                    'scope' => $organizationRow->level ?? null,
                     'level' => $organizationRow->level ?? null,
                     'field' => $organizationRow->field ?? null,
                     'advisor' => $organizationRow->advisor ?? null,
