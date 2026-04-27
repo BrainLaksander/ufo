@@ -22,9 +22,19 @@
 
 body.ufo-pengurus-shell {
   margin: 0;
-  background: radial-gradient(circle at 8% 0%, #f7f3ff 0%, #eff3fb 38%, #eef1f6 100%);
+  background: #f4effb;
   color: var(--ufo-gray-900);
   font-family: "Plus Jakarta Sans", "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body.ufo-pengurus-shell .role-layout {
+  display: block;
+  min-height: 100vh;
+}
+
+body.ufo-pengurus-shell .role-content-shell {
+  width: 100%;
+  min-width: 0;
 }
 
 body.ufo-no-scroll {
@@ -37,7 +47,7 @@ body.ufo-no-scroll {
   left: 0;
   right: 0;
   z-index: 1050;
-  background: linear-gradient(110deg, var(--ufo-purple-800), var(--ufo-purple-700));
+  background: var(--ufo-purple-700);
   border-bottom: 1px solid rgba(255, 255, 255, 0.14);
   box-shadow: 0 10px 24px rgba(63, 23, 88, 0.28);
 }
@@ -333,14 +343,14 @@ body.ufo-no-scroll {
 }
 
 .ufo-pengurus-notification-item.tone-message {
-  border-color: #ead39f;
-  background: #fff8e8;
+  border-color: #d1b4f7;
+  background: #f3eaff;
 }
 
 .ufo-pengurus-notification-item.tone-message .ufo-pengurus-notification-icon {
-  border-color: #ead39f;
-  background: #fff3d8;
-  color: #946800;
+  border-color: #d1b4f7;
+  background: #eadbff;
+  color: #5c2f97;
 }
 
 .ufo-pengurus-notification-icon {
@@ -373,10 +383,20 @@ body.ufo-no-scroll {
   color: var(--ufo-gray-500);
 }
 
-.ufo-pengurus-main {
+body.ufo-pengurus-shell .role-layout .role-main-content.ufo-pengurus-main {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 96px 0 1.25rem;
+  min-width: 0;
+}
+
+.ufo-pengurus-main-inner {
+  width: min(100%, 1120px);
   max-width: 1120px;
   margin: 0 auto;
-  padding: 88px 1rem 1.25rem;
+  padding: 0 1rem;
+  box-sizing: border-box;
 }
 
 /* Reusable page blocks */
@@ -454,9 +474,9 @@ body.ufo-no-scroll {
 }
 
 .ufo-kboard-stat.gold {
-  background: #fff9e5;
-  border-color: #f4d76d;
-  color: #8a6600;
+  background: #f3eaff;
+  border-color: #d1b4f7;
+  color: #5c2f97;
 }
 
 .ufo-kboard-stat.purple {
@@ -515,8 +535,8 @@ body.ufo-no-scroll {
 
 .ufo-kboard-btn.gold {
   background: var(--ufo-gold-500);
-  border-color: #ebbd08;
-  color: #2f2512;
+  border-color: var(--ufo-gold-500);
+  color: #fff;
 }
 
 .ufo-kboard-btn.ghost {
@@ -610,9 +630,9 @@ body.ufo-no-scroll {
 }
 
 .ufo-kboard-pill.pending {
-  background: #fff4dd;
-  border-color: #efce7b;
-  color: #946800;
+  background: #f3eaff;
+  border-color: #d1b4f7;
+  color: #5c2f97;
 }
 
 .ufo-kboard-pill.approved {
@@ -748,9 +768,9 @@ body.ufo-no-scroll {
 }
 
 .ufo-pg-calendar-summary article.orange {
-  background: #fff9e5;
-  border-color: #f4d76d;
-  color: #8a6600;
+  background: #f3eaff;
+  border-color: #d1b4f7;
+  color: #5c2f97;
 }
 
 .ufo-pg-calendar-legend {
@@ -911,8 +931,8 @@ body.ufo-no-scroll {
 }
 
 .ufo-pg-task-card.urgent {
-  background: #fff4dd;
-  border-color: #efce7b;
+  background: #f5edff;
+  border-color: #d1b4f7;
 }
 
 .ufo-pg-task-card.normal {
@@ -934,9 +954,9 @@ body.ufo-no-scroll {
 }
 
 .ufo-pg-task-tag.urgent {
-  color: #946800;
-  border-color: #efce7b;
-  background: #fff9e5;
+  color: #5c2f97;
+  border-color: #d1b4f7;
+  background: #f3eaff;
 }
 
 .ufo-pg-task-tag.normal {
@@ -968,7 +988,7 @@ body.ufo-no-scroll {
 .ufo-pengurus-shell .nav-pills .show > .nav-link {
   color: #fff;
   border-color: #5a2ca0;
-  background: linear-gradient(135deg, #5a2ca0 0%, #3f1769 100%);
+  background: #5a2ca0;
 }
 
 .ufo-pg-upload-box {
@@ -1012,7 +1032,7 @@ body.ufo-no-scroll {
 
 .ufo-pg-event-cover {
   min-height: 132px;
-  background: linear-gradient(135deg, #efefff 0%, #dce8ff 100%);
+  background: #eee7fb;
   display: grid;
   place-items: center;
   color: #4864a5;
@@ -1020,7 +1040,7 @@ body.ufo-no-scroll {
 }
 
 .ufo-pg-event-cover.muted {
-  background: linear-gradient(135deg, #f4f4f6 0%, #e8ecf2 100%);
+  background: #f1edf8;
   color: #7f8594;
 }
 
@@ -1037,7 +1057,7 @@ body.ufo-no-scroll {
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  background: linear-gradient(135deg, #5e2f9f 0%, #7f53c0 100%);
+  background: #5e2f9f;
   color: #fff;
   border: 1px solid #5e2f9f;
   font-size: 0.82rem;
@@ -1121,7 +1141,7 @@ body.ufo-no-scroll {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #5e2f9f 0%, #7f53c0 100%);
+  background: #5e2f9f;
   color: #fff;
   font-size: 1.2rem;
   box-shadow: 0 8px 16px rgba(78, 35, 101, 0.26);
@@ -1177,7 +1197,7 @@ body.ufo-no-scroll {
 }
 
 .ufo-pg-info-banner {
-  background: linear-gradient(110deg, #5e2f9f 0%, #7f53c0 100%);
+  background: #5e2f9f;
   color: #fff;
   border-color: #542271;
 }
@@ -1196,7 +1216,7 @@ body.ufo-no-scroll {
 }
 
 .ufo-pg-priority-wrap {
-  background: linear-gradient(120deg, #5e2f9f 0%, #7f53c0 100%);
+  background: #6f3fb2;
   border-color: #5e2f9f;
 }
 
@@ -1352,9 +1372,9 @@ body.ufo-no-scroll {
 .ufo-pg-event-create-page .ufo-pg-warning-banner {
   margin: 0;
   border-radius: 10px;
-  border: 1px solid #e9d99c;
-  color: #6b5522;
-  background: #f5e7b8;
+  border: 1px solid #d1b4f7;
+  color: #5c2f97;
+  background: #f3eaff;
 }
 
 .ufo-pg-event-create-page .ufo-pg-status-banner {
@@ -1498,7 +1518,7 @@ body.ufo-no-scroll {
 .ufo-pg-event-create-page .btn-primary-org {
   color: #fff;
   border-color: #5e2f9f;
-  background: linear-gradient(135deg, #5e2f9f 0%, #7f53c0 100%);
+  background: #5e2f9f;
 }
 
 .ufo-pg-event-create-page .btn-primary-org:hover {
@@ -1557,9 +1577,9 @@ body.ufo-no-scroll {
 .ufo-pg-settings-page .ufo-pg-warning-banner {
   margin: 0;
   border-radius: 10px;
-  border: 1px solid #e9d99c;
-  color: #6b5522;
-  background: #f5e7b8;
+  border: 1px solid #d1b4f7;
+  color: #5c2f97;
+  background: #f3eaff;
 }
 
 .ufo-pg-settings-page .ufo-pg-settings-form {
@@ -1618,7 +1638,7 @@ body.ufo-no-scroll {
   align-items: center;
   border-radius: 11px;
   padding: 0.52rem 0.95rem;
-  background: linear-gradient(135deg, var(--ufo-purple-700) 0%, var(--ufo-purple-800) 100%);
+  background: var(--ufo-purple-700);
   color: #fff;
   font-size: 0.96rem;
   font-weight: 700;
@@ -1760,7 +1780,7 @@ body.ufo-no-scroll {
 .ufo-pg-settings-page .btn-primary-org {
   color: #fff;
   border-color: #5e2f9f;
-  background: linear-gradient(135deg, #5e2f9f 0%, #7f53c0 100%);
+  background: #5e2f9f;
 }
 
 .ufo-pg-settings-page .btn-primary-org:hover {
@@ -1884,8 +1904,14 @@ body.ufo-no-scroll {
     min-height: 64px;
   }
 
-  .ufo-pengurus-main {
-    padding-top: 78px;
+  body.ufo-pengurus-shell .role-layout .role-main-content.ufo-pengurus-main {
+    width: 100%;
+    margin-left: 0;
+    padding-top: 84px;
+  }
+
+  .ufo-pengurus-main-inner {
+    padding-inline: 14px;
   }
 
   .ufo-pengurus-brand-text small {
