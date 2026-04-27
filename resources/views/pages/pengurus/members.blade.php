@@ -313,11 +313,10 @@
                 <p class="ufo-kboard-item-meta mb-2">Logo Organisasi</p>
                 <div class="ufo-pg-upload-box">
                     @if($logoUrl !== '')
-                        <img src="{{ $logoUrl }}" alt="Logo organisasi" class="members-media-preview">
+                        <img id="members-logo-preview-main" src="{{ $logoUrl }}" alt="Logo organisasi" class="members-media-preview">
                     @else
-                        <i class="bi bi-image"></i>
-                        <p class="mb-0">Klik untuk upload logo</p>
-                        <small>PNG, JPG (maks. 2MB)</small>
+                        <div id="members-logo-preview-main-empty" class="members-media-empty">Belum ada logo</div>
+                        <img id="members-logo-preview-main" src="" alt="Logo organisasi" class="members-media-preview d-none">
                     @endif
                 </div>
             </article>
@@ -326,11 +325,10 @@
                 <p class="ufo-kboard-item-meta mb-2">Banner Organisasi</p>
                 <div class="ufo-pg-upload-box">
                     @if($bannerUrl !== '')
-                        <img src="{{ $bannerUrl }}" alt="Banner organisasi" class="members-media-preview">
+                        <img id="members-banner-preview-main" src="{{ $bannerUrl }}" alt="Banner organisasi" class="members-media-preview">
                     @else
-                        <i class="bi bi-card-image"></i>
-                        <p class="mb-0">Klik untuk upload banner</p>
-                        <small>PNG, JPG (maks. 5MB)</small>
+                        <div id="members-banner-preview-main-empty" class="members-media-empty">Belum ada banner</div>
+                        <img id="members-banner-preview-main" src="" alt="Banner organisasi" class="members-media-preview d-none">
                     @endif
                 </div>
             </article>
