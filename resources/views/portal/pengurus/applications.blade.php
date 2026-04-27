@@ -4,7 +4,6 @@
 
 @php
     $contacts = $contacts ?? [];
-    $supportInfo = $supportInfo ?? [];
 @endphp
 
 @section('content')
@@ -63,18 +62,5 @@
         </div>
     </section>
 
-    @if(!empty($supportInfo))
-        <section class="ufo-kboard-section ufo-pg-info-banner">
-            <h2>{{ $supportInfo['title'] ?? '' }}</h2>
-            @foreach(($supportInfo['items'] ?? []) as $info)
-                <p>
-                    @if(!empty($info['icon']))
-                        <span>{{ $info['icon'] }}</span>
-                    @endif
-                    {{ $info['text'] ?? '' }}
-                </p>
-            @endforeach
-        </section>
-    @endif
 </div>
 @endsection

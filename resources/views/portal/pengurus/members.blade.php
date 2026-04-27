@@ -18,13 +18,33 @@
     $organizationLevel = $organizationLevel ?? '';
     $organizationField = $organizationField ?? '';
     $contactEmail = $contactEmail ?? '';
-    $contactPhone = $contactPhone ?? '';
     $contactInstagram = $contactInstagram ?? '';
-    $contactLine = $contactLine ?? '';
+    $contactFacebook = $contactFacebook ?? '';
+    $contactTiktok = $contactTiktok ?? '';
+    $contactYoutube = $contactYoutube ?? '';
     $valuesText = $valuesText ?? '';
     $programsText = $programsText ?? '';
     $structureText = $structureText ?? '';
     $contactsText = $contactsText ?? '';
+    $registrationOpen = $registrationOpen ?? false;
+    $registrationPeriod = $registrationPeriod ?? '';
+    $registrationOpenDate = $registrationOpenDate ?? '';
+    $registrationFormLink = $registrationFormLink ?? '';
+    $registrationGuidebookUrl = $registrationGuidebookUrl ?? '';
+    $registrationDivisionsText = $registrationDivisionsText ?? '';
+    $registrationDivisionsPreview = collect(preg_split('/\r\n|\r|\n/', (string) $registrationDivisionsText) ?: [])
+        ->map(static function (string $line): array {
+            [$name, $description] = array_pad(explode('|', $line, 2), 2, '');
+            return [
+                'name' => trim($name),
+                'description' => trim($description),
+            ];
+        })
+        ->filter(static fn (array $item): bool => $item['name'] !== '' || $item['description'] !== '')
+        ->values()
+        ->all();
+    $loggedOrganizationName = $loggedOrganizationName ?? '';
+    $loggedAccountName = $loggedAccountName ?? '';
     $logoUrl = $logoUrl ?? '';
     $bannerUrl = $bannerUrl ?? '';
 @endphp
@@ -116,6 +136,31 @@
     gap: 0.75rem;
 }
 
+.members-section-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.members-context-chip {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-top: 0.35rem;
+}
+
+.members-context-chip span {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    font-size: 0.78rem;
+    color: #334155;
+    background: #f1f5f9;
+    border: 1px solid #cbd5e1;
+    border-radius: 999px;
+    padding: 0.2rem 0.6rem;
+}
+
 @media (max-width: 768px) {
     #membersEditModal .modal-dialog {
         margin: 0.5rem;
@@ -127,6 +172,20 @@
 
     #membersEditModal .modal-body {
         max-height: calc(100vh - 10rem);
+    }
+
+    .members-section-head {
+        flex-direction: column;
+    }
+
+    .members-section-actions {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 1fr;
+    }
+
+    .members-section-actions .ufo-kboard-btn {
+        width: 100%;
     }
 }
 </style>
@@ -151,11 +210,23 @@
             <div>
                 <h1 class="ufo-kboard-heading">Profil Organisasi</h1>
                 <p class="ufo-kboard-lead">Kelola informasi organisasi yang ditampilkan kepada mahasiswa.</p>
+                <div class="members-context-chip">
+                    <span>
+                        <i class="bi bi-building"></i>
+                        Organisasi: {{ $loggedOrganizationName !== '' ? $loggedOrganizationName : '-' }}
+                    </span>
+                </div>
             </div>
-            <button class="ufo-kboard-btn primary" type="button" data-bs-toggle="modal" data-bs-target="#membersEditModal" data-edit-target="kategori" data-edit-title="Edit Profil Organisasi">
-                <i class="bi bi-pencil-square"></i>
-                Edit Profil
-            </button>
+            <div class="members-section-actions">
+                <button class="ufo-kboard-btn primary" type="button" data-bs-toggle="modal" data-bs-target="#membersEditModal" data-edit-target="kategori" data-edit-title="Edit Profil Organisasi">
+                    <i class="bi bi-pencil-square"></i>
+                    Edit Profil
+                </button>
+                <button class="ufo-kboard-btn" type="button" data-bs-toggle="modal" data-bs-target="#membersEditModal" data-edit-target="pendaftaran" data-edit-title="Edit Info Pendaftaran">
+                    <i class="bi bi-clipboard-plus"></i>
+                    Edit Info Pendaftaran
+                </button>
+            </div>
         </div>
 
         <div class="ufo-kboard-row three mt-3">
@@ -175,6 +246,43 @@
     </section>
 
     <section class="ufo-kboard-section">
+        <div class="ufo-kboard-item-head d-flex justify-content-between align-items-center gap-2 flex-wrap">
+            <h3 class="ufo-kboard-item-title mb-0">Info Pendaftaran Organisasi</h3>
+            <button class="ufo-kboard-btn" type="button" data-bs-toggle="modal" data-bs-target="#membersEditModal" data-edit-target="pendaftaran" data-edit-title="Edit Info Pendaftaran">
+                <i class="bi bi-pencil-square"></i>
+                Edit Info Pendaftaran
+            </button>
+        </div>
+
+        <div class="members-readonly-grid mt-3">
+            <article class="members-readonly-item">
+                <h6>Status Pendaftaran</h6>
+                <p>{{ $registrationOpen ? 'Dibuka' : 'Belum Dibuka' }}</p>
+            </article>
+            <article class="members-readonly-item">
+                <h6>Periode</h6>
+                <p>{{ $registrationPeriod !== '' ? $registrationPeriod : '-' }}</p>
+            </article>
+            <article class="members-readonly-item">
+                <h6>Tanggal Dibuka</h6>
+                <p>{{ $registrationOpenDate !== '' ? $registrationOpenDate : '-' }}</p>
+            </article>
+            <article class="members-readonly-item">
+                <h6>Link Form</h6>
+                <p>{{ $registrationFormLink !== '' ? $registrationFormLink : '-' }}</p>
+            </article>
+            <article class="members-readonly-item">
+                <h6>Link Buku Panduan</h6>
+                <p>{{ $registrationGuidebookUrl !== '' ? $registrationGuidebookUrl : '-' }}</p>
+            </article>
+            <article class="members-readonly-item">
+                <h6>Total Divisi</h6>
+                <p>{{ count($registrationDivisionsPreview) }}</p>
+            </article>
+        </div>
+    </section>
+
+    <section class="ufo-kboard-section">
         <div class="ufo-kboard-item-head">
             <h3 class="ufo-kboard-item-title">Kategori Organisasi</h3>
         </div>
@@ -187,10 +295,6 @@
             <article class="members-readonly-item">
                 <h6>Tipe Organisasi</h6>
                 <p>{{ $organizationType !== '' ? $organizationType : '-' }}</p>
-            </article>
-            <article class="members-readonly-item">
-                <h6>Level</h6>
-                <p>{{ $organizationLevel !== '' ? $organizationLevel : '-' }}</p>
             </article>
             <article class="members-readonly-item">
                 <h6>Bidang</h6>
@@ -248,18 +352,11 @@
 
         <section class="ufo-kboard-section">
             <div class="ufo-kboard-item-head">
-                <h3 class="ufo-kboard-item-title">Culture</h3>
+                <h3 class="ufo-kboard-item-title">Values &amp; Culture</h3>
             </div>
 
-            <p class="members-simple-text">{{ $cultureText !== '' ? $cultureText : '-' }}</p>
-        </section>
-    </div>
-
-    <div class="ufo-kboard-row two">
-        <section class="ufo-kboard-section">
-            <div class="ufo-kboard-item-head">
-                <h3 class="ufo-kboard-item-title">Values</h3>
-            </div>
+            <p class="ufo-kboard-item-meta mb-1">Culture</p>
+            <p class="members-simple-text mb-3">{{ $cultureText !== '' ? $cultureText : '-' }}</p>
 
             <div class="ufo-kboard-list">
                 @forelse($values as $value)
@@ -284,19 +381,17 @@
                         <summary>
                             <div>
                                 <h4 class="ufo-kboard-item-title">{{ $program['nama'] }}</h4>
-                                <p class="ufo-kboard-item-meta">{{ $program['periode'] }}</p>
                             </div>
                             <span class="ufo-kboard-pill draft">Detail</span>
                         </summary>
 
                         <div class="ufo-pg-program-detail">
+                            <p><strong>Deskripsi:</strong> {{ $program['deskripsi'] }}</p>
                             <p><strong>Tujuan:</strong> {{ $program['tujuan'] }}</p>
-                            <p><strong>Kegiatan:</strong> {{ $program['kegiatan'] }}</p>
-                            <p><strong>Output:</strong> {{ $program['output'] }}</p>
                         </div>
                     </details>
                 @empty
-                    <p class="ufo-kboard-item-meta mb-0">Belum ada program kegiatan dari data event.</p>
+                    <p class="ufo-kboard-item-meta mb-0">Belum ada program kegiatan yang tersimpan.</p>
                 @endforelse
             </div>
         </section>
@@ -389,10 +484,13 @@
                                 <button class="nav-link" id="members-tab-kontak" data-bs-toggle="pill" data-bs-target="#members-pane-kontak" type="button" role="tab" aria-controls="members-pane-kontak" aria-selected="false">Kontak</button>
                             </li>
                             <li class="nav-item" role="presentation">
-                                <button class="nav-link" id="members-tab-values" data-bs-toggle="pill" data-bs-target="#members-pane-values" type="button" role="tab" aria-controls="members-pane-values" aria-selected="false">Values</button>
+                                <button class="nav-link" id="members-tab-values" data-bs-toggle="pill" data-bs-target="#members-pane-values" type="button" role="tab" aria-controls="members-pane-values" aria-selected="false">Values & Culture</button>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="members-tab-program" data-bs-toggle="pill" data-bs-target="#members-pane-program" type="button" role="tab" aria-controls="members-pane-program" aria-selected="false">Program</button>
+                            </li>
+                            <li class="nav-item" role="presentation">
+                                <button class="nav-link" id="members-tab-pendaftaran" data-bs-toggle="pill" data-bs-target="#members-pane-pendaftaran" type="button" role="tab" aria-controls="members-pane-pendaftaran" aria-selected="false">Pendaftaran</button>
                             </li>
                             <li class="nav-item" role="presentation">
                                 <button class="nav-link" id="members-tab-struktur" data-bs-toggle="pill" data-bs-target="#members-pane-struktur" type="button" role="tab" aria-controls="members-pane-struktur" aria-selected="false">Struktur</button>
@@ -417,10 +515,6 @@
                                     <div class="col-md-6">
                                         <label class="form-label">Tipe Organisasi</label>
                                         <input type="text" class="form-control" name="type" value="{{ old('type', $organizationType) }}" placeholder="Contoh: UKM / BEM">
-                                    </div>
-                                    <div class="col-md-6">
-                                        <label class="form-label">Level</label>
-                                        <input type="text" class="form-control" name="level" value="{{ old('level', $organizationLevel) }}" placeholder="Contoh: Universitas">
                                     </div>
                                     <div class="col-md-6">
                                         <label class="form-label">Bidang</label>
@@ -476,10 +570,6 @@
                                         <label class="form-label">Misi</label>
                                         <textarea class="form-control" name="mission_text" rows="4">{{ old('mission_text', $missionText) }}</textarea>
                                     </div>
-                                    <div class="col-12">
-                                        <label class="form-label">Culture / Deskripsi</label>
-                                        <textarea class="form-control" name="culture_text" rows="4">{{ old('culture_text', $cultureText) }}</textarea>
-                                    </div>
                                 </div>
                             </section>
                         </div>
@@ -493,16 +583,20 @@
                                         <input type="email" class="form-control" name="email" value="{{ old('email', $contactEmail) }}">
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">Telepon</label>
-                                        <input type="text" class="form-control" name="phone" value="{{ old('phone', $contactPhone) }}">
-                                    </div>
-                                    <div class="col-md-6">
                                         <label class="form-label">Instagram</label>
                                         <input type="text" class="form-control" name="instagram" value="{{ old('instagram', $contactInstagram) }}">
                                     </div>
                                     <div class="col-md-6">
-                                        <label class="form-label">LINE</label>
-                                        <input type="text" class="form-control" name="line" value="{{ old('line', $contactLine) }}">
+                                        <label class="form-label">Facebook</label>
+                                        <input type="text" class="form-control" name="facebook" value="{{ old('facebook', $contactFacebook) }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">TikTok</label>
+                                        <input type="text" class="form-control" name="tiktok" value="{{ old('tiktok', $contactTiktok) }}">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">YouTube</label>
+                                        <input type="text" class="form-control" name="youtube" value="{{ old('youtube', $contactYoutube) }}">
                                     </div>
                                 </div>
                             </section>
@@ -510,7 +604,11 @@
 
                         <div class="tab-pane fade" id="members-pane-values" role="tabpanel" aria-labelledby="members-tab-values" tabindex="0">
                             <section class="mb-4" data-edit-section="values">
-                                <h6 class="mb-3">Values</h6>
+                                <h6 class="mb-3">Values dan Culture</h6>
+                                <div class="mb-3">
+                                    <label class="form-label">Culture / Deskripsi</label>
+                                    <textarea class="form-control" name="culture_text" rows="4">{{ old('culture_text', $cultureText) }}</textarea>
+                                </div>
                                 <label class="form-label">Format per baris: Nama Value|Deskripsi</label>
                                 <textarea class="form-control" name="values_text" rows="8" placeholder="Integritas|Menjaga komitmen organisasi">{{ old('values_text', $valuesText) }}</textarea>
                             </section>
@@ -519,8 +617,51 @@
                         <div class="tab-pane fade" id="members-pane-program" role="tabpanel" aria-labelledby="members-tab-program" tabindex="0">
                             <section class="mb-4" data-edit-section="program">
                                 <h6 class="mb-3">Program Kegiatan</h6>
-                                <label class="form-label">Format per baris: Nama|Periode|Tujuan|Kegiatan|Output</label>
-                                <textarea class="form-control" name="programs_text" rows="10" placeholder="Seminar Teknologi|2026|Meningkatkan literasi|Workshop & seminar|Sertifikat peserta">{{ old('programs_text', $programsText) }}</textarea>
+                                <label class="form-label">Format per baris: Nama Program|Deskripsi|Tujuan</label>
+                                <textarea class="form-control" name="programs_text" rows="10" placeholder="Seminar Teknologi|Workshop dan seminar teknologi|Meningkatkan literasi teknologi">{{ old('programs_text', $programsText) }}</textarea>
+                            </section>
+                        </div>
+
+                        <div class="tab-pane fade" id="members-pane-pendaftaran" role="tabpanel" aria-labelledby="members-tab-pendaftaran" tabindex="0">
+                            <section class="mb-4" data-edit-section="pendaftaran">
+                                <h6 class="mb-3">Info Pendaftaran Organisasi</h6>
+
+                                <div class="form-check form-switch mb-3">
+                                    <input
+                                        class="form-check-input"
+                                        type="checkbox"
+                                        role="switch"
+                                        id="members-registration-open"
+                                        name="registration_open"
+                                        value="1"
+                                        @checked(old('registration_open', $registrationOpen ? '1' : '0') === '1')
+                                    >
+                                    <label class="form-check-label" for="members-registration-open">Pendaftaran sedang dibuka</label>
+                                </div>
+
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label class="form-label">Periode Pendaftaran</label>
+                                        <input type="text" class="form-control" name="registration_period" value="{{ old('registration_period', $registrationPeriod) }}" placeholder="Contoh: 1 - 14 Mei 2026">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Tanggal Dibuka (jika belum dibuka)</label>
+                                        <input type="text" class="form-control" name="registration_open_date" value="{{ old('registration_open_date', $registrationOpenDate) }}" placeholder="Contoh: Minggu ke-2 Agustus 2026">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Link Form Pendaftaran</label>
+                                        <input type="text" class="form-control" name="registration_form_link" value="{{ old('registration_form_link', $registrationFormLink) }}" placeholder="https://...">
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label class="form-label">Link Buku Panduan</label>
+                                        <input type="text" class="form-control" name="registration_guidebook_url" value="{{ old('registration_guidebook_url', $registrationGuidebookUrl) }}" placeholder="https://...">
+                                    </div>
+                                </div>
+
+                                <div class="mt-3">
+                                    <label class="form-label">Divisi (format per baris: Nama Divisi|Deskripsi)</label>
+                                    <textarea class="form-control" name="registration_divisions_text" rows="8" placeholder="Pengembangan|Fokus pada riset dan pengembangan anggota">{{ old('registration_divisions_text', $registrationDivisionsText) }}</textarea>
+                                </div>
                             </section>
                         </div>
 
@@ -561,6 +702,7 @@ document.addEventListener('DOMContentLoaded', function () {
         'kontak': '#members-tab-kontak',
         'values': '#members-tab-values',
         'program': '#members-tab-program',
+        'pendaftaran': '#members-tab-pendaftaran',
         'struktur': '#members-tab-struktur'
     };
 

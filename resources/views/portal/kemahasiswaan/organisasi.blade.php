@@ -9,14 +9,26 @@
     $organizationDirectory = $organizationDirectory ?? [];
     $organizationSummary = $organizationSummary ?? [
         'total' => count($organizationDirectory),
-        'bem' => collect($organizationDirectory)->where('type', 'BEM')->count(),
-        'ukm' => collect($organizationDirectory)->where('type', 'UKM')->count(),
+        'ukm_umum' => collect($organizationDirectory)
+            ->where('type', 'UKM')
+            ->filter(fn ($org) => \Illuminate\Support\Str::lower((string) ($org['scope'] ?? '')) === 'umum'
+                || \Illuminate\Support\Str::lower((string) ($org['category'] ?? '')) === 'ukm umum')
+            ->count(),
+        'ukm_level_universitas' => collect($organizationDirectory)
+            ->where('type', 'UKM')
+            ->filter(fn ($org) => \Illuminate\Support\Str::lower((string) ($org['scope'] ?? '')) === 'universitas')
+            ->count(),
+        'ukm_level_fakultas' => collect($organizationDirectory)
+            ->where('type', 'UKM')
+            ->filter(fn ($org) => \Illuminate\Support\Str::lower((string) ($org['scope'] ?? '')) === 'fakultas')
+            ->count(),
         'categories' => collect($organizationDirectory)->pluck('category')->filter()->unique()->count(),
     ];
 
     $totalOrganizations = (int) ($organizationSummary['total'] ?? 0);
-    $totalBem = (int) ($organizationSummary['bem'] ?? 0);
-    $totalUkm = (int) ($organizationSummary['ukm'] ?? 0);
+    $totalUkmUmum = (int) ($organizationSummary['ukm_umum'] ?? 0);
+    $totalUkmUniversitas = (int) ($organizationSummary['ukm_level_universitas'] ?? 0);
+    $totalUkmFakultas = (int) ($organizationSummary['ukm_level_fakultas'] ?? 0);
     $totalCategories = (int) ($organizationSummary['categories'] ?? 0);
     $categoryOptions = collect(array_merge(
         ['BEM', 'UKM Umum', 'Minat & Bakat', 'Kerohanian', 'Akademik & Teknologi', 'Kedaerahan'],
@@ -155,24 +167,24 @@
 
         <article class="kmh-stat-card tone-success">
             <div>
-                <p>BEM</p>
-                <strong class="kmh-stat-value">{{ $totalBem }}</strong>
+                <p>Total UKM Umum</p>
+                <strong class="kmh-stat-value">{{ $totalUkmUmum }}</strong>
             </div>
             <span class="kmh-stat-icon"><i class="bi bi-bank2"></i></span>
         </article>
 
         <article class="kmh-stat-card tone-warning">
             <div>
-                <p>UKM</p>
-                <strong class="kmh-stat-value">{{ $totalUkm }}</strong>
+                <p>Total UKM Level Universitas</p>
+                <strong class="kmh-stat-value">{{ $totalUkmUniversitas }}</strong>
             </div>
             <span class="kmh-stat-icon"><i class="bi bi-diagram-3-fill"></i></span>
         </article>
 
         <article class="kmh-stat-card tone-info">
             <div>
-                <p>Kategori</p>
-                <strong class="kmh-stat-value">{{ $totalCategories }}</strong>
+                <p>Total UKM Level Fakultas</p>
+                <strong class="kmh-stat-value">{{ $totalUkmFakultas }}</strong>
             </div>
             <span class="kmh-stat-icon"><i class="bi bi-collection-fill"></i></span>
         </article>
@@ -192,6 +204,7 @@
                             <th>Kategori</th>
                             <th>Type</th>
                             <th>Bidang</th>
+                            <th>Advisor</th>
                             <th>Ketua</th>
                             <th class="text-center">Aksi</th>
                         </tr>
@@ -206,6 +219,7 @@
                                     (string) ($org['category'] ?? ''),
                                     (string) ($org['type'] ?? ''),
                                     (string) ($org['field'] ?? ''),
+                                    (string) ($org['advisor'] ?? ''),
                                     (string) ($org['leader'] ?? ''),
                                     (string) ($org['description'] ?? ''),
                                     (string) ($org['email'] ?? ''),
@@ -229,6 +243,7 @@
                                 data-org-level="{{ $org['scope'] ?? '' }}"
                                 data-org-type="{{ $org['type'] ?? '' }}"
                                 data-org-field="{{ $org['field'] ?? '' }}"
+                                data-org-advisor="{{ $org['advisor'] ?? '' }}"
                                 data-org-leader="{{ $org['leader'] ?? '' }}"
                                  data-org-account-email="{{ $org['account_email'] ?? '' }}"
                             >
@@ -252,6 +267,7 @@
                                     @endif
                                 </td>
                                 <td>{{ $org['field'] }}</td>
+                                <td>{{ $org['advisor'] ?? '-' }}</td>
                                 <td>{{ $org['leader'] }}</td>
                                 <td class="text-center">
                                     <div class="kmh-action-links justify-content-center kmh-org-actions">
@@ -273,13 +289,13 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="kmh-empty-row">Belum ada data organisasi.</td>
+                                <td colspan="7" class="kmh-empty-row">Belum ada data organisasi.</td>
                             </tr>
                         @endforelse
 
                         @if($totalOrganizations > 0)
                             <tr class="kmh-filter-empty-row d-none" data-org-empty>
-                                <td colspan="6" class="kmh-empty-row">Tidak ada organisasi yang cocok dengan filter.</td>
+                                <td colspan="7" class="kmh-empty-row">Tidak ada organisasi yang cocok dengan filter.</td>
                             </tr>
                         @endif
                     </tbody>
@@ -347,6 +363,7 @@
                                     <option value="">Pilih level</option>
                                     <option value="Universitas" @selected(old('level', 'Universitas') === 'Universitas')>Universitas</option>
                                     <option value="Fakultas" @selected(old('level') === 'Fakultas')>Fakultas</option>
+                                    <option value="Umum" @selected(old('level') === 'Umum')>Umum</option>
                                 </select>
                                 <small class="text-muted d-block mt-1">Dapat berubah bila nama organisasi mengarah ke fakultas tertentu.</small>
                             </div>
@@ -363,6 +380,32 @@
                                     data-org-autofill-target="field"
                                 >
                                 <small class="text-muted d-block mt-1">Auto-fill akan memberi saran bidang paling relevan dari nama organisasi.</small>
+                            </div>
+                            <div class="col-md-12">
+                                <label for="kmh-org-advisor" class="form-label">Nama Advisor</label>
+                                <input
+                                    id="kmh-org-advisor"
+                                    type="text"
+                                    name="advisor"
+                                    class="form-control"
+                                    value="{{ old('advisor') }}"
+                                    maxlength="255"
+                                    placeholder="Masukkan nama advisor organisasi"
+                                    required
+                                >
+                            </div>
+                            <div class="col-md-12">
+                                <label for="kmh-org-leader-name" class="form-label">Nama Ketua Organisasi</label>
+                                <input
+                                    id="kmh-org-leader-name"
+                                    type="text"
+                                    name="leader_name"
+                                    class="form-control"
+                                    value="{{ old('leader_name') }}"
+                                    maxlength="120"
+                                    placeholder="Masukkan nama ketua organisasi"
+                                    required
+                                >
                             </div>
                             <div class="col-12">
                                 <label for="kmh-org-description" class="form-label">Deskripsi</label>
@@ -496,6 +539,10 @@
                             <dd id="kmh-org-detail-field" class="mb-0"></dd>
                         </div>
                         <div class="col-md-6">
+                            <dt>Advisor</dt>
+                            <dd id="kmh-org-detail-advisor" class="mb-0"></dd>
+                        </div>
+                        <div class="col-md-6">
                             <dt>Ketua</dt>
                             <dd id="kmh-org-detail-leader" class="mb-0"></dd>
                         </div>
@@ -569,11 +616,20 @@
                                     <option value="">-</option>
                                     <option value="Universitas" @selected(old('level') === 'Universitas')>Universitas</option>
                                     <option value="Fakultas" @selected(old('level') === 'Fakultas')>Fakultas</option>
+                                    <option value="Umum" @selected(old('level') === 'Umum')>Umum</option>
                                 </select>
                             </div>
                             <div class="col-md-6">
                                 <label for="kmh-org-edit-field" class="form-label">Bidang</label>
                                 <input id="kmh-org-edit-field" type="text" name="field" class="form-control" value="{{ old('field') }}" maxlength="120">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="kmh-org-edit-advisor" class="form-label">Nama Advisor</label>
+                                <input id="kmh-org-edit-advisor" type="text" name="advisor" class="form-control" value="{{ old('advisor') }}" maxlength="255" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="kmh-org-edit-leader-name" class="form-label">Nama Ketua Organisasi</label>
+                                <input id="kmh-org-edit-leader-name" type="text" name="leader_name" class="form-control" value="{{ old('leader_name') }}" maxlength="120" required>
                             </div>
                             <div class="col-12">
                                 <label for="kmh-org-edit-description" class="form-label">Deskripsi</label>
@@ -618,6 +674,25 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    @php
+        $editOldValues = [
+            'name' => old('name'),
+            'shortname' => old('shortname'),
+            'description' => old('description'),
+            'email' => old('email'),
+            'phone' => old('phone'),
+            'category' => old('category'),
+            'type' => old('type'),
+            'level' => old('level'),
+            'field' => old('field'),
+            'advisor' => old('advisor'),
+            'leader_name' => old('leader_name'),
+            'account_email' => old('account_email'),
+            'account_password' => old('account_password'),
+            'status' => old('status'),
+            'organization_id' => old('organization_id'),
+        ];
+    @endphp
     var searchInput = document.getElementById('kmh-org-search');
     var categorySelect = document.getElementById('kmh-org-category');
     var visibleCount = document.getElementById('kmh-org-visible-count');
@@ -642,6 +717,8 @@ document.addEventListener('DOMContentLoaded', function () {
     var editTypeInput = document.getElementById('kmh-org-edit-type');
     var editLevelInput = document.getElementById('kmh-org-edit-level');
     var editFieldInput = document.getElementById('kmh-org-edit-field');
+    var editAdvisorInput = document.getElementById('kmh-org-edit-advisor');
+    var editLeaderNameInput = document.getElementById('kmh-org-edit-leader-name');
     var editAccountEmailInput = document.getElementById('kmh-org-edit-account-email');
     var editAccountPasswordInput = document.getElementById('kmh-org-edit-account-password');
     var detailName = document.getElementById('kmh-org-detail-name');
@@ -651,6 +728,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var detailType = document.getElementById('kmh-org-detail-type');
     var detailScope = document.getElementById('kmh-org-detail-scope');
     var detailField = document.getElementById('kmh-org-detail-field');
+    var detailAdvisor = document.getElementById('kmh-org-detail-advisor');
     var detailLeader = document.getElementById('kmh-org-detail-leader');
     var detailEmail = document.getElementById('kmh-org-detail-email');
     var detailPhone = document.getElementById('kmh-org-detail-phone');
@@ -659,6 +737,7 @@ document.addEventListener('DOMContentLoaded', function () {
     var emptyRow = document.querySelector('[data-org-empty]');
     var shouldOpenCreateModal = {{ ($errors->any() && !session('organization_edit_id')) ? 'true' : 'false' }};
     var editOrganizationId = @json(session('organization_edit_id'));
+    var editOldValues = @json($editOldValues);
 
     function applyFilter() {
         var query = (searchInput.value || '').toLowerCase().trim();
@@ -875,6 +954,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (detailType) detailType.textContent = row.getAttribute('data-org-type') || '-';
         if (detailScope) detailScope.textContent = row.getAttribute('data-org-scope') || '-';
         if (detailField) detailField.textContent = row.getAttribute('data-org-field') || '-';
+        if (detailAdvisor) detailAdvisor.textContent = row.getAttribute('data-org-advisor') || '-';
         if (detailLeader) detailLeader.textContent = row.getAttribute('data-org-leader') || '-';
         if (detailEmail) detailEmail.textContent = row.getAttribute('data-org-email') || '-';
         if (detailPhone) detailPhone.textContent = row.getAttribute('data-org-phone') || '-';
@@ -892,20 +972,27 @@ document.addEventListener('DOMContentLoaded', function () {
         var action = editForm.getAttribute('action') || '';
         editForm.setAttribute('action', action.replace(/\/(\d+)\/update$/, '/' + orgId + '/update'));
 
+        function useOld(fieldName, fallback) {
+            var value = editOldValues && editOldValues[fieldName];
+            return value !== null && value !== undefined && String(value).trim() !== '' ? String(value) : fallback;
+        }
+
         if (editIdInput) editIdInput.value = orgId;
-        if (editNameInput) editNameInput.value = row.getAttribute('data-org-name') || '';
-        if (editShortnameInput) editShortnameInput.value = row.getAttribute('data-org-shortname') || '';
-        if (editDescriptionInput) editDescriptionInput.value = row.getAttribute('data-org-description') || '';
-        if (editEmailInput) editEmailInput.value = row.getAttribute('data-org-email') || '';
-        if (editPhoneInput) editPhoneInput.value = row.getAttribute('data-org-phone') || '';
-        if (editCategoryInput) editCategoryInput.value = row.getAttribute('data-org-category-label') || '';
-        if (editTypeInput) editTypeInput.value = row.getAttribute('data-org-type') || '';
-        if (editLevelInput) editLevelInput.value = row.getAttribute('data-org-level') || row.getAttribute('data-org-scope') || '';
-        if (editFieldInput) editFieldInput.value = row.getAttribute('data-org-field') || '';
-        if (editAccountEmailInput) editAccountEmailInput.value = row.getAttribute('data-org-account-email') || '';
+        if (editNameInput) editNameInput.value = useOld('name', row.getAttribute('data-org-name') || '');
+        if (editShortnameInput) editShortnameInput.value = useOld('shortname', row.getAttribute('data-org-shortname') || '');
+        if (editDescriptionInput) editDescriptionInput.value = useOld('description', row.getAttribute('data-org-description') || '');
+        if (editEmailInput) editEmailInput.value = useOld('email', row.getAttribute('data-org-email') || '');
+        if (editPhoneInput) editPhoneInput.value = useOld('phone', row.getAttribute('data-org-phone') || '');
+        if (editCategoryInput) editCategoryInput.value = useOld('category', row.getAttribute('data-org-category-label') || '');
+        if (editTypeInput) editTypeInput.value = useOld('type', row.getAttribute('data-org-type') || '');
+        if (editLevelInput) editLevelInput.value = useOld('level', row.getAttribute('data-org-level') || row.getAttribute('data-org-scope') || '');
+        if (editFieldInput) editFieldInput.value = useOld('field', row.getAttribute('data-org-field') || '');
+        if (editAdvisorInput) editAdvisorInput.value = useOld('advisor', row.getAttribute('data-org-advisor') || '');
+        if (editLeaderNameInput) editLeaderNameInput.value = useOld('leader_name', row.getAttribute('data-org-leader') || '');
+        if (editAccountEmailInput) editAccountEmailInput.value = useOld('account_email', row.getAttribute('data-org-account-email') || '');
         if (editAccountPasswordInput) editAccountPasswordInput.value = '';
 
-        var status = (row.getAttribute('data-org-status') || 'active').toLowerCase();
+        var status = useOld('status', row.getAttribute('data-org-status') || 'active').toLowerCase();
         if (editStatusInput) editStatusInput.value = ['active', 'inactive', 'suspended'].indexOf(status) !== -1 ? status : 'active';
 
         new bootstrap.Modal(editModalEl).show();

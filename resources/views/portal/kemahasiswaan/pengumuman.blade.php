@@ -16,12 +16,33 @@
     $draftCount = collect($workflowPengumuman)->where('status_code', 'draft')->count();
     $hasAccounts = !empty($ukmAccounts);
     $defaultAnnouncementAccountId = $ukmAccounts[0]['id'] ?? null;
+    $minPublishAt = now()->format('Y-m-d\TH:i');
     $hasCreateAnnouncementErrors = $errors->has('judul')
         || $errors->has('kategori')
         || $errors->has('target')
         || $errors->has('konten')
         || $errors->has('publish_at')
         || $errors->has('submit_action');
+
+    $announcementEditPayload = collect($workflowPengumuman)
+        ->mapWithKeys(function (array $item) {
+            $publishAt = !empty($item['publish_at'])
+                ? \Carbon\Carbon::parse($item['publish_at'])->format('Y-m-d\TH:i')
+                : '';
+
+            return [
+                (int) ($item['id'] ?? 0) => [
+                    'id' => (int) ($item['id'] ?? 0),
+                    'judul' => (string) ($item['judul'] ?? ''),
+                    'kategori' => (string) ($item['kategori'] ?? ''),
+                    'target' => (string) ($item['target'] ?? ''),
+                    'konten' => (string) ($item['konten'] ?? ''),
+                    'publish_at' => $publishAt,
+                    'status_code' => (string) ($item['status_code'] ?? ''),
+                ],
+            ];
+        })
+        ->all();
 
     $announcementCategoryOptions = [
         'Informasi Akademik',
@@ -123,11 +144,9 @@
                     <label class="kmh-toolbar-field mb-0" for="kmh-pengumuman-status">
                         <i class="bi bi-funnel kmh-toolbar-icon"></i>
                         <select id="kmh-pengumuman-status" class="kmh-toolbar-select" aria-label="Filter status pengumuman">
-                            <option value="semua">{{ $ui['all_statuses'] ?? '' }}</option>
+                            <option value="draft">Draft</option>
                             <option value="published">Terpublikasi</option>
                             <option value="scheduled">Terjadwal</option>
-                            <option value="draft">Draft</option>
-                            <option value="archived">Arsip</option>
                         </select>
                     </label>
                 </div>
@@ -159,6 +178,7 @@
                     @endif
 
                     <div class="modal-body">
+                        <input type="hidden" id="kmh-pengumuman-mode" value="create">
                         @unless($hasAccounts)
                             <div class="alert alert-warning" role="alert">
                                 {{ $ui['account_missing_warning'] ?? '' }}
@@ -169,6 +189,7 @@
                             <div class="col-12">
                                 <label class="form-label">{{ $ui['field_title'] ?? 'Judul Pengumuman' }} <span class="text-danger">*</span></label>
                                 <input
+                                    id="kmh-pengumuman-judul"
                                     type="text"
                                     name="judul"
                                     class="form-control"
@@ -181,7 +202,7 @@
 
                             <div class="col-12">
                                 <label class="form-label">{{ $ui['field_category'] ?? 'Kategori' }} <span class="text-danger">*</span></label>
-                                <select name="kategori" class="form-select" required>
+                                <select id="kmh-pengumuman-kategori" name="kategori" class="form-select" required>
                                     <option value="">{{ $ui['field_category_placeholder'] ?? 'Pilih Kategori' }}</option>
                                     @foreach($announcementCategoryOptions as $category)
                                         <option value="{{ $category }}" @selected(old('kategori') === $category)>{{ $category }}</option>
@@ -192,6 +213,7 @@
                             <div class="col-12">
                                 <label class="form-label">{{ $ui['field_content'] ?? 'Konten Pengumuman' }} <span class="text-danger">*</span></label>
                                 <textarea
+                                    id="kmh-pengumuman-konten"
                                     name="konten"
                                     class="form-control"
                                     rows="5"
@@ -203,7 +225,7 @@
 
                             <div class="col-md-6">
                                 <label class="form-label">{{ $ui['field_target'] ?? 'Target Distribusi' }} <span class="text-danger">*</span></label>
-                                <select name="target" class="form-select" required>
+                                <select id="kmh-pengumuman-target" name="target" class="form-select" required>
                                     <option value="">{{ $ui['field_target_placeholder'] ?? 'Pilih target distribusi' }}</option>
                                     @foreach($announcementTargetOptions as $target)
                                         <option value="{{ $target }}" @selected(old('target') === $target)>{{ $target }}</option>
@@ -214,10 +236,12 @@
                             <div class="col-md-6">
                                 <label class="form-label">{{ $ui['field_publish_date'] ?? 'Jadwal Publish (Opsional)' }}</label>
                                 <input
+                                    id="kmh-pengumuman-publish-at"
                                     type="datetime-local"
                                     name="publish_at"
                                     class="form-control"
                                     value="{{ old('publish_at') }}"
+                                    min="{{ $minPublishAt }}"
                                     placeholder="{{ $ui['field_publish_placeholder'] ?? 'dd/mm/yyyy --:--' }}"
                                 >
                             </div>
@@ -231,7 +255,7 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-light" data-bs-dismiss="modal">{{ $ui['cancel_button'] ?? 'Batal' }}</button>
                         <button type="submit" name="submit_action" value="draft" class="btn btn-secondary" @disabled(!$hasAccounts)>{{ $ui['save_draft_button'] ?? 'Simpan sebagai Draft' }}</button>
-                        <button type="submit" name="submit_action" value="publish_now" class="btn btn-primary kmh-form-action-btn" @disabled(!$hasAccounts)>{{ $ui['publish_now_button'] ?? 'Publikasikan Sekarang' }}</button>
+                        <button id="kmh-pengumuman-submit-primary" type="submit" name="submit_action" value="publish_now" class="btn btn-primary kmh-form-action-btn" @disabled(!$hasAccounts)>{{ $ui['publish_now_button'] ?? 'Publikasikan Sekarang' }}</button>
                     </div>
                 </form>
             </div>
@@ -317,6 +341,7 @@
                             <th>Publish</th>
                             <th>Status</th>
                             <th>Review Email</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -329,6 +354,8 @@
                                     (string) ($item['organisasi'] ?? ''),
                                     (string) ($item['ringkasan'] ?? ''),
                                 ]));
+                                $canEditSchedule = ($item['status_code'] ?? '') === 'scheduled';
+                                $canDelete = in_array((string) ($item['status_code'] ?? ''), ['draft', 'scheduled'], true);
                             @endphp
                             <tr
                                 data-pengumuman-row
@@ -357,16 +384,40 @@
                                         <small class="text-muted d-block mt-1">{{ $item['email_review_note'] }}</small>
                                     @endif
                                 </td>
+                                <td class="text-center">
+                                    <div class="d-inline-flex gap-2">
+                                        @if($canEditSchedule)
+                                            <button
+                                                type="button"
+                                                class="btn btn-sm btn-outline-primary"
+                                                data-pengumuman-edit
+                                                data-pengumuman-id="{{ $item['id'] }}"
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#kmh-pengumuman-modal"
+                                            >
+                                                Edit Jadwal
+                                            </button>
+                                        @endif
+
+                                        @if($canDelete)
+                                            <form method="POST" action="{{ route('portal.kemahasiswaan.pengumuman.destroy', ['id' => $item['id']]) }}" onsubmit="return confirm('Hapus pengumuman ini?');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                                            </form>
+                                        @endif
+                                    </div>
+                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" class="kmh-empty-row">{{ $ui['list_empty'] ?? '' }}</td>
+                                <td colspan="8" class="kmh-empty-row">{{ $ui['list_empty'] ?? '' }}</td>
                             </tr>
                         @endforelse
 
                         @if(count($workflowPengumuman) > 0)
                             <tr class="kmh-filter-empty-row d-none" data-pengumuman-empty>
-                                <td colspan="7" class="kmh-empty-row">{{ $ui['list_filter_empty'] ?? '' }}</td>
+                                <td colspan="8" class="kmh-empty-row">{{ $ui['list_filter_empty'] ?? '' }}</td>
                             </tr>
                         @endif
                     </tbody>
@@ -380,25 +431,120 @@
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function () {
+    var editPayload = @json($announcementEditPayload);
     var searchInput = document.getElementById('kmh-pengumuman-search');
     var statusSelect = document.getElementById('kmh-pengumuman-status');
     var rows = Array.prototype.slice.call(document.querySelectorAll('[data-pengumuman-row]'));
     var emptyRow = document.querySelector('[data-pengumuman-empty]');
+    var modalElement = document.getElementById('kmh-pengumuman-modal');
+    var modalTitle = document.getElementById('kmh-pengumuman-modal-label');
+    var modeInput = document.getElementById('kmh-pengumuman-mode');
+    var form = modalElement ? modalElement.querySelector('form') : null;
+    var editButtons = Array.prototype.slice.call(document.querySelectorAll('[data-pengumuman-edit]'));
+    var createButton = document.querySelector('.kmh-pengumuman-cta');
+    var fieldJudul = document.getElementById('kmh-pengumuman-judul');
+    var fieldKategori = document.getElementById('kmh-pengumuman-kategori');
+    var fieldTarget = document.getElementById('kmh-pengumuman-target');
+    var fieldKonten = document.getElementById('kmh-pengumuman-konten');
+    var fieldPublishAt = document.getElementById('kmh-pengumuman-publish-at');
+    var primarySubmitButton = document.getElementById('kmh-pengumuman-submit-primary');
 
-    if (!searchInput || !statusSelect || rows.length === 0) {
+    var storeAction = form ? form.getAttribute('action') : '';
+    var updateActionTemplate = '{{ route('portal.kemahasiswaan.pengumuman.update', ['id' => '__ID__']) }}';
+
+    if (!searchInput || !statusSelect) {
         return;
+    }
+
+    function updatePrimaryActionLabel() {
+        if (!primarySubmitButton || !fieldPublishAt) {
+            return;
+        }
+
+        var hasScheduleValue = String(fieldPublishAt.value || '').trim() !== '';
+        primarySubmitButton.textContent = hasScheduleValue
+            ? 'Simpan di Jadwal Publikasi'
+            : 'Publikasikan Sekarang';
+    }
+
+    function validatePublishDateNotPast() {
+        if (!fieldPublishAt) {
+            return;
+        }
+
+        var value = String(fieldPublishAt.value || '').trim();
+        if (value === '') {
+            fieldPublishAt.setCustomValidity('');
+            return;
+        }
+
+        var selected = new Date(value);
+        var now = new Date();
+        now.setSeconds(0, 0);
+        if (selected.getTime() < now.getTime()) {
+            fieldPublishAt.setCustomValidity('Jadwal publish tidak boleh menggunakan tanggal atau waktu yang sudah lewat.');
+        } else {
+            fieldPublishAt.setCustomValidity('');
+        }
+    }
+
+    function resetToCreateMode() {
+        if (!form) {
+            return;
+        }
+
+        form.setAttribute('action', storeAction);
+        form.reset();
+        if (modeInput) {
+            modeInput.value = 'create';
+        }
+
+        if (modalTitle) {
+            modalTitle.textContent = 'Buat Pengumuman Baru';
+        }
+
+        updatePrimaryActionLabel();
+    }
+
+    function setEditMode(id) {
+        if (!form) {
+            return;
+        }
+
+        var payload = editPayload[String(id)] || null;
+        if (!payload) {
+            return;
+        }
+
+        form.setAttribute('action', updateActionTemplate.replace('__ID__', String(payload.id)));
+        if (modeInput) {
+            modeInput.value = 'edit';
+        }
+
+        if (modalTitle) {
+            modalTitle.textContent = 'Edit Jadwal Pengumuman';
+        }
+
+        if (fieldJudul) fieldJudul.value = payload.judul || '';
+        if (fieldKategori) fieldKategori.value = payload.kategori || '';
+        if (fieldTarget) fieldTarget.value = payload.target || '';
+        if (fieldKonten) fieldKonten.value = payload.konten || '';
+        if (fieldPublishAt) fieldPublishAt.value = payload.publish_at || '';
+
+        validatePublishDateNotPast();
+        updatePrimaryActionLabel();
     }
 
     function applyFilter() {
         var query = (searchInput.value || '').toLowerCase().trim();
-        var status = (statusSelect.value || 'semua').toLowerCase();
+        var status = (statusSelect.value || 'draft').toLowerCase();
         var visibleCount = 0;
 
         rows.forEach(function (row) {
             var rowSearch = (row.getAttribute('data-pengumuman-search') || '').toLowerCase();
             var rowStatus = (row.getAttribute('data-pengumuman-status') || '').toLowerCase();
             var textMatch = query === '' || rowSearch.indexOf(query) !== -1;
-            var statusMatch = status === 'semua' || rowStatus === status;
+            var statusMatch = rowStatus === status;
             var showRow = textMatch && statusMatch;
 
             row.classList.toggle('d-none', !showRow);
@@ -414,10 +560,48 @@ document.addEventListener('DOMContentLoaded', function () {
 
     searchInput.addEventListener('input', applyFilter);
     statusSelect.addEventListener('change', applyFilter);
+    if (fieldPublishAt) {
+        fieldPublishAt.addEventListener('input', function () {
+            validatePublishDateNotPast();
+            updatePrimaryActionLabel();
+        });
+        fieldPublishAt.addEventListener('change', function () {
+            validatePublishDateNotPast();
+            updatePrimaryActionLabel();
+        });
+    }
+
+    if (form) {
+        form.addEventListener('submit', function (event) {
+            validatePublishDateNotPast();
+            if (fieldPublishAt && !fieldPublishAt.checkValidity()) {
+                event.preventDefault();
+                fieldPublishAt.reportValidity();
+            }
+        });
+    }
+
+    if (createButton) {
+        createButton.addEventListener('click', function () {
+            resetToCreateMode();
+        });
+    }
+
+    editButtons.forEach(function (button) {
+        button.addEventListener('click', function () {
+            var id = button.getAttribute('data-pengumuman-id');
+            if (!id) {
+                return;
+            }
+
+            setEditMode(id);
+        });
+    });
+
     applyFilter();
+    updatePrimaryActionLabel();
 
     @if($hasCreateAnnouncementErrors)
-        var modalElement = document.getElementById('kmh-pengumuman-modal');
         if (modalElement && typeof bootstrap !== 'undefined' && bootstrap.Modal) {
             bootstrap.Modal.getOrCreateInstance(modalElement).show();
         }

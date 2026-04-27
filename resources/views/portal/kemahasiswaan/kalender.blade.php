@@ -205,10 +205,16 @@
                     <h2>{{ $ui['calendar_title'] ?? '' }}</h2>
                     <p>{{ $ui['calendar_subtitle'] ?? '' }}</p>
                 </div>
-                <button type="button" class="kmh-calendar-add-btn" data-bs-toggle="modal" data-bs-target="#kmh-calendar-modal">
-                    <i class="bi bi-plus-lg" aria-hidden="true"></i>
-                    <span>{{ $ui['add_activity'] ?? '' }}</span>
-                </button>
+                <div class="d-flex flex-wrap gap-2">
+                    <button type="button" class="kmh-calendar-add-btn" data-bs-toggle="modal" data-bs-target="#kmh-calendar-import-modal">
+                        <i class="bi bi-file-earmark-arrow-up" aria-hidden="true"></i>
+                        <span>Import PDF</span>
+                    </button>
+                    <button type="button" class="kmh-calendar-add-btn" data-bs-toggle="modal" data-bs-target="#kmh-calendar-manual-modal">
+                        <i class="bi bi-plus-lg" aria-hidden="true"></i>
+                        <span>{{ $ui['add_activity'] ?? '' }}</span>
+                    </button>
+                </div>
             </div>
 
             <form method="GET" action="{{ route('portal.kemahasiswaan.kalender') }}" class="kmh-calendar-filter-grid">
@@ -287,8 +293,45 @@
 
                     <div class="kmh-calendar-days" role="rowgroup">
                         @foreach($calendarDays as $day)
-                            <article class="kmh-calendar-day {{ $day['in_month'] ? '' : 'is-outside' }}" role="cell">
-                                <span class="kmh-calendar-date">{{ $day['date']->day }}</span>
+                            @php
+                                $dayCategories = collect($day['events'])
+                                    ->pluck('kategori')
+                                    ->filter()
+                                    ->map(fn ($value) => (string) $value)
+                                    ->unique()
+                                    ->values();
+
+                                $dayTone = (string) ($dayCategories->first() ?? '');
+                                $colorMap = [
+                                    'acad' => '#1e40af',
+                                    'org' => '#047857',
+                                    'restricted' => '#b45309',
+                                    'holiday' => '#be123c',
+                                    'campus' => '#5b21b6',
+                                ];
+
+                                $dateStyle = null;
+                                if ($dayCategories->count() > 1) {
+                                    $palette = $dayCategories
+                                        ->map(fn (string $key) => $colorMap[$key] ?? null)
+                                        ->filter()
+                                        ->values();
+
+                                    if ($palette->isNotEmpty()) {
+                                        $segments = [];
+                                        $count = $palette->count();
+                                        foreach ($palette as $index => $hex) {
+                                            $start = (int) floor(($index / $count) * 100);
+                                            $end = (int) floor((($index + 1) / $count) * 100);
+                                            $segments[] = $hex . ' ' . $start . '% ' . $end . '%';
+                                        }
+
+                                        $dateStyle = 'background: conic-gradient(' . implode(', ', $segments) . '); color: #ffffff;';
+                                    }
+                                }
+                            @endphp
+                            <article class="kmh-calendar-day {{ $day['in_month'] ? '' : 'is-outside' }} {{ $dayTone !== '' ? 'is-' . $dayTone : '' }}" role="cell">
+                                <span class="kmh-calendar-date" @if($dateStyle) style="{{ $dateStyle }}" @endif>{{ $day['date']->day }}</span>
 
                                 <div class="kmh-calendar-events">
                                     @forelse(collect($day['events'])->take(2) as $event)
@@ -317,6 +360,7 @@
                                 <th>{{ $ui['table_col_date'] ?? '' }}</th>
                                 <th>{{ $ui['table_col_location'] ?? '' }}</th>
                                 <th>{{ $ui['table_col_category'] ?? '' }}</th>
+                                <th class="text-center">Aksi</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -333,10 +377,21 @@
                                             {{ $kategoriLabelMap[$item['kategori'] ?? ''] ?? '' }}
                                         </span>
                                     </td>
+                                    <td class="text-center">
+                                        @if(!empty($item['id']) && ($item['can_delete'] ?? false))
+                                            <form method="POST" action="{{ route('portal.kemahasiswaan.jadwal.destroy', ['id' => $item['id']]) }}" onsubmit="return confirm('Hapus kegiatan ini dari kalender?')" class="d-inline">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="btn btn-sm btn-outline-danger">Hapus</button>
+                                            </form>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
                                 </tr>
                             @empty
                                 <tr>
-                                    <td colspan="5" class="kmh-empty-row">{{ $ui['empty_state'] ?? '' }}</td>
+                                    <td colspan="6" class="kmh-empty-row">{{ $ui['empty_state'] ?? '' }}</td>
                                 </tr>
                             @endforelse
                         </tbody>
@@ -347,12 +402,53 @@
     </section>
 </div>
 
-<div class="modal fade" id="kmh-calendar-modal" tabindex="-1" aria-labelledby="kmh-calendar-modal-title" aria-hidden="true">
+<div class="modal fade" id="kmh-calendar-import-modal" tabindex="-1" aria-labelledby="kmh-calendar-import-modal-title" aria-hidden="true">
     <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable kmh-calendar-modal-dialog">
         <div class="modal-content kmh-calendar-modal-content">
             <div class="modal-header">
                 <div>
-                    <h5 class="modal-title" id="kmh-calendar-modal-title">{{ $ui['modal_title'] ?? '' }}</h5>
+                    <h5 class="modal-title" id="kmh-calendar-import-modal-title">Import Otomatis Dari PDF Kalender</h5>
+                    <p class="modal-subtitle mb-0">Upload PDF kalender akademik/sekolah dan sistem akan mengisi otomatis daftar kegiatan.</p>
+                </div>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+            </div>
+            <div class="modal-body">
+                @unless(count($organizations) > 0)
+                    <div class="alert alert-warning" role="alert">
+                        {{ $ui['schedule_form_warning'] ?? '' }}
+                    </div>
+                @endunless
+
+                <form method="POST" action="{{ route('portal.kemahasiswaan.kalender.import-pdf') }}" enctype="multipart/form-data" class="row g-3">
+                    @csrf
+
+                    <div class="col-12">
+                        <label class="form-label" for="kmh-calendar-pdf">File PDF Kalender</label>
+                        <input
+                            type="file"
+                            id="kmh-calendar-pdf"
+                            name="calendar_pdf"
+                            class="form-control"
+                            accept="application/pdf"
+                            required
+                        >
+                    </div>
+
+                    <div class="col-12 d-flex justify-content-end">
+                        <button type="submit" class="btn btn-primary" @disabled(count($organizations) === 0)>Import PDF Otomatis</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="kmh-calendar-manual-modal" tabindex="-1" aria-labelledby="kmh-calendar-manual-modal-title" aria-hidden="true">
+    <div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable kmh-calendar-modal-dialog">
+        <div class="modal-content kmh-calendar-modal-content">
+            <div class="modal-header">
+                <div>
+                    <h5 class="modal-title" id="kmh-calendar-manual-modal-title">{{ $ui['modal_title'] ?? '' }}</h5>
                     <p class="modal-subtitle mb-0">{{ $ui['modal_subtitle'] ?? '' }}</p>
                 </div>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
@@ -435,3 +531,43 @@
     </div>
 </div>
 @endsection
+
+@push('styles')
+<style>
+.kmh-kalender-page .kmh-calendar-day.is-acad .kmh-calendar-date {
+    color: #1e40af;
+    background: #dbeafe;
+}
+
+.kmh-kalender-page .kmh-calendar-day.is-org .kmh-calendar-date {
+    color: #047857;
+    background: #d1fae5;
+}
+
+.kmh-kalender-page .kmh-calendar-day.is-restricted .kmh-calendar-date {
+    color: #b45309;
+    background: #fef3c7;
+}
+
+.kmh-kalender-page .kmh-calendar-day.is-holiday .kmh-calendar-date {
+    color: #be123c;
+    background: #ffe4e6;
+}
+
+.kmh-kalender-page .kmh-calendar-day.is-campus .kmh-calendar-date {
+    color: #5b21b6;
+    background: #ede9fe;
+}
+
+.kmh-kalender-page .kmh-calendar-day .kmh-calendar-date {
+    border-radius: 999px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.9rem;
+    min-height: 1.9rem;
+    font-weight: 700;
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.2);
+}
+</style>
+@endpush

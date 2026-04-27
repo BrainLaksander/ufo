@@ -64,18 +64,22 @@
     </article>
 
     <article class="figma-highlight">
-        <h2 class="h4 mb-2">{{ $ui['culture_title'] ?? '' }}</h2>
-        <p class="mb-0">{{ $org['culture'] ?? '' }}</p>
-    </article>
+        <h2 class="h4 mb-2">Culture &amp; Values</h2>
+        <p class="mb-3">{{ $org['culture'] ?? '' }}</p>
 
-    <article class="figma-section">
-        <h2>{{ $ui['programs_title'] ?? '' }}</h2>
-        <div class="figma-program-grid" id="program-grid">
-            @foreach(($org['programs'] ?? []) as $index => $program)
-                <button type="button" class="figma-program-btn" data-program-index="{{ $index }}">
-                    <strong>{{ $program['name'] ?? '' }}</strong>
-                </button>
-            @endforeach
+        <div class="row g-3">
+            @forelse(($org['values'] ?? []) as $value)
+                <div class="col-md-6">
+                    <div class="border rounded-3 p-3 h-100 bg-white">
+                        <strong class="d-block mb-1">{{ $value['name'] ?? '' }}</strong>
+                        <p class="mb-0">{{ $value['desc'] ?? '' }}</p>
+                    </div>
+                </div>
+            @empty
+                <div class="col-12">
+                    <p class="mb-0">Belum ada values yang tersimpan.</p>
+                </div>
+            @endforelse
         </div>
     </article>
 
@@ -91,6 +95,17 @@
                     </div>
                     <i class="bi bi-calendar-event"></i>
                 </a>
+            @endforeach
+        </div>
+    </article>
+
+    <article class="figma-section">
+        <h2>{{ $ui['programs_title'] ?? '' }}</h2>
+        <div class="figma-program-grid" id="program-grid">
+            @foreach(($org['programs'] ?? []) as $index => $program)
+                <button type="button" class="figma-program-btn" data-program-index="{{ $index }}">
+                    <strong>{{ $program['name'] ?? '' }}</strong>
+                </button>
             @endforeach
         </div>
     </article>
@@ -136,13 +151,6 @@
                         </a>
                     @endif
 
-                    @if(!empty($org['social_media']['whatsapp']))
-                        <a href="{{ $org['social_media']['whatsapp'] }}" target="_blank" rel="noopener" class="figma-org-contact-link whatsapp">
-                            <i class="bi bi-whatsapp"></i>
-                            {{ $ui['contact_whatsapp_label'] ?? '' }}
-                        </a>
-                    @endif
-
                     @if(!empty($org['social_media']['email']))
                         <a href="{{ $org['social_media']['email'] }}" class="figma-org-contact-link email">
                             <i class="bi bi-envelope"></i>
@@ -150,10 +158,24 @@
                         </a>
                     @endif
 
-                    @if(!empty($org['social_media']['website']))
-                        <a href="{{ $org['social_media']['website'] }}" target="_blank" rel="noopener" class="figma-org-contact-link website">
-                            <i class="bi bi-globe2"></i>
-                            {{ $ui['contact_website_label'] ?? '' }}
+                    @if(!empty($org['social_media']['facebook']))
+                        <a href="{{ $org['social_media']['facebook'] }}" target="_blank" rel="noopener" class="figma-org-contact-link website">
+                            <i class="bi bi-facebook"></i>
+                            Facebook
+                        </a>
+                    @endif
+
+                    @if(!empty($org['social_media']['tiktok']))
+                        <a href="{{ $org['social_media']['tiktok'] }}" target="_blank" rel="noopener" class="figma-org-contact-link website">
+                            <i class="bi bi-tiktok"></i>
+                            TikTok
+                        </a>
+                    @endif
+
+                    @if(!empty($org['social_media']['youtube']))
+                        <a href="{{ $org['social_media']['youtube'] }}" target="_blank" rel="noopener" class="figma-org-contact-link website">
+                            <i class="bi bi-youtube"></i>
+                            YouTube
                         </a>
                     @endif
                 </div>
@@ -179,16 +201,6 @@
     var titleEl = document.getElementById('programModalTitle');
     var bodyEl = document.getElementById('programModalBody');
 
-    function asList(values) {
-        if (!Array.isArray(values) || values.length === 0) {
-            return '<p class="mb-0">' + (ui.program_empty_activities || '') + '</p>';
-        }
-
-        return '<ul>' + values.map(function (item) {
-            return '<li>' + item + '</li>';
-        }).join('') + '</ul>';
-    }
-
     buttons.forEach(function (button) {
         button.addEventListener('click', function () {
             var index = Number(button.getAttribute('data-program-index') || -1);
@@ -199,13 +211,8 @@
 
             titleEl.textContent = program.name || (ui.program_modal_title || '');
             bodyEl.innerHTML = `
-                <p><strong>${ui.program_goal_label || ''}</strong> ${program.goal || ''}</p>
-                <h6>${ui.program_activities_label || ''}</h6>
-                ${asList(program.activities || [])}
-                <div class="figma-register-alert mt-3 mb-3">
-                    <strong>${ui.program_period_label || ''}</strong> ${program.period || ''}
-                </div>
-                <p class="mb-0"><strong>${ui.program_impact_label || ''}</strong> ${program.impact || ''}</p>
+                <p><strong>Deskripsi:</strong> ${program.description || ''}</p>
+                <p class="mb-0"><strong>Tujuan:</strong> ${program.goal || ''}</p>
             `;
 
             modal.show();

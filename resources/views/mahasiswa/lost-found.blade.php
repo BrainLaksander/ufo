@@ -9,6 +9,11 @@
 @section('content')
 @php
     $ui = $pageContent ?? [];
+    $categories = is_array($categories ?? null) ? $categories : [];
+    $urgentItems = is_array($urgentItems ?? null)
+        ? $urgentItems
+        : (is_array($urgent_items ?? null) ? $urgent_items : []);
+    $items = is_array($items ?? null) ? $items : [];
     $allCategory = $categories[0] ?? '';
 @endphp
 <section class="figma-page-container figma-org-page py-3 figma-lf-page" aria-label="Halaman lost and found">
