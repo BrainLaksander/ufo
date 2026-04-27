@@ -8,6 +8,8 @@
 
 @section('content')
 @php
+    // Ensure view has content: prefer aboutContent, fallback to pageContent
+    $aboutContent = $aboutContent ?? ($pageContent ?? []);
     $hero = $aboutContent['hero'] ?? [];
     $intro = $aboutContent['intro'] ?? [];
     $vision = $aboutContent['vision'] ?? [];
@@ -15,7 +17,7 @@
     $features = $aboutContent['features'] ?? [];
     $contact = $aboutContent['contact'] ?? [];
     $bot = $aboutContent['bot'] ?? [];
-@endphp
+endphp
 
 <section class="figma-page-container py-3 figma-tentang-page">
     <header class="figma-about-hero">
