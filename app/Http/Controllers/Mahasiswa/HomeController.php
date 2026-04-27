@@ -40,19 +40,6 @@ class HomeController extends Controller
         ]);
     }
 
-    public function tentang(): View
-    {
-        $data = $this->dataProvider->loadAllData();
-
-        return view('pages.mahasiswa.tentang', [
-            'pageContent' => $this->loadMahasiswaAboutContent(),
-            'aboutContent' => $this->loadMahasiswaAboutContent(),
-            'organizations' => array_values($data['organizations']),
-            'organization_categories' => $data['organization_categories'],
-            'notifications' => array_slice($data['notifications'], 0, 5),
-        ]);
-    }
-
     public function indexRedirect(): RedirectResponse
     {
         return redirect()->route('mahasiswa.organisasi.index');
@@ -61,12 +48,6 @@ class HomeController extends Controller
     private function loadMahasiswaHomeContent(): array
     {
         $references = $this->loadReferenceDomain('mahasiswa_home');
-        return array_map(fn($item) => $item['payload'] ?? [], $references);
-    }
-
-    private function loadMahasiswaAboutContent(): array
-    {
-        $references = $this->loadReferenceDomain('mahasiswa_about');
         return array_map(fn($item) => $item['payload'] ?? [], $references);
     }
 }

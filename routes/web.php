@@ -167,7 +167,6 @@ Route::post('/lost-found/report', [LostFoundController::class, 'report'])->name(
 Route::get('/pengumuman', [AnnouncementController::class, 'index'])->name('mahasiswa.pengumuman');
 Route::get('/pengumuman/{id}', [AnnouncementController::class, 'show'])->name('mahasiswa.pengumuman.show');
 
-Route::get('/tentang', [HomeController::class, 'tentang'])->name('mahasiswa.tentang');
 
 if (env('APP_DEBUG', false)) {
     Route::get('/_debug/about-content', function () {
