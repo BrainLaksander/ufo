@@ -11,6 +11,13 @@ class HomeController extends Controller
 {
     use MahasiswaControllerTrait;
 
+    /**
+     * Cache for loaded reference domains.
+     * Declared to avoid dynamic property deprecation warnings.
+     * @var array<string,mixed>
+     */
+    protected array $referenceCache = [];
+
     private MahasiswaDataProvider $dataProvider;
 
     public function __construct(MahasiswaDataProvider $dataProvider)
@@ -39,6 +46,7 @@ class HomeController extends Controller
 
         return view('pages.mahasiswa.tentang', [
             'pageContent' => $this->loadMahasiswaAboutContent(),
+            'aboutContent' => $this->loadMahasiswaAboutContent(),
             'organizations' => array_values($data['organizations']),
             'organization_categories' => $data['organization_categories'],
             'notifications' => array_slice($data['notifications'], 0, 5),
@@ -53,12 +61,12 @@ class HomeController extends Controller
     private function loadMahasiswaHomeContent(): array
     {
         $references = $this->loadReferenceDomain('mahasiswa_home');
-        return data_get($references, 'home.payload', []);
+        return array_map(fn($item) => $item['payload'] ?? [], $references);
     }
 
     private function loadMahasiswaAboutContent(): array
     {
         $references = $this->loadReferenceDomain('mahasiswa_about');
-        return data_get($references, 'about.payload', []);
+        return array_map(fn($item) => $item['payload'] ?? [], $references);
     }
 }
