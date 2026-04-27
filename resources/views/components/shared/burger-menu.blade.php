@@ -33,6 +33,7 @@
         ['label' => 'Landing Page', 'href' => route('home'), 'icon' => 'bi bi-house-door-fill', 'class' => 'burger-link'],
         ['label' => 'Organisasi', 'href' => route('mahasiswa.organisasi.index'), 'icon' => 'bi bi-people-fill', 'class' => 'burger-link organisasi-link'],
         ['label' => 'Event', 'href' => route('mahasiswa.event'), 'icon' => 'bi bi-calendar-event-fill', 'class' => 'burger-link'],
+        ['label' => 'Kalendar Kegiatan', 'href' => route('mahasiswa.kalendar'), 'icon' => 'bi bi-calendar3', 'class' => 'burger-link'],
         ['label' => 'Lost & Found', 'href' => route('mahasiswa.lost-found'), 'icon' => 'bi bi-search', 'class' => 'burger-link'],
         ['label' => 'Pengumuman', 'href' => route('mahasiswa.pengumuman'), 'icon' => 'bi bi-megaphone-fill', 'class' => 'burger-link'],
         ['label' => 'Tentang UFO', 'href' => route('mahasiswa.tentang'), 'icon' => 'bi bi-info-circle-fill', 'class' => 'burger-link'],
@@ -65,9 +66,9 @@
         ['label' => 'Event Organisasi', 'href' => route('portal.pengurus.events'), 'close' => true],
         ['label' => 'Pengumuman', 'href' => route('portal.pengurus.announcements'), 'close' => true],
         ['label' => 'Pengajuan & Laporan', 'href' => route('portal.pengurus.proposals'), 'close' => true],
-        ['label' => 'Pendaftaran Organisasi', 'href' => route('portal.pengurus.applications'), 'close' => true],
+        ['label' => 'Pendaftaran Organisasi', 'href' => route('portal.pengurus.kontak'), 'close' => true],
         ['label' => 'Lost & Found', 'href' => route('mahasiswa.lost-found'), 'close' => true],
-        ['label' => 'Chat & Konsultasi', 'href' => route('portal.pengurus.applications'), 'close' => true],
+        ['label' => 'Chat & Konsultasi', 'href' => route('portal.pengurus.kontak'), 'close' => true],
         ['label' => 'Keluar', 'href' => route('portal.login'), 'close' => true],
       ],
     ],
@@ -150,6 +151,7 @@
       <ul class="list-unstyled mb-0">
         <li><a href="{{ route('mahasiswa.organisasi.index') }}" class="drawer-item d-block px-3 py-2 text-dark text-decoration-none" data-item="organisasi">Organisasi</a></li>
         <li><a href="{{ route('mahasiswa.event') }}" class="drawer-item d-block px-3 py-2 text-dark text-decoration-none" data-item="event">Event</a></li>
+        <li><a href="{{ route('mahasiswa.kalendar') }}" class="drawer-item d-block px-3 py-2 text-dark text-decoration-none" data-item="kalendar-kegiatan">Kalendar Kegiatan</a></li>
         <li><a href="{{ route('mahasiswa.lost-found') }}" class="drawer-item d-block px-3 py-2 text-dark text-decoration-none" data-item="lost-found" data-close>Lost & Found</a></li>
         <li><a href="{{ route('mahasiswa.pengumuman') }}" class="drawer-item d-block px-3 py-2 text-dark text-decoration-none" data-item="pengumuman">Pengumuman</a></li>
         <li><a href="{{ route('mahasiswa.tentang') }}" class="drawer-item d-block px-3 py-2 text-dark text-decoration-none" data-item="tentang">Tentang UFO</a></li>

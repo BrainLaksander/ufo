@@ -1,0 +1,176 @@
+.figma-calendar-page .figma-page-header p {
+    max-width: 760px;
+}
+
+.figma-calendar-shell {
+    background: #ffffff;
+    border: 1px solid #dbe3ee;
+    border-radius: 18px;
+    padding: 1rem;
+    box-shadow: 0 10px 28px rgba(15, 23, 42, 0.06);
+}
+
+.figma-calendar-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    margin-bottom: 0.9rem;
+}
+
+.figma-calendar-toolbar h2 {
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #172033;
+}
+
+.figma-calendar-nav {
+    width: 2.2rem;
+    height: 2.2rem;
+    border-radius: 999px;
+    border: 1px solid #c8d5e7;
+    background: #f8fbff;
+    color: #25324a;
+}
+
+.figma-calendar-weekdays {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    margin-bottom: 0.35rem;
+    color: #64748b;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+.figma-calendar-grid {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 0.35rem;
+}
+
+.figma-calendar-cell {
+    min-height: 108px;
+    border-radius: 10px;
+    border: 1px solid #dbe5f4;
+    background: #f9fbff;
+    text-align: left;
+    padding: 0.45rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.figma-calendar-cell.is-today {
+    border-color: #0d6efd;
+}
+
+.figma-calendar-cell.is-muted {
+    background: #f2f5fb;
+}
+
+.figma-calendar-cell.is-selected {
+    background: #eaf2ff;
+    color: #1a2238;
+    border-color: #0d6efd;
+}
+
+.figma-calendar-day {
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.figma-calendar-events-preview {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    min-height: 56px;
+}
+
+.figma-calendar-badge {
+    display: block;
+    border-radius: 6px;
+    padding: 0.1rem 0.24rem;
+    font-size: 0.63rem;
+    font-weight: 700;
+    color: #fff;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    background: #22c55e;
+}
+
+.figma-calendar-badge.acad {
+    background: #3b82f6;
+}
+
+.figma-calendar-badge.org {
+    background: #22c55e;
+}
+
+.figma-calendar-badge.holiday {
+    background: #eab308;
+    color: #2d2a14;
+}
+
+.figma-calendar-badge.major {
+    background: #a855f7;
+}
+
+.figma-calendar-overflow {
+    font-size: 0.7rem;
+    color: #64748b;
+    font-weight: 600;
+}
+
+.figma-calendar-agenda {
+    margin-top: 1rem;
+    border-top: 1px solid #dbe5f4;
+    padding-top: 0.9rem;
+}
+
+.figma-calendar-agenda h3 {
+    font-size: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+.figma-calendar-agenda-list {
+    display: grid;
+    gap: 0.7rem;
+}
+
+.figma-calendar-event-card {
+    border: 1px solid #dbe3ee;
+    border-radius: 12px;
+    padding: 0.75rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 0.6rem;
+    background: #ffffff;
+}
+
+.figma-calendar-event-card h4 {
+    margin: 0 0 0.4rem;
+    font-size: 1rem;
+}
+
+@media (max-width: 768px) {
+    .figma-calendar-shell {
+        padding: 0.75rem;
+        border-radius: 14px;
+    }
+
+    .figma-calendar-cell {
+        min-height: 92px;
+    }
+
+    .figma-calendar-events-preview {
+        min-height: 42px;
+    }
+
+    .figma-calendar-event-card {
+        flex-direction: column;
+    }
+}

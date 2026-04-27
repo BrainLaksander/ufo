@@ -101,6 +101,7 @@
         <div class="tab-content" id="announcementTabsContent">
             <div class="tab-pane fade show active" id="announcement-active-pane" role="tabpanel" aria-labelledby="announcement-active-tab" tabindex="0">
                 <div class="ufo-kboard-list">
+                    @forelse($activeAnnouncements as $item)
                         <article class="ufo-kboard-item"
                             data-id="{{ $item['id'] }}"
                             data-title="{{ $item['title'] }}"
@@ -128,12 +129,15 @@
                                 <button class="ufo-kboard-btn ghost btn-detail-announcement" type="button">Lihat</button>
                             </div>
                         </article>
+                    @empty
+                        <p class="ufo-kboard-item-meta mb-0">Belum ada pengumuman aktif.</p>
+                    @endforelse
                 </div>
             </div>
 
             <div class="tab-pane fade" id="announcement-all-pane" role="tabpanel" aria-labelledby="announcement-all-tab" tabindex="0">
                 <div class="ufo-kboard-list">
-                    @foreach($allAnnouncements as $item)
+                    @forelse($allAnnouncements as $item)
                         <article class="ufo-kboard-item"
                             data-id="{{ $item['id'] }}"
                             data-title="{{ $item['title'] }}"
@@ -163,7 +167,9 @@
                                 @endif
                             </div>
                         </article>
-                    @endforeach
+                    @empty
+                        <p class="ufo-kboard-item-meta mb-0">Belum ada pengumuman yang ditambahkan.</p>
+                    @endforelse
                 </div>
             </div>
         </div>
