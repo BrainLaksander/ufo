@@ -4,7 +4,8 @@
 
 @php
     $eventDate = \Carbon\Carbon::parse($event['date']);
-    $eventDateTime = \Carbon\Carbon::parse($event['date'] . ' ' . $event['time']);
+    $eventStartTime = (string) ($event['start_time'] ?? '');
+    $eventEndTime = (string) ($event['end_time'] ?? '');
     $statusRaw = (string) ($event['status'] ?? '');
     $statusText = strtolower($statusRaw);
     $statusPill = 'draft';
@@ -40,8 +41,8 @@
                 <p>Tanggal Event</p>
             </article>
             <article class="ufo-kboard-stat green">
-                <h3>{{ $eventDateTime->format('H:i') }}</h3>
-                <p>Waktu Mulai</p>
+                <h3>{{ $event['time'] }}</h3>
+                <p>Waktu Event</p>
             </article>
             <article class="ufo-kboard-stat gold">
                 <h3>{{ $event['quota'] }}</h3>
@@ -58,7 +59,12 @@
             <div class="ufo-kboard-list">
                 <article class="ufo-kboard-item">
                     <p class="ufo-kboard-item-meta mb-1"><i class="bi bi-calendar3"></i> Jadwal</p>
-                    <h4 class="ufo-kboard-item-title">{{ $eventDateTime->translatedFormat('d M Y H:i') }}</h4>
+                    <h4 class="ufo-kboard-item-title">
+                        {{ $eventDate->translatedFormat('d M Y') }}
+                        @if($eventStartTime !== '')
+                            • {{ $eventStartTime }}@if($eventEndTime !== '') - {{ $eventEndTime }}@endif
+                        @endif
+                    </h4>
                 </article>
 
                 <article class="ufo-kboard-item">

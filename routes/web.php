@@ -96,10 +96,9 @@ Route::prefix('pengurus')->name('portal.pengurus.')->middleware(['auth', 'role:p
     Route::get('/events', [IzinKegiatanWorkflowController::class, 'pengurusEvents'])->name('events');
     Route::get('/events/create', [IzinKegiatanWorkflowController::class, 'eventForm'])->name('events.create');
     Route::post('/events', [IzinKegiatanWorkflowController::class, 'storeEvent'])->name('events.store');
+    Route::post('/events/{id}/submit', [IzinKegiatanWorkflowController::class, 'submitEvent'])->name('events.submit');
     Route::post('/events/{id}/update', [IzinKegiatanWorkflowController::class, 'updateEvent'])->name('events.update');
     Route::get('/events/{id}', [IzinKegiatanWorkflowController::class, 'pengurusEventDetail'])->name('events.detail');
-
-    Route::post('/news', [IzinKegiatanWorkflowController::class, 'storeNews'])->name('news.store');
 
     Route::get('/announcements', [IzinKegiatanWorkflowController::class, 'pengurusAnnouncements'])->name('announcements');
     Route::get('/announcements/create', [IzinKegiatanWorkflowController::class, 'pengurusAnnouncementForm'])->name('announcements.create');

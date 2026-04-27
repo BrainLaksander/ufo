@@ -48,6 +48,8 @@
                 <span class="ufo-pg-event-chip">Draft Baru</span>
             </div>
 
+            @php $todayDate = now()->format('Y-m-d\TH:i'); @endphp
+
             <div class="ufo-pg-event-field-grid">
                 <div class="ufo-pg-field-group ufo-pg-col-span-6">
                     <label for="event-name">Nama Event</label>
@@ -56,7 +58,7 @@
 
                 <div class="ufo-pg-field-group ufo-pg-col-span-3">
                     <label for="event-start">Mulai</label>
-                    <input id="event-start" type="datetime-local" name="start_date" value="{{ old('start_date') }}" required @disabled(!$canCreateEvent)>
+                    <input id="event-start" type="datetime-local" name="start_date" value="{{ old('start_date', $todayDate) }}" min="{{ $todayDate }}" required @disabled(!$canCreateEvent)>
                 </div>
 
                 <div class="ufo-pg-field-group ufo-pg-col-span-3">
@@ -76,22 +78,30 @@
 
                 <div class="ufo-pg-field-group ufo-pg-col-span-3">
                     <label for="event-status">Status Event</label>
-                    <select id="event-status" name="status" required @disabled(!$canCreateEvent)>
-                        <option value="draft" @selected(old('status', 'draft') === 'draft')>Draft</option>
-                        <option value="approved" @selected(old('status') === 'approved')>Approved</option>
-                    </select>
+                    <input id="event-status" type="text" value="Draft (Belum Publik)" readonly @disabled(!$canCreateEvent)>
+                    <input type="hidden" name="status" value="draft">
                 </div>
 
                 <div class="ufo-pg-field-group ufo-pg-col-span-12">
                     <label for="event-description">Deskripsi Event</label>
                     <textarea id="event-description" name="description" placeholder="{{ $eventDescriptionPlaceholder ?? '' }}" required @disabled(!$canCreateEvent)>{{ old('description') }}</textarea>
                 </div>
+
+                <div class="ufo-pg-field-group ufo-pg-col-span-12">
+                    <label for="news-title">Judul Berita Event</label>
+                    <input id="news-title" type="text" name="news_title" value="{{ old('news_title') }}" placeholder="Contoh: Kegiatan berjalan lancar dan meriah" required @disabled(!$canCreateEvent)>
+                </div>
+
+                <div class="ufo-pg-field-group ufo-pg-col-span-12">
+                    <label for="news-content">Konten Berita Event</label>
+                    <textarea id="news-content" name="news_content" placeholder="Ceritakan rangkaian kegiatan dan hasil event..." required @disabled(!$canCreateEvent)>{{ old('news_content') }}</textarea>
+                </div>
             </div>
 
             <div class="ufo-pg-event-actions">
                 <button type="submit" class="btn-primary-org" @disabled(!$canCreateEvent)>
                     <i class="bi bi-check-circle" aria-hidden="true"></i>
-                    <span>Simpan Event</span>
+                    <span>Simpan Event & Berita</span>
                 </button>
                 <a href="{{ route('portal.pengurus.events') }}" class="btn-secondary-org">
                     <i class="bi bi-arrow-left" aria-hidden="true"></i>

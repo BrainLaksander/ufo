@@ -20,6 +20,7 @@ class KemahasiswaanWorkflowController extends Controller
     public function organisasiIndex(): View
     {
         $this->ensureDefaultBemUkmAccount();
+        $this->ensureOrganizationPengurusAccounts();
 
         $organizationDirectory = $this->getOrganizationDirectory();
         $organizationSummary = [
@@ -51,7 +52,7 @@ class KemahasiswaanWorkflowController extends Controller
             'description' => 'required|string|max:1000',
             'email' => 'nullable|email|max:120',
             'phone' => 'nullable|string|max:30',
-            'account_email' => 'required|email|max:120|unique:kemahasiswaan_ukm_accounts,email',
+            'account_email' => 'required|email|max:120|unique:kemahasiswaan_ukm_accounts,email|unique:users,email',
             'account_password' => 'required|string|min:6|max:40',
         ]);
 
@@ -98,39 +99,14 @@ class KemahasiswaanWorkflowController extends Controller
 
         $orgId = DB::table('organizations')->insertGetId($insertPayload);
 
-        // Create UKM Account
-        $accountPayload = [
-            'organization_id' => $orgId,
-            'name' => 'Pengurus ' . ($validated['shortname'] ?: $validated['name']),
-            'email' => $validated['account_email'],
-            'position' => 'Ketua / Pengurus',
-            'status' => 'active',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ];
-
-        if (Schema::hasColumn('kemahasiswaan_ukm_accounts', 'password_hash')) {
-            $accountPayload['password_hash'] = Hash::make($validated['account_password']);
-        }
-
-        DB::table('kemahasiswaan_ukm_accounts')->insert($accountPayload);
-
-        // Ensure a matching record exists in 'members' table so they can submit proposals
-        DB::table('members')->insert([
-            'organization_id' => $orgId,
-            'name' => $accountPayload['name'],
-            'nim' => 'ADM-' . str_pad((string) $orgId, 6, '0', STR_PAD_LEFT),
-            'email' => $validated['account_email'],
-            'phone' => $validated['phone'] ?? null,
-            'faculty' => 'Universitas',
-            'major' => 'Staff UKM',
-            'position' => 'ketua',
-            'status' => 'aktif',
-            'join_type' => 'founder',
-            'join_date' => now()->toDateString(),
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        $this->syncOrganizationPengurusAccount(
+            $orgId,
+            (string) $validated['name'],
+            $shortname,
+            (string) ($validated['account_email'] ?? ''),
+            (string) ($validated['account_password'] ?? ''),
+            (string) ($validated['phone'] ?? '')
+        );
 
         return back()->with('success', 'Organisasi baru dan akun pengurus berhasil ditambahkan.');
     }
@@ -286,83 +262,53 @@ class KemahasiswaanWorkflowController extends Controller
             ->where('id', $id)
             ->update($updatePayload);
 
-        // Update or Create UKM Account
-        if (!empty($validated['account_email'])) {
-            $existingAccount = DB::table('kemahasiswaan_ukm_accounts')
+        $accountEmail = trim((string) ($validated['account_email'] ?? ''));
+
+        if ($accountEmail === '') {
+            $currentAccountEmail = DB::table('kemahasiswaan_ukm_accounts')
                 ->where('organization_id', $id)
-                ->first();
+                ->value('email');
 
-            $accountData = [
-                'email' => $validated['account_email'],
-                'updated_at' => now(),
-            ];
+            $accountEmail = trim((string) $currentAccountEmail);
+        }
 
-            if (!empty($validated['account_password']) && Schema::hasColumn('kemahasiswaan_ukm_accounts', 'password_hash')) {
-                $accountData['password_hash'] = Hash::make($validated['account_password']);
+        if ($accountEmail !== '') {
+            $currentAccountId = DB::table('kemahasiswaan_ukm_accounts')
+                ->where('organization_id', $id)
+                ->value('id');
+
+            $duplicateAccountEmail = DB::table('kemahasiswaan_ukm_accounts')
+                ->whereRaw('LOWER(email) = ?', [Str::lower($accountEmail)])
+                ->when($currentAccountId, fn ($query) => $query->where('id', '!=', (int) $currentAccountId))
+                ->exists();
+
+            if ($duplicateAccountEmail) {
+                return back()->with('error', 'Email akun sudah digunakan oleh organisasi lain.');
             }
 
-            if ($existingAccount) {
-                // Validate email uniqueness if changed
-                if ($existingAccount->email !== $validated['account_email']) {
-                    $emailExists = DB::table('kemahasiswaan_ukm_accounts')
-                        ->where('email', $validated['account_email'])
-                        ->where('id', '!=', $existingAccount->id)
-                        ->exists();
-                    
-                    if ($emailExists) {
-                        return back()->with('error', 'Email akun sudah digunakan oleh organisasi lain.');
+            $duplicateUserEmail = DB::table('users')
+                ->whereRaw('LOWER(email) = ?', [Str::lower($accountEmail)])
+                ->when($currentAccountId, function ($query) use ($currentAccountId) {
+                    $linkedUserId = DB::table('kemahasiswaan_ukm_accounts')->where('id', (int) $currentAccountId)->value('user_id');
+
+                    if ($linkedUserId) {
+                        $query->where('id', '!=', (int) $linkedUserId);
                     }
-                }
+                })
+                ->exists();
 
-                DB::table('kemahasiswaan_ukm_accounts')
-                    ->where('id', $existingAccount->id)
-                    ->update($accountData);
-            } else {
-                // Create new if doesn't exist
-                $accountData['organization_id'] = $id;
-                $accountData['name'] = 'Pengurus ' . ($validated['shortname'] ?: $validated['name']);
-                $accountData['position'] = 'Ketua / Pengurus';
-                $accountData['status'] = 'active';
-                $accountData['created_at'] = now();
-                
-                if (empty($validated['account_password']) && Schema::hasColumn('kemahasiswaan_ukm_accounts', 'password_hash')) {
-                    $accountData['password_hash'] = Hash::make(Str::random(10));
-                }
-
-                DB::table('kemahasiswaan_ukm_accounts')->insert($accountData);
+            if ($duplicateUserEmail) {
+                return back()->with('error', 'Email akun sudah digunakan pada tabel users.');
             }
 
-            // Sync with 'members' table so they can submit proposals
-            $member = DB::table('members')
-                ->where('organization_id', $id)
-                ->where('email', $validated['account_email'])
-                ->first();
-
-            $memberName = 'Pengurus ' . ($validated['shortname'] ?: $validated['name']);
-
-            if ($member) {
-                DB::table('members')
-                    ->where('id', $member->id)
-                    ->update([
-                        'name' => $memberName,
-                        'updated_at' => now(),
-                    ]);
-            } else {
-                DB::table('members')->insert([
-                    'organization_id' => $id,
-                    'name' => $memberName,
-                    'nim' => 'ADM-' . str_pad((string) $id, 6, '0', STR_PAD_LEFT),
-                    'email' => $validated['account_email'],
-                    'faculty' => 'Universitas',
-                    'major' => 'Staff UKM',
-                    'position' => 'ketua',
-                    'status' => 'aktif',
-                    'join_type' => 'founder',
-                    'join_date' => now()->toDateString(),
-                    'created_at' => now(),
-                    'updated_at' => now(),
-                ]);
-            }
+            $this->syncOrganizationPengurusAccount(
+                $id,
+                (string) $validated['name'],
+                (string) ($validated['shortname'] ?? ''),
+                $accountEmail,
+                (string) ($validated['account_password'] ?? ''),
+                (string) ($validated['phone'] ?? '')
+            );
         }
 
         return back()->with('success', 'Data organisasi dan akun pengurus berhasil diperbarui.');
@@ -386,6 +332,15 @@ class KemahasiswaanWorkflowController extends Controller
                 'status' => 'inactive',
                 'updated_at' => now(),
             ]);
+
+        if (Schema::hasTable('kemahasiswaan_ukm_accounts')) {
+            DB::table('kemahasiswaan_ukm_accounts')
+                ->where('organization_id', $id)
+                ->update([
+                    'status' => $this->inactiveAccountStatus(),
+                    'updated_at' => now(),
+                ]);
+        }
 
         return back()->with('success', 'Organisasi berhasil dinonaktifkan.');
     }
@@ -1071,6 +1026,257 @@ class KemahasiswaanWorkflowController extends Controller
         }
     }
 
+    private function ensureOrganizationPengurusAccounts(): void
+    {
+        if (!Schema::hasTable('organizations') || !Schema::hasTable('kemahasiswaan_ukm_accounts')) {
+            return;
+        }
+
+        $organizations = DB::table('organizations')
+            ->select(['id', 'name', 'shortname', 'phone'])
+            ->where('status', $this->organizationActiveStatus())
+            ->orderBy('id')
+            ->get();
+
+        foreach ($organizations as $organization) {
+            $organizationId = (int) ($organization->id ?? 0);
+
+            if ($organizationId <= 0) {
+                continue;
+            }
+
+            $currentEmail = DB::table('kemahasiswaan_ukm_accounts')
+                ->where('organization_id', $organizationId)
+                ->value('email');
+
+            $email = trim((string) $currentEmail);
+            if ($email === '') {
+                $email = $this->generateUniqueOrganizationAccountEmail(
+                    (string) ($organization->shortname ?? ''),
+                    (string) ($organization->name ?? ''),
+                    $organizationId
+                );
+            }
+
+            $this->syncOrganizationPengurusAccount(
+                $organizationId,
+                (string) ($organization->name ?? ''),
+                (string) ($organization->shortname ?? ''),
+                $email,
+                '',
+                (string) ($organization->phone ?? '')
+            );
+        }
+    }
+
+    private function syncOrganizationPengurusAccount(
+        int $organizationId,
+        string $organizationName,
+        string $organizationShortname,
+        string $accountEmail,
+        string $plainPassword,
+        string $phone = ''
+    ): void {
+        if (!Schema::hasTable('kemahasiswaan_ukm_accounts')) {
+            return;
+        }
+
+        $accountDisplay = trim($organizationShortname) !== '' ? trim($organizationShortname) : trim($organizationName);
+        if ($accountDisplay === '') {
+            $accountDisplay = 'Organisasi';
+        }
+
+        $accountName = 'Ketua ' . $accountDisplay;
+        $passwordToUse = trim($plainPassword) !== ''
+            ? trim($plainPassword)
+            : (trim((string) config('auth.default_ukm_password', '')) !== ''
+                ? trim((string) config('auth.default_ukm_password', ''))
+                : 'Pengurus12345');
+
+        $passwordHash = Hash::make($passwordToUse);
+        $passwordHashColumnExists = Schema::hasColumn('kemahasiswaan_ukm_accounts', 'password_hash');
+        $existingAccount = DB::table('kemahasiswaan_ukm_accounts')
+            ->where('organization_id', $organizationId)
+            ->orderBy('id')
+            ->first();
+
+        if ($existingAccount) {
+            $updates = [
+                'name' => $accountName,
+                'email' => $accountEmail,
+                'position' => 'Ketua / Pengurus',
+                'updated_at' => now(),
+            ];
+
+            if (empty($existingAccount->status)) {
+                $updates['status'] = $this->defaultAccountStatus();
+            }
+
+            if ($passwordHashColumnExists && ($plainPassword !== '' || empty($existingAccount->password_hash))) {
+                $updates['password_hash'] = $passwordHash;
+            }
+
+            DB::table('kemahasiswaan_ukm_accounts')
+                ->where('id', $existingAccount->id)
+                ->update($updates);
+
+            $accountId = (int) $existingAccount->id;
+        } else {
+            $insertPayload = [
+                'organization_id' => $organizationId,
+                'user_id' => null,
+                'name' => $accountName,
+                'email' => $accountEmail,
+                'position' => 'Ketua / Pengurus',
+                'status' => $this->defaultAccountStatus(),
+                'created_at' => now(),
+                'updated_at' => now(),
+            ];
+
+            if ($passwordHashColumnExists) {
+                $insertPayload['password_hash'] = $passwordHash;
+            }
+
+            $accountId = (int) DB::table('kemahasiswaan_ukm_accounts')->insertGetId($insertPayload);
+        }
+
+        $userId = $this->syncPengurusUserAccount($organizationId, $accountName, $accountEmail, $passwordHash);
+
+        if ($userId !== null && Schema::hasColumn('kemahasiswaan_ukm_accounts', 'user_id')) {
+            DB::table('kemahasiswaan_ukm_accounts')
+                ->where('id', $accountId)
+                ->update([
+                    'user_id' => $userId,
+                    'updated_at' => now(),
+                ]);
+        }
+
+        $this->syncKetuaMember($organizationId, $accountName, $accountEmail, $phone);
+    }
+
+    private function generateUniqueOrganizationAccountEmail(string $shortname, string $name, int $organizationId): string
+    {
+        $source = trim($shortname) !== '' ? $shortname : $name;
+        $baseLocalPart = strtolower((string) preg_replace('/[^a-z0-9]+/i', '', $source));
+
+        if ($baseLocalPart === '') {
+            $baseLocalPart = 'org' . $organizationId;
+        }
+
+        $email = $baseLocalPart . '@unklab.ac.id';
+        $attempt = 1;
+
+        while (
+            DB::table('kemahasiswaan_ukm_accounts')->whereRaw('LOWER(email) = ?', [Str::lower($email)])->exists()
+            || (Schema::hasTable('users') && DB::table('users')->whereRaw('LOWER(email) = ?', [Str::lower($email)])->exists())
+        ) {
+            $email = $baseLocalPart . $attempt . '@unklab.ac.id';
+            $attempt++;
+        }
+
+        return $email;
+    }
+
+    private function syncPengurusUserAccount(int $organizationId, string $name, string $email, string $passwordHash): ?int
+    {
+        if (!Schema::hasTable('users')) {
+            return null;
+        }
+
+        $existing = DB::table('users')
+            ->whereRaw('LOWER(email) = ?', [Str::lower($email)])
+            ->first();
+
+        $payload = [
+            'name' => $name,
+            'email' => $email,
+            'role' => 'pengurus',
+            'organization_id' => $organizationId,
+            'updated_at' => now(),
+        ];
+
+        if ($existing) {
+            if (($existing->role ?? null) !== 'pengurus') {
+                return null;
+            }
+
+            DB::table('users')
+                ->where('id', $existing->id)
+                ->update($payload);
+
+            return (int) $existing->id;
+        }
+
+        $payload['password'] = $passwordHash;
+        $payload['created_at'] = now();
+
+        return (int) DB::table('users')->insertGetId($payload);
+    }
+
+    private function syncKetuaMember(int $organizationId, string $name, string $email, string $phone = ''): void
+    {
+        if (!Schema::hasTable('members')) {
+            return;
+        }
+
+        $member = DB::table('members')
+            ->where('organization_id', $organizationId)
+            ->whereRaw('LOWER(position) = ?', ['ketua'])
+            ->orderBy('id')
+            ->first();
+
+        $payload = [
+            'name' => $name,
+            'email' => $email,
+            'updated_at' => now(),
+        ];
+
+        if (Schema::hasColumn('members', 'phone')) {
+            $payload['phone'] = $phone !== '' ? $phone : null;
+        }
+
+        if ($member) {
+            DB::table('members')
+                ->where('id', $member->id)
+                ->update($payload);
+
+            return;
+        }
+
+        $payload['organization_id'] = $organizationId;
+        $payload['created_at'] = now();
+
+        if (Schema::hasColumn('members', 'nim')) {
+            $payload['nim'] = 'ADM-' . str_pad((string) $organizationId, 6, '0', STR_PAD_LEFT);
+        }
+
+        if (Schema::hasColumn('members', 'faculty')) {
+            $payload['faculty'] = 'Universitas';
+        }
+
+        if (Schema::hasColumn('members', 'major')) {
+            $payload['major'] = 'Staff UKM';
+        }
+
+        if (Schema::hasColumn('members', 'position')) {
+            $payload['position'] = 'ketua';
+        }
+
+        if (Schema::hasColumn('members', 'status')) {
+            $payload['status'] = 'aktif';
+        }
+
+        if (Schema::hasColumn('members', 'join_type')) {
+            $payload['join_type'] = 'founder';
+        }
+
+        if (Schema::hasColumn('members', 'join_date')) {
+            $payload['join_date'] = now()->toDateString();
+        }
+
+        DB::table('members')->insert($payload);
+    }
+
     private function getAkunUKM(): array
     {
         $statusLabels = $this->statusLabelMap('ukm_account_status_map', [
@@ -1277,9 +1483,10 @@ class KemahasiswaanWorkflowController extends Controller
         }
 
         $accountsByOrganization = [];
+        $accountNamesByOrganization = [];
         if (Schema::hasTable('kemahasiswaan_ukm_accounts')) {
             $accountRows = DB::table('kemahasiswaan_ukm_accounts')
-                ->select(['organization_id', 'email'])
+                ->select(['organization_id', 'name', 'email'])
                 ->whereIn('organization_id', $organizationIds)
                 ->get();
 
@@ -1287,6 +1494,7 @@ class KemahasiswaanWorkflowController extends Controller
                 $organizationId = (int) ($accountRow->organization_id ?? 0);
                 if ($organizationId > 0) {
                     $accountsByOrganization[$organizationId] = (string) ($accountRow->email ?? '');
+                    $accountNamesByOrganization[$organizationId] = (string) ($accountRow->name ?? '');
                 }
             }
         }
@@ -1397,7 +1605,8 @@ class KemahasiswaanWorkflowController extends Controller
                 }
 
                 $organizationId = (int) ($organizationRow->id ?? 0);
-                $leader = $leadersByOrganization[$organizationId] ?? '-';
+                $leader = $leadersByOrganization[$organizationId]
+                    ?? ($accountNamesByOrganization[$organizationId] ?? '-');
 
                 return [
                     'id' => $organizationId,

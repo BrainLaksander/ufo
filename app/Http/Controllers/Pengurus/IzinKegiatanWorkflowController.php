@@ -205,6 +205,8 @@ class IzinKegiatanWorkflowController extends Controller
 
     public function kemahasiswaanIndex(): View
     {
+        $this->syncApprovedEventsIntoSubmissionQueue();
+
         $workflowPengajuan = $this->getPengajuan();
         $workflowLaporan = $this->getLaporan();
 
@@ -216,6 +218,29 @@ class IzinKegiatanWorkflowController extends Controller
             'ui' => $this->buildKemahasiswaanPengajuanUiText(),
             'headerNotificationCount' => $this->countKemahasiswaanPendingNotifications($workflowPengajuan, $workflowLaporan),
         ]);
+    }
+
+    private function syncApprovedEventsIntoSubmissionQueue(): void
+    {
+        if (!Schema::hasTable('events')) {
+            return;
+        }
+
+        $approvedEvents = DB::table('events')
+            ->select(['id', 'organization_id', 'name', 'description', 'start_date', 'status'])
+            ->where('status', 'approved')
+            ->orderByDesc('id')
+            ->limit(300)
+            ->get();
+
+        foreach ($approvedEvents as $event) {
+            $this->syncEventSubmissionReview(
+                (int) ($event->organization_id ?? 0),
+                null,
+                $event,
+                (string) ($event->status ?? 'approved')
+            );
+        }
     }
 
     public function pengurusDashboard(Request $request): View
@@ -287,11 +312,12 @@ class IzinKegiatanWorkflowController extends Controller
             $rows = $query->get();
         }
 
-        $announcementTitles = collect();
+        $announcementRows = collect();
         if (Schema::hasTable('kemahasiswaan_announcements')) {
             $announcementQuery = DB::table('kemahasiswaan_announcements as ann')
-                ->select('ann.title')
-                ->where('ann.publish_status', 'published')
+            ->select(['ann.title', 'ann.content'])
+            ->where('ann.publish_status', 'published')
+            ->where('ann.category', 'event')
                 ->limit(300);
 
             if ($organizationId && Schema::hasTable('kemahasiswaan_ukm_accounts')) {
@@ -300,20 +326,31 @@ class IzinKegiatanWorkflowController extends Controller
                     ->where('akun.organization_id', $organizationId);
             }
 
-            $announcementTitles = $announcementQuery
-                ->pluck('title')
-                ->filter()
-                ->map(fn ($title) => Str::lower((string) $title));
+            $announcementRows = $announcementQuery
+                ->get()
+                ->map(fn ($row) => [
+                    'title' => Str::lower((string) ($row->title ?? '')),
+                    'content' => Str::lower((string) ($row->content ?? '')),
+                ]);
         }
 
-        $mapped = $rows->map(function ($row) use ($announcementTitles) {
+        $mapped = $rows->map(function ($row) use ($announcementRows) {
             $startDate = $row->start_date ? Carbon::parse($row->start_date) : null;
             $endDate = $row->end_date ? Carbon::parse($row->end_date) : $startDate;
             [$statusLabel, $pill] = $this->mapEventStatusToPortal((string) $row->status, $startDate, $endDate);
 
-            $hasNews = $announcementTitles->contains(function ($title) use ($row) {
+            $eventIdToken = '<!--event_id:' . (int) $row->id . '-->';
+            $hasNews = $announcementRows->contains(function ($announcement) use ($row, $eventIdToken) {
                 $needle = Str::lower((string) $row->name);
-                return $needle !== '' && Str::contains((string) $title, $needle);
+                $title = (string) ($announcement['title'] ?? '');
+                $content = (string) ($announcement['content'] ?? '');
+
+                if (Str::contains($content, $eventIdToken)) {
+                    return true;
+                }
+
+                return $needle !== ''
+                    && (Str::contains($title, $needle) || Str::contains($content, $needle));
             });
 
             return [
@@ -322,9 +359,8 @@ class IzinKegiatanWorkflowController extends Controller
                 'description' => (string) ($row->description ?? ''),
                 'date' => $startDate ? $startDate->translatedFormat('d F Y') : '',
                 'raw_date' => $startDate ? $startDate->toDateString() : '',
-                'time' => $startDate
-                    ? $startDate->format('H:i') . ' - ' . ($endDate ? $endDate->format('H:i') : $startDate->format('H:i'))
-                    : '',
+                'end_date' => $endDate ? $endDate->toDateString() : '',
+                'time' => $this->formatEventTimeRange($startDate, $endDate),
                 'location' => (string) ($row->location ?? ''),
                 'registrants' => (int) ($row->current_participants ?? 0),
                 'participants' => (int) ($row->current_participants ?? 0),
@@ -332,7 +368,7 @@ class IzinKegiatanWorkflowController extends Controller
                 'status' => $statusLabel,
                 'raw_status' => (string) $row->status,
                 'pill' => $pill,
-                'banner' => $row->banner ? Storage::url($row->banner) : null,
+                'banner' => $row->banner ? $this->resolveOrganizationMediaUrl((string) $row->banner) : null,
                 'has_news' => $hasNews,
             ];
         });
@@ -791,8 +827,10 @@ class IzinKegiatanWorkflowController extends Controller
                 'id' => (int) $row->id,
                 'name' => (string) $row->name,
                 'date' => $startDate ? $startDate->toDateString() : '',
-                'time' => $startDate ? $startDate->format('H:i') : '',
-                'location' => (string) ($row->location ?? ''),
+                'end_date' => $endDate ? $endDate->toDateString() : '',
+                'time' => $this->formatEventTimeRange($startDate, $endDate),
+                'start_time' => $startDate ? $startDate->format('H:i') : '',
+                'end_time' => $endDate ? $endDate->format('H:i') : '',
                 'quota' => (int) ($row->quota ?? 0),
                 'description' => (string) ($row->description ?? ''),
                 'status' => $statusLabel,
@@ -831,26 +869,16 @@ class IzinKegiatanWorkflowController extends Controller
             return back()->with('error', 'Konteks organisasi tidak ditemukan.');
         }
 
-        // Safety check: only allow publishing if there's at least one approved submission
-        if ($request->input('status') === 'approved') {
-            $hasApprovedIzin = DB::table('submissions')
-                ->where('organization_id', $context['organization_id'])
-                ->where('status', 'approved')
-                ->exists();
-
-            if (!$hasApprovedIzin) {
-                return back()->with('error', 'Anda harus memiliki izin kegiatan yang sudah disetujui (Approved) sebelum dapat mempublikasikan event secara publik.');
-            }
-        }
-
         $validated = $request->validate([
             'name' => 'required|string|max:200',
             'description' => 'required|string',
-            'start_date' => 'required|date',
+            'start_date' => 'required|date|after_or_equal:today',
             'location' => 'required|string|max:200',
             'quota' => 'required|integer|min:1',
-            'status' => 'required|in:draft,approved',
             'banner' => 'nullable|image|max:5120',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'news_title' => 'required|string|max:200',
+            'news_content' => 'required|string',
         ]);
 
         $bannerPath = null;
@@ -858,51 +886,66 @@ class IzinKegiatanWorkflowController extends Controller
             $bannerPath = $this->storeOrganizationMedia($request->file('banner'), (int)$context['organization_id'], 'event');
         }
 
-        DB::table('events')->insert([
-            'organization_id' => $context['organization_id'],
-            'created_by' => $this->resolveSessionUserId($request),
-            'name' => $validated['name'],
-            'description' => $validated['description'],
-            'start_date' => $validated['start_date'],
-            'end_date' => $validated['start_date'],
-            'location' => $validated['location'],
-            'quota' => $validated['quota'],
-            'status' => $validated['status'],
-            'banner' => $bannerPath,
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        DB::transaction(function () use ($context, $request, $validated, $bannerPath): void {
+            $eventId = DB::table('events')->insertGetId([
+                'organization_id' => $context['organization_id'],
+                'created_by' => $this->resolveSessionUserId($request),
+                'name' => $validated['name'],
+                'description' => $validated['description'],
+                'start_date' => $validated['start_date'],
+                'end_date' => $validated['end_date'] ?? $validated['start_date'],
+                'location' => $validated['location'],
+                'quota' => $validated['quota'],
+                'status' => 'draft',
+                'banner' => $bannerPath,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
 
-        return back()->with('success', 'Event berhasil disimpan!');
+            $this->storeEventNewsAnnouncement((int) $context['organization_id'], $eventId, $validated);
+        });
+
+        return back()->with('success', 'Event dan berita event berhasil disimpan!');
     }
 
-    public function storeNews(Request $request): RedirectResponse
+    public function submitEvent(Request $request, int $id): RedirectResponse
     {
         $context = $this->resolvePengurusContext($request);
-        
-        $validated = $request->validate([
-            'title' => 'required|string|max:200',
-            'content' => 'required|string',
-            'image' => 'nullable|image|max:5120',
-        ]);
+        if (!$context['organization_id']) {
+            return back()->with('error', 'Konteks organisasi tidak ditemukan.');
+        }
 
-        $ukmAccountId = DB::table('kemahasiswaan_ukm_accounts')
+        $event = DB::table('events')
+            ->where('id', $id)
             ->where('organization_id', $context['organization_id'])
-            ->value('id');
+            ->first();
 
-        DB::table('kemahasiswaan_announcements')->insert([
-            'ukm_account_id' => $ukmAccountId,
-            'title' => $validated['title'],
-            'category' => 'event',
-            'content' => $validated['content'],
-            'summary' => Str::limit(strip_tags($validated['content']), 150),
-            'publish_at' => now(),
-            'publish_status' => 'published',
-            'created_at' => now(),
-            'updated_at' => now(),
-        ]);
+        if (!$event) {
+            return back()->with('error', 'Event tidak ditemukan.');
+        }
 
-        return back()->with('success', 'Berita event berhasil dipublikasikan!');
+        if (Str::lower((string) ($event->status ?? '')) !== 'draft') {
+            return back()->with('success', 'Event sudah pernah disubmit.');
+        }
+
+        DB::table('events')
+            ->where('id', $id)
+            ->where('organization_id', $context['organization_id'])
+            ->update([
+                'status' => 'approved',
+                'updated_at' => now(),
+            ]);
+
+        $this->syncEventAnnouncementPublication($id, 'approved', (string) ($event->start_date ?? now()));
+        $this->syncEventSubmissionReview(
+            (int) $context['organization_id'],
+            isset($context['member_id']) ? (int) $context['member_id'] : null,
+            $event,
+            'approved',
+            (string) data_get($request->session()->get('user'), 'email', '')
+        );
+
+        return back()->with('success', 'Event berhasil disubmit dan dipublikasikan.');
     }
 
     public function storeAnnouncement(Request $request): RedirectResponse
@@ -946,7 +989,7 @@ class IzinKegiatanWorkflowController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:200',
             'description' => 'required|string',
-            'start_date' => 'required|date',
+            'start_date' => 'required|date|after_or_equal:today',
             'location' => 'required|string|max:200',
             'quota' => 'required|integer|min:1',
             'status' => 'required|in:draft,approved',
@@ -973,7 +1016,231 @@ class IzinKegiatanWorkflowController extends Controller
             ->where('organization_id', $context['organization_id'])
             ->update($payload);
 
+        $this->syncEventAnnouncementPublication($id, (string) $validated['status'], (string) $validated['start_date']);
+
+        $eventSnapshot = (object) [
+            'id' => $id,
+            'name' => $validated['name'],
+            'description' => $validated['description'],
+            'start_date' => $validated['start_date'],
+        ];
+
+        $this->syncEventSubmissionReview(
+            (int) $context['organization_id'],
+            isset($context['member_id']) ? (int) $context['member_id'] : null,
+            $eventSnapshot,
+            (string) $validated['status']
+        );
+
         return back()->with('success', 'Event berhasil diperbarui!');
+    }
+
+    private function storeEventNewsAnnouncement(int $organizationId, int $eventId, array $validated): void
+    {
+        if (!Schema::hasTable('kemahasiswaan_announcements')) {
+            return;
+        }
+
+        $ukmAccountId = null;
+        if (Schema::hasTable('kemahasiswaan_ukm_accounts')) {
+            $ukmAccountId = DB::table('kemahasiswaan_ukm_accounts')
+                ->where('organization_id', $organizationId)
+                ->value('id');
+        }
+
+        $isPublished = ($validated['status'] ?? 'draft') === 'approved';
+
+        DB::table('kemahasiswaan_announcements')->insert([
+            'ukm_account_id' => $ukmAccountId,
+            'title' => trim((string) ($validated['news_title'] ?? '')) . ' | ' . trim((string) ($validated['name'] ?? '')),
+            'category' => 'event',
+            'content' => '<!--event_id:' . $eventId . '-->\n' . (string) ($validated['news_content'] ?? ''),
+            'summary' => Str::limit(strip_tags((string) ($validated['news_content'] ?? '')), 150),
+            'publish_at' => $isPublished ? ($validated['start_date'] ?? now()) : null,
+            'publish_status' => $isPublished ? 'published' : 'draft',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ]);
+    }
+
+    private function syncEventAnnouncementPublication(int $eventId, string $status, string $startDate): void
+    {
+        if (!Schema::hasTable('kemahasiswaan_announcements')) {
+            return;
+        }
+
+        $isPublished = Str::lower(trim($status)) === 'approved';
+
+        DB::table('kemahasiswaan_announcements')
+            ->where('category', 'event')
+            ->where('content', 'like', '%<!--event_id:' . $eventId . '-->%')
+            ->update([
+                'publish_status' => $isPublished ? 'published' : 'draft',
+                'publish_at' => $isPublished ? $startDate : null,
+                'updated_at' => now(),
+            ]);
+    }
+
+    private function syncEventSubmissionReview(int $organizationId, ?int $memberId, object $event, string $eventStatus, ?string $preferredEmail = null): void
+    {
+        if (!Schema::hasTable('submissions')) {
+            return;
+        }
+
+        $effectiveMemberId = $this->ensureSubmissionMemberId($organizationId, $memberId, $preferredEmail);
+
+        if (!$effectiveMemberId) {
+            return;
+        }
+
+        $title = 'Event: ' . trim((string) ($event->name ?? 'Tanpa Judul'));
+        $description = trim((string) ($event->description ?? ''));
+        $targetStatus = Str::lower(trim($eventStatus)) === 'approved' ? 'submitted' : 'draft';
+
+        $existing = DB::table('submissions')
+            ->where('organization_id', $organizationId)
+            ->where('type', 'activity_plan')
+            ->where('title', $title)
+            ->orderByDesc('id')
+            ->first();
+
+        $payload = [
+            'organization_id' => $organizationId,
+            'member_id' => $effectiveMemberId,
+            'title' => $title,
+            'description' => $description,
+            'type' => 'activity_plan',
+            'status' => $targetStatus,
+            'submitted_date' => $targetStatus === 'submitted' ? now()->toDateString() : null,
+            'updated_at' => now(),
+        ];
+
+        if (Schema::hasColumn('submissions', 'department_review_note')) {
+            $payload['department_review_note'] = null;
+        }
+
+        if (Schema::hasColumn('submissions', 'reviewed_at')) {
+            $payload['reviewed_at'] = null;
+        }
+
+        if ($existing) {
+            DB::table('submissions')
+                ->where('id', $existing->id)
+                ->update($payload);
+
+            return;
+        }
+
+        $payload['created_at'] = now();
+
+        if (Schema::hasColumn('submissions', 'feedback')) {
+            $payload['feedback'] = null;
+        }
+
+        if (Schema::hasColumn('submissions', 'revision_count')) {
+            $payload['revision_count'] = 0;
+        }
+
+        if (Schema::hasColumn('submissions', 'approved_date')) {
+            $payload['approved_date'] = null;
+        }
+
+        if (Schema::hasColumn('submissions', 'reviewed_by_department_user_id')) {
+            $payload['reviewed_by_department_user_id'] = null;
+        }
+
+        if (Schema::hasColumn('submissions', 'file_path')) {
+            $payload['file_path'] = null;
+        }
+
+        DB::table('submissions')->insert($payload);
+    }
+
+    private function ensureSubmissionMemberId(int $organizationId, ?int $memberId, ?string $preferredEmail = null): ?int
+    {
+        if ($memberId && Schema::hasTable('members')) {
+            $exists = DB::table('members')->where('id', $memberId)->exists();
+            if ($exists) {
+                return $memberId;
+            }
+        }
+
+        if (!Schema::hasTable('members')) {
+            return null;
+        }
+
+        $existing = DB::table('members')
+            ->select('id')
+            ->where('organization_id', $organizationId)
+            ->orderByRaw("CASE position WHEN 'ketua' THEN 1 WHEN 'sekretaris' THEN 2 ELSE 3 END")
+            ->orderBy('id')
+            ->first();
+
+        if ($existing) {
+            return (int) $existing->id;
+        }
+
+        $organizationName = (string) DB::table('organizations')->where('id', $organizationId)->value('name');
+        $email = trim((string) $preferredEmail);
+
+        if ($email === '') {
+            $email = (string) DB::table('kemahasiswaan_ukm_accounts')
+                ->where('organization_id', $organizationId)
+                ->orderBy('id')
+                ->value('email');
+        }
+
+        if ($email === '') {
+            $email = 'org' . $organizationId . '@unklab.ac.id';
+        }
+
+        $nim = 'ADM-' . str_pad((string) $organizationId, 6, '0', STR_PAD_LEFT);
+        while (DB::table('members')->where('nim', $nim)->exists()) {
+            $nim = 'ADM-' . str_pad((string) $organizationId, 6, '0', STR_PAD_LEFT) . '-' . random_int(10, 99);
+        }
+
+        $payload = [
+            'organization_id' => $organizationId,
+            'name' => 'Ketua ' . ($organizationName !== '' ? $organizationName : ('Org ' . $organizationId)),
+            'nim' => $nim,
+            'email' => $email,
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+
+        if (Schema::hasColumn('members', 'faculty')) {
+            $payload['faculty'] = 'Universitas';
+        }
+
+        if (Schema::hasColumn('members', 'major')) {
+            $payload['major'] = 'Staff UKM';
+        }
+
+        if (Schema::hasColumn('members', 'position')) {
+            $payload['position'] = 'ketua';
+        }
+
+        if (Schema::hasColumn('members', 'status')) {
+            $payload['status'] = 'aktif';
+        }
+
+        if (Schema::hasColumn('members', 'join_type')) {
+            $payload['join_type'] = 'founder';
+        }
+
+        if (Schema::hasColumn('members', 'join_date')) {
+            $payload['join_date'] = now()->toDateString();
+        }
+
+        if (Schema::hasColumn('members', 'phone')) {
+            $payload['phone'] = null;
+        }
+
+        if (Schema::hasColumn('members', 'notes')) {
+            $payload['notes'] = 'Auto-generated for event submission sync.';
+        }
+
+        return (int) DB::table('members')->insertGetId($payload);
     }
 
     public function updateAnnouncement(Request $request, int $id): RedirectResponse
@@ -1764,6 +2031,24 @@ class IzinKegiatanWorkflowController extends Controller
         return $this->refStatusPair('event_status_map', 'default');
     }
 
+    private function isPublishedEventStatus(string $status): bool
+    {
+        return in_array(Str::lower(trim($status)), ['approved', 'ongoing', 'completed'], true);
+    }
+
+    private function formatEventTimeRange(?Carbon $startDate, ?Carbon $endDate): string
+    {
+        if (!$startDate && !$endDate) {
+            return '';
+        }
+
+        if ($startDate && $endDate) {
+            return $startDate->format('H:i') . ' - ' . $endDate->format('H:i');
+        }
+
+        return ($startDate ?: $endDate)->format('H:i');
+    }
+
     private function mapAnnouncementStatus(string $status): array
     {
         return match (Str::lower($status)) {
@@ -1910,16 +2195,22 @@ class IzinKegiatanWorkflowController extends Controller
 
     private function storeOrganizationMedia(UploadedFile $file, int $organizationId, string $type): string
     {
-        $safeType = in_array($type, ['logo', 'banner'], true) ? $type : 'media';
+        $safeType = in_array($type, ['logo', 'banner', 'event'], true) ? $type : 'media';
         $relativeDirectory = 'uploads/organizations/' . $organizationId;
         $absoluteDirectory = public_path($relativeDirectory);
-
-        File::ensureDirectoryExists($absoluteDirectory);
 
         $extension = strtolower((string) ($file->getClientOriginalExtension() ?: 'jpg'));
         $fileName = $safeType . '_' . now()->format('YmdHis') . '_' . Str::random(10) . '.' . $extension;
 
-        $file->move($absoluteDirectory, $fileName);
+        try {
+            File::ensureDirectoryExists($absoluteDirectory);
+            $file->move($absoluteDirectory, $fileName);
+
+            return $relativeDirectory . '/' . $fileName;
+        } catch (\Throwable $publicPathException) {
+            // Fallback when webroot is not writable (common on local XAMPP setups).
+            Storage::disk('public')->putFileAs($relativeDirectory, $file, $fileName);
+        }
 
         return $relativeDirectory . '/' . $fileName;
     }
@@ -1933,6 +2224,14 @@ class IzinKegiatanWorkflowController extends Controller
 
         if (Str::startsWith($trimmed, ['http://', 'https://', '//'])) {
             return $trimmed;
+        }
+
+        if (File::exists(public_path($trimmed))) {
+            return asset(ltrim($trimmed, '/'));
+        }
+
+        if (Storage::disk('public')->exists($trimmed)) {
+            return Storage::url($trimmed);
         }
 
         return asset(ltrim($trimmed, '/'));

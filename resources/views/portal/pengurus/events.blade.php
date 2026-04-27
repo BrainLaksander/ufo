@@ -19,11 +19,7 @@
             <div class="ufo-kboard-item-actions mt-0">
                 <button class="ufo-kboard-btn primary" type="button" data-bs-toggle="modal" data-bs-target="#modalCreateEvent">
                     <i class="bi bi-plus-lg"></i>
-                    Buat Event Baru
-                </button>
-                <button class="ufo-kboard-btn gold" type="button" data-bs-toggle="modal" data-bs-target="#modalCreateNews">
-                    <i class="bi bi-file-earmark-text"></i>
-                    Buat Berita Event
+                    Buat Event
                 </button>
             </div>
         </div>
@@ -35,19 +31,24 @@
         @if(session('error'))
             <div class="alert alert-danger mt-3 mb-0" role="alert">{{ session('error') }}</div>
         @endif
+
+        @if($errors->any())
+            <div class="alert alert-danger mt-3 mb-0" role="alert">{{ $errors->first() }}</div>
+        @endif
     </section>
 
-    <!-- Modal Buat Event Baru -->
+    <!-- Modal Buat Event + Berita -->
     <div class="modal fade" id="modalCreateEvent" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
             <div class="modal-content">
                 <form method="POST" action="{{ route('portal.pengurus.events.store') }}" enctype="multipart/form-data">
                     @csrf
                     <div class="modal-header">
-                        <h5 class="modal-title">Form Event Baru</h5>
+                        <h5 class="modal-title">Form Event + Berita</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
+                        @php $todayDate = now()->toDateString(); @endphp
                         <div class="ufo-kboard-row two">
                             <div class="ufo-kboard-span-full">
                                 <span class="ufo-kboard-item-meta mb-2 d-block">Poster Event</span>
@@ -57,78 +58,49 @@
 
                             <label class="ufo-kboard-span-full">
                                 <span class="ufo-kboard-item-meta">Nama Event</span>
-                                <input type="text" name="name" class="ufo-kboard-field" placeholder="Contoh: Seminar Kepemimpinan 2026" required>
+                                <input type="text" name="name" class="ufo-kboard-field" placeholder="Contoh: Seminar Kepemimpinan 2026" value="{{ old('name') }}" required>
                             </label>
 
                             <label class="ufo-kboard-span-full">
                                 <span class="ufo-kboard-item-meta">Deskripsi</span>
-                                <textarea name="description" class="ufo-kboard-textarea" style="min-height: 100px;" placeholder="Tuliskan detail kegiatan..." required></textarea>
+                                <textarea name="description" class="ufo-kboard-textarea" style="min-height: 100px;" placeholder="Tuliskan detail kegiatan..." required>{{ old('description') }}</textarea>
                             </label>
 
                             <label>
                                 <span class="ufo-kboard-item-meta">Tanggal Mulai</span>
-                                <input type="date" name="start_date" class="ufo-kboard-field" required>
+                                <input type="date" name="start_date" class="ufo-kboard-field" value="{{ old('start_date', $todayDate) }}" min="{{ $todayDate }}" required>
                             </label>
 
                             <label>
                                 <span class="ufo-kboard-item-meta">Lokasi / Platform</span>
-                                <input type="text" name="location" class="ufo-kboard-field" placeholder="Contoh: GK1 - Lt. 2 atau Zoom" required>
+                                <input type="text" name="location" class="ufo-kboard-field" placeholder="Contoh: GK1 - Lt. 2 atau Zoom" value="{{ old('location') }}" required>
                             </label>
 
                             <label>
                                 <span class="ufo-kboard-item-meta">Kuota Peserta</span>
-                                <input type="number" name="quota" class="ufo-kboard-field" value="100" min="1" required>
+                                <input type="number" name="quota" class="ufo-kboard-field" value="{{ old('quota', 100) }}" min="1" required>
                             </label>
 
                             <label>
                                 <span class="ufo-kboard-item-meta">Status Awal</span>
-                                <select name="status" class="ufo-kboard-select">
-                                    <option value="draft">Draft (Belum Publik)</option>
-                                    <option value="approved">Langsung Publikasikan</option>
-                                </select>
+                                <input type="text" class="ufo-kboard-field" value="Draft (Belum Publik)" readonly>
+                                <input type="hidden" name="status" value="draft">
                             </label>
-                        </div>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="ufo-kboard-btn ghost" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="ufo-kboard-btn primary">Simpan Event</button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    </div>
 
-    <!-- Modal Buat Berita Event -->
-    <div class="modal fade" id="modalCreateNews" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <form method="POST" action="{{ route('portal.pengurus.news.store') }}" enctype="multipart/form-data">
-                    @csrf
-                    <div class="modal-header">
-                        <h5 class="modal-title">Form Berita Kegiatan</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="ufo-kboard-row two">
                             <label class="ufo-kboard-span-full">
                                 <span class="ufo-kboard-item-meta">Judul Berita</span>
-                                <input type="text" name="title" class="ufo-kboard-field" placeholder="Contoh: Suksesnya Acara Malam Akrab 2026" required>
+                                <input type="text" name="news_title" class="ufo-kboard-field" placeholder="Contoh: Suksesnya Acara Malam Akrab 2026" value="{{ old('news_title') }}" required>
                             </label>
 
                             <label class="ufo-kboard-span-full">
                                 <span class="ufo-kboard-item-meta">Cerita / Konten Kegiatan</span>
-                                <textarea name="content" class="ufo-kboard-textarea" style="min-height: 150px;" placeholder="Ceritakan keseruan acara Anda..." required></textarea>
+                                <textarea name="news_content" class="ufo-kboard-textarea" style="min-height: 150px;" placeholder="Ceritakan keseruan acara Anda..." required>{{ old('news_content') }}</textarea>
                             </label>
-
-                            <div class="ufo-kboard-span-full">
-                                <span class="ufo-kboard-item-meta mb-2 d-block">Foto Dokumentasi</span>
-                                <input type="file" name="image" class="form-control" accept="image/*">
-                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="ufo-kboard-btn ghost" data-bs-dismiss="modal">Batal</button>
-                        <button type="submit" class="ufo-kboard-btn gold">Publikasikan Berita</button>
+                        <button type="submit" class="ufo-kboard-btn primary">Simpan Event & Berita</button>
                     </div>
                 </form>
             </div>
@@ -186,6 +158,12 @@
                                 <p class="ufo-kboard-item-meta"><i class="bi bi-people"></i> {{ $event['registrants'] }} pendaftar</p>
 
                                 <div class="ufo-kboard-item-actions mt-3">
+                                    @if(($event['raw_status'] ?? '') === 'draft')
+                                        <form method="POST" action="{{ route('portal.pengurus.events.submit', ['id' => $event['id']]) }}" onsubmit="return confirm('Submit event ini untuk publikasi?')" style="display:inline;">
+                                            @csrf
+                                            <button class="ufo-kboard-btn gold" type="submit">Submit</button>
+                                        </form>
+                                    @endif
                                     <button class="ufo-kboard-btn primary btn-edit-event" type="button">Edit Event</button>
                                     <button class="ufo-kboard-btn ghost btn-detail-event" type="button">Lihat Detail</button>
                                 </div>
@@ -324,7 +302,7 @@
 
                             <label>
                                 <span class="ufo-kboard-item-meta">Tanggal Mulai</span>
-                                <input type="date" name="start_date" id="editEventDate" class="ufo-kboard-field" required>
+                                <input type="date" name="start_date" id="editEventDate" class="ufo-kboard-field" min="{{ now()->toDateString() }}" required>
                             </label>
 
                             <label>
@@ -358,6 +336,11 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+    const hasCreateErrors = @json($errors->any());
+    if (hasCreateErrors) {
+        new bootstrap.Modal(document.getElementById('modalCreateEvent')).show();
+    }
+
     const detailModal = new bootstrap.Modal(document.getElementById('modalEventDetail'));
     const editModal = new bootstrap.Modal(document.getElementById('modalEditEvent'));
 
