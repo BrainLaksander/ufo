@@ -68,7 +68,7 @@
 
                             <label>
                                 <span class="ufo-kboard-item-meta">Tanggal Mulai</span>
-                                <input type="date" name="start_date" class="ufo-kboard-field" value="{{ old('start_date', $todayDate) }}" min="{{ $todayDate }}" required>
+                                <input type="date" name="start_date" class="ufo-kboard-field" value="{{ old('start_date', $todayDate) }}" required>
                             </label>
 
                             <label>
