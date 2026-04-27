@@ -16,41 +16,49 @@
     <section class="ufo-kboard-section">
         <div class="ufo-pg-contact-grid">
             @forelse($contacts as $contact)
+                <?php
+                    // normalize keys that controller provides (loadContactMiniCards)
+                    $name = data_get($contact, 'name', data_get($contact, 'nama', ''));
+                    $role = data_get($contact, 'role', data_get($contact, 'jabatan', ''));
+                    $phone = data_get($contact, 'phone', data_get($contact, 'whatsapp', ''));
+                    $email = data_get($contact, 'email', '');
+                ?>
+
                 <article class="ufo-pg-contact-card">
                     <div class="ufo-pg-contact-head">
                         <div class="ufo-pg-avatar">
                             <i class="bi bi-person"></i>
                         </div>
                         <div>
-                            <h3 class="ufo-kboard-item-title">{{ $contact['name'] }}</h3>
-                            <p class="ufo-kboard-item-meta">{{ $contact['role'] }}</p>
+                            <h3 class="ufo-kboard-item-title">{{ $name }}</h3>
+                            <p class="ufo-kboard-item-meta">{{ $role }}</p>
                         </div>
                     </div>
 
                     <div class="ufo-pg-contact-actions">
-                        <a href="{{ $contact['whatsapp'] }}" target="_blank" rel="noopener noreferrer" class="ufo-pg-contact-link wa">
+                        <a href="{{ $phone }}" target="_blank" rel="noopener noreferrer" class="ufo-pg-contact-link wa">
                             <i class="bi bi-whatsapp"></i>
                             <div>
                                 <p>WhatsApp</p>
-                                <small>{{ $contact['phone'] }}</small>
+                                <small>{{ $phone }}</small>
                             </div>
                             <span>→</span>
                         </a>
 
-                        <a href="tel:{{ preg_replace('/[^0-9+]/', '', $contact['phone']) }}" class="ufo-pg-contact-link call">
+                        <a href="tel:{{ preg_replace('/[^0-9+]/', '', $phone) }}" class="ufo-pg-contact-link call">
                             <i class="bi bi-telephone"></i>
                             <div>
                                 <p>Telepon</p>
-                                <small>{{ $contact['phone'] }}</small>
+                                <small>{{ $phone }}</small>
                             </div>
                             <span>→</span>
                         </a>
 
-                        <a href="mailto:{{ $contact['email'] }}" class="ufo-pg-contact-link mail">
+                        <a href="mailto:{{ $email }}" class="ufo-pg-contact-link mail">
                             <i class="bi bi-envelope"></i>
                             <div>
                                 <p>Email</p>
-                                <small>{{ $contact['email'] }}</small>
+                                <small>{{ $email }}</small>
                             </div>
                             <span>→</span>
                         </a>
