@@ -12,6 +12,23 @@ class Submission extends Model
 {
     use SoftDeletes;
 
+    public const STATUS_DRAFT = 'draft';
+    public const STATUS_SUBMITTED = 'submitted';
+    public const STATUS_REVIEWING = 'reviewing';
+    public const STATUS_APPROVED = 'approved';
+    public const STATUS_REJECTED = 'rejected';
+    public const STATUS_REVISED = 'revised';
+
+    public const REVIEWABLE_STATUSES = [
+        self::STATUS_SUBMITTED,
+        self::STATUS_REVIEWING,
+    ];
+
+    public const PENGURUS_SUBMITTABLE_STATUSES = [
+        self::STATUS_DRAFT,
+        self::STATUS_REVISED,
+    ];
+
     protected $fillable = [
         'organization_id', 'member_id', 'title', 'description', 'file_path', 'type',
         'status', 'rejection_reason', 'notes', 'feedback', 'revision_count',
@@ -42,19 +59,29 @@ class Submission extends Model
 
     public function getApprovalStatus(): string
     {
-        if ($this->status === 'approved') {
+        if ($this->status === self::STATUS_APPROVED) {
             return 'Disetujui';
         }
-        if ($this->status === 'rejected') {
+        if ($this->status === self::STATUS_REJECTED) {
             return 'Ditolak';
         }
-        if ($this->status === 'revised') {
+        if ($this->status === self::STATUS_REVISED) {
             return 'Perlu Revisi';
         }
-        if ($this->status === 'submitted') {
+        if ($this->status === self::STATUS_SUBMITTED) {
             return 'Menunggu Review';
         }
 
         return ucfirst((string) $this->status);
+    }
+
+    public static function isSubmittableByPengurus(string $status): bool
+    {
+        return in_array($status, self::PENGURUS_SUBMITTABLE_STATUSES, true);
+    }
+
+    public static function isReviewableByKemahasiswaan(string $status): bool
+    {
+        return in_array($status, self::REVIEWABLE_STATUSES, true);
     }
 }

@@ -348,16 +348,6 @@ class DemoDataSeeder extends Seeder
         }
 
         $rows = [
-            'draft' => [
-                'title' => 'Draft Pengajuan Kegiatan ' . ($shortname !== '' ? $shortname : 'Organisasi ' . $organizationId) . ' ' . $currentYear,
-                'description' => 'Draft pengajuan awal untuk menampilkan tombol kirim di portal pengurus.',
-                'type' => 'activity_plan',
-                'status' => 'draft',
-                'submitted_date' => null,
-                'approved_date' => null,
-                'reviewed_at' => null,
-                'reviewed_by_department_user_id' => null,
-            ],
             'submitted' => [
                 'title' => 'Pengajuan Dana ' . ($shortname !== '' ? $shortname : 'Organisasi ' . $organizationId) . ' ' . $currentYear,
                 'description' => 'Pengajuan yang sudah dikirim dan menunggu review departemen kemahasiswaan.',
@@ -423,18 +413,6 @@ class DemoDataSeeder extends Seeder
         }
 
         $rows = [
-            'draft' => [
-                'title' => 'Draft LPJ ' . ($shortname !== '' ? $shortname : 'Organisasi ' . $organizationId) . ' ' . $currentYear,
-                'content' => 'Draft laporan kegiatan yang masih menunggu pengiriman dari pengurus.',
-                'participants' => 20 + $index,
-                'report_type' => 'activity',
-                'status' => 'draft',
-                'submitted_date' => null,
-                'approved_date' => null,
-                'reviewed_at' => null,
-                'reviewed_by_department_user_id' => null,
-                'department_review_note' => null,
-            ],
             'submitted' => [
                 'title' => 'LPJ Kegiatan ' . ($shortname !== '' ? $shortname : 'Organisasi ' . $organizationId) . ' ' . $currentYear,
                 'content' => 'Laporan kegiatan yang sudah dikirim dan menunggu review departemen kemahasiswaan.',
@@ -633,8 +611,8 @@ class DemoDataSeeder extends Seeder
             'task_type' => $index % 2 === 0 ? 'report_submission' : 'revision',
             'deadline' => $deadline,
             'completed_at' => null,
-            'related_submission_id' => $submissionIds['submitted'] ?? ($submissionIds['draft'] ?? null),
-            'related_report_id' => $reportIds['submitted'] ?? ($reportIds['draft'] ?? null),
+            'related_submission_id' => $submissionIds['submitted'] ?? null,
+            'related_report_id' => $reportIds['submitted'] ?? null,
             'created_at' => $now,
             'updated_at' => $now,
         ]);
@@ -650,7 +628,7 @@ class DemoDataSeeder extends Seeder
             [
                 'action' => 'submission_created',
                 'description' => 'Pengajuan kegiatan baru dibuat untuk ' . ($shortname !== '' ? $shortname : $slug) . '.',
-                'metadata' => ['submission_id' => $submissionIds['draft'] ?? null],
+                'metadata' => ['submission_id' => $submissionIds['submitted'] ?? null],
             ],
             [
                 'action' => 'report_received',
