@@ -169,6 +169,33 @@ Route::get('/pengumuman/{id}', [AnnouncementController::class, 'show'])->name('m
 
 Route::get('/tentang', [HomeController::class, 'tentang'])->name('mahasiswa.tentang');
 
+if (env('APP_DEBUG', false)) {
+    Route::get('/_debug/about-content', function () {
+        $rows = DB::table('workflow_reference_values')
+            ->select(['code', 'label', 'payload'])
+            ->where('domain', 'mahasiswa_about')
+            ->where('is_active', true)
+            ->orderBy('sort_order')
+            ->orderBy('id')
+            ->get()
+            ->mapWithKeys(function ($row) {
+                $payload = [];
+
+                if (is_string($row->payload) && trim($row->payload) !== '') {
+                    $decoded = json_decode($row->payload, true);
+                    $payload = is_array($decoded) ? $decoded : [];
+                }
+
+                return [ (string) $row->code => [
+                    'label' => $row->label,
+                    'payload' => $payload,
+                ]];
+            });
+
+        return response()->json($rows);
+    });
+}
+
 Route::get('/kegiatan', [EventController::class, 'index'])->name('kegiatan.index');
 
 /*
