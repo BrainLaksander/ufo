@@ -5,6 +5,7 @@
 @section('content')
 @php
     $ui = $pageContent ?? [];
+    $orgDetailUrlTemplate = route('mahasiswa.organisasi.show', ['id' => '__ORG_ID__']);
 @endphp
 <section class="figma-page-container figma-org-page py-3" aria-label="Halaman organisasi">
     <div class="figma-org-carousel" data-org-carousel>
@@ -65,6 +66,7 @@
 (function () {
     var organizations = @json($organizations);
     var ui = @json($ui);
+    var orgDetailUrlTemplate = @json($orgDetailUrlTemplate);
 
     var searchInput = document.getElementById('org-search');
     var sortSelect = document.getElementById('org-sort');
@@ -92,12 +94,14 @@
     }
 
     function buildCard(org) {
+        var detailUrl = orgDetailUrlTemplate.replace('__ORG_ID__', String(org.id));
+
         return `
             <article class="figma-card figma-org-card" data-org-id="${org.id}">
                 <div class="figma-org-logo"><i class="bi ${categoryIcon(org)}"></i></div>
                 <h3>${org.name}</h3>
                 <p>${org.tagline || ''}</p>
-                <a href="/organisasi/${org.id}" class="figma-btn-primary mt-1">${ui.detail_button || ''}</a>
+                <a href="${detailUrl}" class="figma-btn-primary mt-1">${ui.detail_button || ''}</a>
             </article>
         `;
     }

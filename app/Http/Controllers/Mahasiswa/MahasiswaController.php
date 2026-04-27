@@ -172,12 +172,28 @@ class MahasiswaController extends Controller
         $validated = $request->validate([
             'type' => ['required', 'in:lost,found'],
             'name' => ['required', 'string', 'max:255'],
+            'reporter_name' => ['required', 'string', 'max:120'],
             'location' => ['required', 'string', 'max:255'],
-            'category' => ['nullable', 'string', 'max:100'],
-            'contact' => ['nullable', 'string', 'max:100'],
+            'category' => ['required', 'string', 'max:100'],
+            'contact' => ['required', 'string', 'max:100'],
             'notes' => ['nullable', 'string'],
-            'image' => ['nullable', 'image', 'max:5120'],
+            'image' => ['required', 'image', 'max:5120'],
         ]);
+
+        $bemReviewerEmail = 'bem@unklab.ac.id';
+        $bemOrganizationId = null;
+
+        if (Schema::hasTable('kemahasiswaan_ukm_accounts')) {
+            $bemAccount = DB::table('kemahasiswaan_ukm_accounts')
+                ->whereRaw('LOWER(email) = ?', [Str::lower($bemReviewerEmail)])
+                ->first();
+
+            if ($bemAccount === null) {
+                return back()->with('error', 'Akun reviewer BEM (bem@unklab.ac.id) belum tersedia.');
+            }
+
+            $bemOrganizationId = isset($bemAccount->organization_id) ? (int) $bemAccount->organization_id : null;
+        }
 
         $columns = Schema::getColumnListing('lost_found_items');
         $hasColumn = static fn (string $column): bool => in_array($column, $columns, true);
@@ -189,6 +205,7 @@ class MahasiswaController extends Controller
         $typeColumn = $hasColumn('type') ? 'type' : null;
         $statusColumn = $hasColumn('status') ? 'status' : null;
         $reporterColumn = $hasColumn('reported_by') ? 'reported_by' : ($hasColumn('reporter_id') ? 'reporter_id' : null);
+        $organizationColumn = $hasColumn('organization_id');
 
         if ($nameColumn === null || $locationColumn === null) {
             return back()->with('error', $this->uiText('mahasiswa_lost_found_schema_unsupported'));
@@ -197,6 +214,10 @@ class MahasiswaController extends Controller
         $payload = [];
         $payload[$nameColumn] = $validated['name'];
         $payload[$locationColumn] = $validated['location'];
+
+        if ($organizationColumn && $bemOrganizationId) {
+            $payload['organization_id'] = $bemOrganizationId;
+        }
 
         if ($descriptionColumn) {
             $payload[$descriptionColumn] = trim((string) ($validated['notes'] ?? ''));
@@ -216,8 +237,11 @@ class MahasiswaController extends Controller
 
         if ($descriptionColumn) {
             $metaText = collect([
+                'Pelapor: ' . $validated['reporter_name'],
                 !empty($validated['category']) ? 'Kategori: ' . $validated['category'] : null,
                 !empty($validated['contact']) ? 'Kontak: ' . $validated['contact'] : null,
+                'ReviewStatus: pending_bem',
+                'ReviewerEmail: ' . $bemReviewerEmail,
                 !empty($payload[$descriptionColumn]) ? (string) $payload[$descriptionColumn] : null,
             ])->filter()->implode(PHP_EOL);
 
@@ -239,7 +263,7 @@ class MahasiswaController extends Controller
 
         DB::table('lost_found_items')->insert($payload);
 
-        return redirect()->route('mahasiswa.lost-found')->with('success', $this->uiText('mahasiswa_lost_found_saved'));
+        return redirect()->route('mahasiswa.lost-found')->with('success', 'Laporan berhasil dikirim dan sedang menunggu review pengurus BEM.');
     }
 
     public function tentang(): View
@@ -861,6 +885,11 @@ class MahasiswaController extends Controller
         $items = $rows->map(function ($row) {
             $name = (string) ($row->item_name ?: '');
             $type = in_array((string) $row->item_type, ['lost', 'found'], true) ? (string) $row->item_type : 'lost';
+            $description = (string) ($row->item_description ?: '');
+            $meta = $this->extractLostFoundMeta($description);
+
+            $reviewStatus = Str::lower((string) ($meta['ReviewStatus'] ?? 'approved'));
+            $isReviewApproved = !in_array($reviewStatus, ['pending_bem', 'pending', 'draft', 'under_review'], true);
 
             return [
                 'id' => (int) $row->id,
@@ -869,12 +898,14 @@ class MahasiswaController extends Controller
                 'category' => $this->inferLostFoundCategory($name),
                 'location' => $row->item_location ?: '',
                 'date' => $this->formatDate($row->reported_at),
-                'reporter' => $row->reporter_name ?: '',
+                'reporter' => $row->reporter_name ?: (string) ($meta['Pelapor'] ?? ''),
                 'status' => $this->mapLostFoundStatus((string) $row->item_status),
                 'image' => $row->item_image ?: $this->placeholderImage($name),
-                'description' => (string) ($row->item_description ?: ''),
+                'description' => $description,
+                'contact' => (string) ($meta['Kontak'] ?? ''),
+                'is_review_approved' => $isReviewApproved,
             ];
-        })->values();
+        })->filter(fn ($item) => $item['is_review_approved'])->values();
 
         $urgent = $items
             ->filter(fn ($item) => $item['type'] === 'lost' && $item['status'] === 'Belum ditemukan')
@@ -890,6 +921,36 @@ class MahasiswaController extends Controller
             'urgent' => $urgent,
             'items' => $items->all(),
         ];
+    }
+
+    /**
+     * @return array<string, string>
+     */
+    private function extractLostFoundMeta(string $description): array
+    {
+        if ($description === '') {
+            return [];
+        }
+
+        $meta = [];
+        $lines = preg_split('/\r\n|\r|\n/', $description) ?: [];
+
+        foreach ($lines as $line) {
+            $line = trim((string) $line);
+            if ($line === '' || !str_contains($line, ':')) {
+                continue;
+            }
+
+            [$rawKey, $rawValue] = explode(':', $line, 2);
+            $key = trim((string) $rawKey);
+            $value = trim((string) $rawValue);
+
+            if ($key !== '' && $value !== '') {
+                $meta[$key] = $value;
+            }
+        }
+
+        return $meta;
     }
 
     /**
@@ -995,19 +1056,25 @@ class MahasiswaController extends Controller
     {
         $startDate = $this->parseDate($row->start_date);
         $endDate = $this->parseDate($row->end_date);
+        $status = (string) ($row->status ?? '');
+        $organizationId = (int) ($row->organization_id ?? 0);
 
         return [
             'id' => (int) $row->id,
             'title' => (string) $row->name,
             'organizer' => $row->organization_name ?: null,
-            'organizer_id' => (int) $row->organization_id,
+            'organizer_id' => $organizationId,
             'date' => $this->formatDate($row->start_date),
             'time' => $this->formatTimeRange($startDate, $endDate),
             'location' => (string) ($row->location ?: ''),
             'category' => $category,
             'poster' => $row->banner ?: $this->placeholderImage((string) $row->name),
             'participants' => (int) ($row->current_participants ?? 0),
-            'registration_status' => $this->mapEventStatusLabel((string) $row->status),
+            'registration_status' => $this->mapEventStatusLabel($status),
+            'registration_open' => $this->isEventRegistrationOpen($status),
+            'register_url' => $organizationId > 0
+                ? route('mahasiswa.organisasi.daftar', ['id' => $organizationId])
+                : null,
             'description' => (string) ($row->description ?: ''),
             'benefits' => [],
             'speakers' => [],
@@ -1061,6 +1128,18 @@ class MahasiswaController extends Controller
         }
 
         return Str::title(str_replace('_', ' ', $status));
+    }
+
+    private function isEventRegistrationOpen(string $status): bool
+    {
+        return in_array(Str::lower(trim($status)), [
+            'approved',
+            'ongoing',
+            'open',
+            'scheduled',
+            'published',
+            'active',
+        ], true);
     }
 
     /**

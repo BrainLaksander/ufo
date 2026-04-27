@@ -48,7 +48,13 @@
     <article class="figma-highlight mb-3">
         <p class="mb-1">{{ $ui['registration_status_label'] ?? '' }}</p>
         <h2 class="h4 mb-3">{{ $event['registration_status'] ?? '' }}</h2>
-        <button type="button" class="figma-btn-secondary">{{ $ui['register_button'] ?? '' }}</button>
+
+        @if(!empty($event['registration_open']) && !empty($event['register_url']))
+            <a href="{{ $event['register_url'] }}" class="figma-btn-secondary">{{ $ui['register_button'] ?? '' }}</a>
+        @else
+            <button type="button" class="figma-btn-secondary" disabled aria-disabled="true">{{ $ui['register_button'] ?? '' }}</button>
+            <p class="figma-muted mt-2 mb-0">Pendaftaran event ini sudah ditutup.</p>
+        @endif
     </article>
 
     <article class="figma-section">

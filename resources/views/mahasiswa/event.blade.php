@@ -47,6 +47,7 @@
     var organizations = @json($organizations);
     var ui = @json($ui);
     var allCategory = @json($categories[0] ?? '');
+    var eventDetailUrlTemplate = @json(route('mahasiswa.event.show', ['id' => '__EVENT_ID__']));
 
     var searchInput = document.getElementById('event-search');
     var categoryButtons = Array.from(document.querySelectorAll('[data-event-category]'));
@@ -67,6 +68,8 @@
     }
 
     function renderCard(event) {
+        var eventDetailUrl = eventDetailUrlTemplate.replace('__EVENT_ID__', String(event.id));
+
         return `
             <article class="figma-card figma-event-card">
                 <div class="figma-event-card-image">
@@ -79,7 +82,7 @@
                     <div class="figma-meta-row"><i class="bi bi-calendar-event"></i> ${event.date} | ${event.time}</div>
                     <div class="figma-meta-row"><i class="bi bi-geo-alt"></i> ${event.location}</div>
                     <p class="figma-muted mb-0">${event.participants} peserta terdaftar</p>
-                    <a href="/event/${event.id}" class="figma-btn-primary mt-2">${ui.detail_button_label || ''}</a>
+                    <a href="${eventDetailUrl}" class="figma-btn-primary mt-2">${ui.detail_button_label || ''}</a>
                 </div>
             </article>
         `;

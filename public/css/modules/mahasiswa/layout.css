@@ -12,3 +12,21 @@
     padding-top: 56px;
     background: var(--bg-light);
 }
+
+/* Active shell used by layouts/public/mahasiswa.blade.php */
+body.ufo-mahasiswa-shell {
+    min-height: 100vh;
+    background: var(--bg-light);
+}
+
+body.ufo-mahasiswa-shell .ufo-mahasiswa-main {
+    min-height: 100vh;
+    padding-top: 88px;
+    background: var(--bg-light);
+}
+
+@media (max-width: 768px) {
+    body.ufo-mahasiswa-shell .ufo-mahasiswa-main {
+        padding-top: 80px;
+    }
+}

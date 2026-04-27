@@ -9,8 +9,9 @@
 @section('content')
 @php
     $ui = $pageContent ?? [];
+    $detailUrlTemplate = route('mahasiswa.pengumuman.show', ['id' => '__ANN_ID__']);
 @endphp
-<section class="figma-page-container py-3 figma-pengumuman-page">
+<section class="figma-page-container figma-org-page py-3 figma-ann-page" aria-label="Halaman pengumuman">
     <header class="figma-page-header">
         <h1>{{ $ui['title'] ?? '' }}</h1>
         <p>{{ $ui['subtitle'] ?? '' }}</p>
@@ -49,6 +50,7 @@
 (function () {
     var announcements = @json($announcements);
     var allCategory = @json($categories[0] ?? '');
+    var detailUrlTemplate = @json($detailUrlTemplate);
 
     var searchInput = document.getElementById('ann-search');
     var categoryButtons = Array.from(document.querySelectorAll('[data-ann-category]'));
@@ -61,9 +63,13 @@
 
     var currentCategory = allCategory;
 
+    function detailUrl(id) {
+        return detailUrlTemplate.replace('__ANN_ID__', String(id));
+    }
+
     function renderPriority(item) {
         return `
-            <a href="/pengumuman/${item.id}" class="figma-card figma-ann-priority-item">
+            <a href="${detailUrl(item.id)}" class="figma-card figma-ann-priority-item">
                 <img src="${item.image}" alt="${item.title}">
                 <div>
                     <h3>${item.title}</h3>
@@ -80,7 +86,7 @@
 
     function renderItem(item) {
         return `
-            <a href="/pengumuman/${item.id}" class="figma-card figma-ann-item">
+            <a href="${detailUrl(item.id)}" class="figma-card figma-ann-item">
                 <img src="${item.image}" alt="${item.title}">
                 <div>
                     <span class="figma-ann-badge">${item.category}</span>
@@ -111,7 +117,7 @@
 
         priorityGrid.innerHTML = highPriority.map(renderPriority).join('');
         listGrid.innerHTML = others.map(renderItem).join('');
-        count.textContent = String(others.length);
+        count.textContent = String(filtered.length);
 
         prioritySection.classList.toggle('d-none', highPriority.length === 0);
         empty.classList.toggle('d-none', filtered.length > 0);
@@ -129,5 +135,6 @@
     searchInput.addEventListener('input', render);
     render();
 })();
+
 </script>
 @endpush
