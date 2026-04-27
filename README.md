@@ -13,10 +13,10 @@ Aplikasi Laravel untuk mengelola konten publik mahasiswa, alur kerja pengurus UK
 
 ### 1) Letakkan Project
 
-Clone atau salin project ke workspace XAMPP, misalnya:
+Clone atau salin project ke folder `htdocs` XAMPP, misalnya:
 
 ```bash
-/var/www/ufounk/ufo
+c:/xampp/htdocs/ufo
 ```
 
 ### 2) Jalankan Service XAMPP
@@ -28,7 +28,7 @@ Nyalakan service berikut dari XAMPP:
 
 ### 3) Atur `.env`
 
-Ubah pengaturan database di `.env`:
+Salin `.env.example` menjadi `.env`, lalu pastikan pengaturan lokalnya seperti ini:
 
 ```env
 APP_NAME=UFO
@@ -75,13 +75,13 @@ php artisan key:generate
 Untuk membangun schema dan mengisi data dummy:
 
 ```bash
-php artisan migrate --seed
+php artisan server:migrate --create-db --seed
 ```
 
 Anda juga bisa memakai command helper project berikut:
 
 ```bash
-php artisan server:migrate --seed
+composer run server:migrate:seed
 ```
 
 Command itu akan membuat database secara otomatis untuk setup lokal MySQL/MariaDB jika perlu, lalu menjalankan migrasi dan seeder.
