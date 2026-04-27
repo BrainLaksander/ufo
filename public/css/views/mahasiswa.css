@@ -20,7 +20,7 @@ body.figma-ufo-body {
 
 body.figma-ufo-body .figma-ufo-header,
 body.figma-ufo-body .mahasiswa-header {
-    background: linear-gradient(135deg, var(--ufo-color-primary) 0%, var(--ufo-color-primary-strong) 100%);
+    background: var(--ufo-color-primary);
 }
 
 body.figma-ufo-body .burger-mahasiswa {
