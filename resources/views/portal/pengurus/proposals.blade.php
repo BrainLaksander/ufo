@@ -206,74 +206,6 @@
         </div>
     </section>
 
-    <div class="ufo-kboard-row two">
-        <section class="ufo-kboard-section">
-            <div class="ufo-kboard-item-head">
-                <h3 class="ufo-kboard-item-title">Jadwal Kegiatan Organisasi</h3>
-                <span class="ufo-kboard-pill approved">{{ count($jadwalKegiatan ?? []) }} Jadwal</span>
-            </div>
-
-            <div class="ufo-kboard-table-wrap">
-                <table class="ufo-kboard-table">
-                    <thead>
-                        <tr>
-                            <th>Kegiatan</th>
-                            <th>Tanggal</th>
-                            <th>Lokasi</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse(($jadwalKegiatan ?? []) as $jadwal)
-                            <tr>
-                                <td>
-                                    <strong>{{ $jadwal['judul'] }}</strong>
-                                    <div class="ufo-kboard-item-meta">{{ $jadwal['organisasi'] }}</div>
-                                </td>
-                                <td>{{ \Carbon\Carbon::parse($jadwal['tanggal'])->translatedFormat('d M Y') }}</td>
-                                <td>{{ $jadwal['lokasi'] }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="3">Belum ada jadwal kegiatan.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <section class="ufo-kboard-section">
-            <div class="ufo-kboard-item-head">
-                <h3 class="ufo-kboard-item-title">Kontak Pengurus UKM</h3>
-                <span class="ufo-kboard-pill draft">{{ count($kontakPengurus ?? []) }} Kontak</span>
-            </div>
-
-            <div class="ufo-kboard-list">
-                @forelse(($kontakPengurus ?? []) as $kontak)
-                    <article class="ufo-kboard-item">
-                        <div class="ufo-kboard-item-head">
-                            <div>
-                                <h4 class="ufo-kboard-item-title">{{ $kontak['nama'] }}</h4>
-                                <p class="ufo-kboard-item-meta">{{ $kontak['jabatan'] }} • {{ $kontak['organisasi'] }}</p>
-                            </div>
-                            @php
-                                $contactStatus = (string) ($kontak['status'] ?? '');
-                            @endphp
-                            @if($contactStatus !== '')
-                                <span class="ufo-kboard-pill approved">{{ $contactStatus }}</span>
-                            @endif
-                        </div>
-
-                        <p class="ufo-kboard-item-text"><i class="bi bi-telephone"></i> {{ $kontak['kontak'] }}</p>
-                        <p class="ufo-kboard-item-text"><i class="bi bi-envelope"></i> {{ $kontak['email'] }}</p>
-                    </article>
-                @empty
-                    <p class="ufo-kboard-item-meta">Belum ada kontak pengurus.</p>
-                @endforelse
-            </div>
-        </section>
-    </div>
-
     <!-- Modal Ajukan Kegiatan -->
     <div class="modal fade" id="modalAjukanKegiatan" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered">
@@ -298,11 +230,6 @@
                                     <option value="budget">Pengajuan Dana/Budget</option>
                                     <option value="activity_plan">Rencana Aktivitas</option>
                                 </select>
-                            </label>
-
-                            <label>
-                                <span class="ufo-kboard-item-meta">Organisasi Penyelenggara</span>
-                                <input type="text" class="ufo-kboard-field" value="{{ $pengurusOrganizationName ?? '' }}" disabled>
                             </label>
 
                             <label class="ufo-kboard-span-full">
@@ -350,11 +277,6 @@
                                     <option value="financial">Laporan Keuangan</option>
                                     <option value="semester">Laporan Semester</option>
                                 </select>
-                            </label>
-
-                            <label>
-                                <span class="ufo-kboard-item-meta">Jumlah Peserta (Realisasi)</span>
-                                <input type="number" min="0" name="participants" class="ufo-kboard-field" value="0" required @disabled(!($hasPengurusContext ?? false))>
                             </label>
 
                             <label class="ufo-kboard-span-full">

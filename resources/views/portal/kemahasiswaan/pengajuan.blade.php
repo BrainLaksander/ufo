@@ -110,7 +110,6 @@
                             <option value="revisi">Revisi</option>
                             <option value="disetujui">Disetujui</option>
                             <option value="ditolak">Ditolak</option>
-                            <option value="draft">Draft</option>
                         </select>
                     </label>
                 </div>

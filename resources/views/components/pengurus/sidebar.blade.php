@@ -30,8 +30,8 @@
             </a>
         </li>
         <li>
-            <a href="{{ route('portal.pengurus.applications') }}" class="nav-link {{ request()->routeIs('portal.pengurus.applications') ? 'active' : '' }}" data-close>
-                <i class="bi bi-file-earmark-text-fill"></i> Pengajuan & Laporan
+            <a href="{{ route('portal.pengurus.kontak') }}" class="nav-link {{ request()->routeIs('portal.pengurus.kontak') || request()->routeIs('portal.pengurus.applications') ? 'active' : '' }}" data-close>
+                <i class="bi bi-telephone"></i> Kontak Organisasi
             </a>
         </li>
         <li>
@@ -39,11 +39,13 @@
                 <i class="bi bi-clipboard-list"></i> Pendaftaran Organisasi
             </a>
         </li>
+        @if($canAccessLostAndFound ?? false)
         <li>
             <a href="{{ route('portal.pengurus.lostandfound') }}" class="nav-link {{ request()->routeIs('portal.pengurus.lostandfound') ? 'active' : '' }}" data-close>
                 <i class="bi bi-search"></i> Lost & Found
             </a>
         </li>
+        @endif
         <li>
             <a href="#" class="nav-link" data-close>
                 <i class="bi bi-chat-dots-fill"></i> Chat & Konsultasi

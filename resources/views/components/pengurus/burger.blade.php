@@ -35,11 +35,13 @@
             <i class="bi bi-journal-check"></i>
             <span>Pengajuan & Laporan Kegiatan</span>
         </a>
+        @if($canAccessLostAndFound ?? false)
         <a href="{{ route('portal.pengurus.lostandfound') }}" class="ufo-pengurus-menu-link {{ request()->routeIs('portal.pengurus.lostandfound') || request()->routeIs('portal.pengurus.lostandfound.*') ? 'is-active' : '' }}">
             <i class="bi bi-search"></i>
-            <span>Lost &amp; Found</span>
+            <span>Lost & Found</span>
         </a>
-        <a href="{{ route('portal.pengurus.applications') }}" class="ufo-pengurus-menu-link {{ request()->routeIs('portal.pengurus.applications') ? 'is-active' : '' }}">
+        @endif
+        <a href="{{ route('portal.pengurus.kontak') }}" class="ufo-pengurus-menu-link {{ request()->routeIs('portal.pengurus.kontak') || request()->routeIs('portal.pengurus.applications') ? 'is-active' : '' }}">
             <i class="bi bi-telephone"></i>
             <span>Kontak Organisasi</span>
         </a>

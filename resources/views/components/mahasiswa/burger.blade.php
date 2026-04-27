@@ -18,6 +18,10 @@
             <i class="bi bi-calendar-event"></i>
             <span>Event</span>
         </a>
+        <a href="{{ route('mahasiswa.kalendar') }}" class="figma-ufo-menu-link {{ request()->is('kalendar-kegiatan') ? 'is-active' : '' }}">
+            <i class="bi bi-calendar3"></i>
+            <span>Kalendar Kegiatan</span>
+        </a>
         <a href="{{ route('mahasiswa.lost-found') }}" class="figma-ufo-menu-link {{ request()->is('lost-found') ? 'is-active' : '' }}">
             <i class="bi bi-search"></i>
             <span>Lost and Found</span>
