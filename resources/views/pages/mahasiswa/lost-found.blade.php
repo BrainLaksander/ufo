@@ -120,10 +120,9 @@
                     </div>
 
                     <div>
-                        <label class="form-label">Foto</label>
-                        <div class="alert alert-info mb-0">
-                            Upload foto dari halaman mahasiswa dinonaktifkan. Jika barang ditemukan, silakan langsung lapor ke BEM untuk dokumentasi foto real-time.
-                        </div>
+                        <label for="lf-image">Foto Barang</label>
+                        <input id="lf-image" type="file" name="image" accept="image/*">
+                        <small class="text-muted d-block mt-1">Unggah foto barang agar BEM dapat memverifikasi laporan dengan lebih cepat. File JPG/PNG maksimal 10MB.</small>
                     </div>
 
                     <div>
@@ -258,11 +257,18 @@
     tabButtons.forEach(function (button) {
         button.addEventListener('click', function () {
             currentTab = button.getAttribute('data-lf-tab') || 'lost';
-            tabButtons.forEach(function (item) { item.classList.remove('is-active'); });
-            button.classList.add('is-active');
             render();
         });
     });
+
+    function showPopup(message) {
+        if (!message) {
+            return;
+        }
+        window.alert(message);
+    }
+
+    showPopup(@json(session('lf_submission_info')));
 
     categoryButtons.forEach(function (button) {
         button.addEventListener('click', function () {

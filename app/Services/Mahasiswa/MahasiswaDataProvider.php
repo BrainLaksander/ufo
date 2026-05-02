@@ -96,7 +96,6 @@ class MahasiswaDataProvider
 
         $rows = DB::table('organizations')
             ->select($select)
-            ->where('status', 'active')
             ->orderBy('name')
             ->when(Schema::hasColumn('organizations', 'profile_values_json'), fn ($query) => $query->addSelect('profile_values_json'))
             ->when(Schema::hasColumn('organizations', 'profile_programs_json'), fn ($query) => $query->addSelect('profile_programs_json'))

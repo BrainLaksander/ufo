@@ -50,11 +50,6 @@
                     <div class="modal-body">
                         @php $todayDate = now()->toDateString(); @endphp
                         <div class="ufo-kboard-row two">
-                            <div class="ufo-kboard-span-full">
-                                <span class="ufo-kboard-item-meta mb-2 d-block">Poster Event</span>
-                                <input type="file" name="banner" class="form-control" accept="image/*">
-                                <small class="text-muted">PNG, JPG (maks. 5MB)</small>
-                            </div>
 
                             <label class="ufo-kboard-span-full">
                                 <span class="ufo-kboard-item-meta">Nama Event</span>
@@ -284,11 +279,6 @@
                     </div>
                     <div class="modal-body">
                         <div class="ufo-kboard-row two">
-                            <div class="ufo-kboard-span-full">
-                                <span class="ufo-kboard-item-meta mb-2 d-block">Poster Event (Opsional)</span>
-                                <input type="file" name="banner" class="form-control" accept="image/*">
-                                <small class="text-muted">Kosongkan jika tidak ingin mengubah poster</small>
-                            </div>
 
                             <label class="ufo-kboard-span-full">
                                 <span class="ufo-kboard-item-meta">Nama Event</span>

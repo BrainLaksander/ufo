@@ -37,7 +37,10 @@
     </div>
 
     <div class="figma-chip-row" id="org-categories">
-        @foreach($categories as $index => $category)
+        @php
+            $categoryFilters = ['Semua', 'BEM', 'Choir', 'Ministries', 'Creative Club', 'Umum', 'Ikatan Daerah'];
+        @endphp
+        @foreach($categoryFilters as $index => $category)
             <button type="button" class="figma-chip {{ $index === 0 ? 'is-active' : '' }}" data-org-category="{{ $category }}">{{ $category }}</button>
         @endforeach
     </div>
@@ -45,15 +48,19 @@
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
         <p class="figma-muted mb-0"><span id="org-count">0</span> {{ $ui['count_suffix'] ?? '' }}</p>
 
-        <select class="figma-select" id="org-sort">
-            <option value="A-Z">{{ $ui['sort_az'] ?? '' }}</option>
-            <option value="Z-A">{{ $ui['sort_za'] ?? '' }}</option>
-            <option value="baru">{{ $ui['sort_newest'] ?? '' }}</option>
-            <option value="aktif">{{ $ui['sort_active'] ?? '' }}</option>
+        <select class="figma-select" id="org-status">
+            <option value="aktif">Aktif</option>
+            <option value="tidak-aktif">Tidak aktif</option>
         </select>
     </div>
 
     <div class="figma-grid-3" id="org-grid"></div>
+
+    <div class="d-flex justify-content-end mt-3">
+        <nav class="figma-pagination" aria-label="Navigasi halaman organisasi">
+            <ul id="org-pagination" class="figma-pagination-list"></ul>
+        </nav>
+    </div>
 
     <div class="figma-empty-state d-none mt-3" id="org-empty">
         {{ $ui['empty_message'] ?? '' }}
@@ -69,15 +76,19 @@
     var orgDetailUrlTemplate = @json($orgDetailUrlTemplate);
 
     var searchInput = document.getElementById('org-search');
-    var sortSelect = document.getElementById('org-sort');
+    var statusSelect = document.getElementById('org-status');
     var categoryButtons = Array.from(document.querySelectorAll('[data-org-category]'));
     var grid = document.getElementById('org-grid');
+    var pagination = document.getElementById('org-pagination');
     var count = document.getElementById('org-count');
     var empty = document.getElementById('org-empty');
 
     var currentCategory = categoryButtons.length > 0
         ? String(categoryButtons[0].getAttribute('data-org-category') || '')
         : '';
+    var currentStatus = statusSelect ? statusSelect.value : 'aktif';
+    var currentPage = 1;
+    var itemsPerPage = 9;
 
     function categoryIcon(org) {
         var category = String(org.category || '').toLowerCase();
@@ -106,36 +117,96 @@
         `;
     }
 
-    function applySort(items) {
-        var mode = sortSelect.value;
-        var sorted = items.slice();
+    function normalizeText(value) {
+        return String(value || '').trim().toLowerCase();
+    }
 
-        if (mode === 'A-Z') {
-            sorted.sort(function (a, b) { return a.name.localeCompare(b.name); });
-        } else if (mode === 'Z-A') {
-            sorted.sort(function (a, b) { return b.name.localeCompare(a.name); });
-        } else if (mode === 'aktif') {
-            sorted.sort(function (a, b) { return (b.active_members || 0) - (a.active_members || 0); });
-        } else if (mode === 'baru') {
-            sorted.sort(function (a, b) { return (b.id || 0) - (a.id || 0); });
+    function isCategoryMatch(org, category) {
+        var orgCategory = normalizeText(org.category);
+        var orgName = normalizeText(org.name);
+
+        if (category === 'Semua') {
+            return true;
+        }
+        if (category === 'BEM') {
+            return orgCategory.includes('bem') || orgName.includes('bem');
+        }
+        if (category === 'Choir') {
+            return orgCategory.includes('choir') || orgName.includes('choir') || orgCategory.includes('paduan') || orgName.includes('paduan suara');
+        }
+        if (category === 'Ministries') {
+            return orgCategory.includes('ministry') || orgCategory.includes('ministries') || orgCategory.includes('kerohanian') || orgName.includes('kerohanian') || orgName.includes('rohani');
+        }
+        if (category === 'Creative Club') {
+            return orgCategory.includes('creative') || orgCategory.includes('kreatif') || orgCategory.includes('club') || orgCategory.includes('teknologi') || orgName.includes('creative') || orgName.includes('kreatif') || orgName.includes('teknologi');
+        }
+        if (category === 'Umum') {
+            var isKnown = orgCategory.includes('bem') || orgCategory.includes('choir') || orgCategory.includes('ministry') || orgCategory.includes('ministries') || orgCategory.includes('kreatif') || orgCategory.includes('creative') || orgCategory.includes('kedaerahan') || orgCategory.includes('ikatan daerah') || orgName.includes('bem') || orgName.includes('choir') || orgName.includes('paduan suara') || orgName.includes('kerohanian') || orgName.includes('rohani') || orgName.includes('kreatif') || orgName.includes('creative') || orgName.includes('teknologi') || orgName.includes('kedaerahan') || orgName.includes('ikatan daerah');
+            return !isKnown;
+        }
+        if (category === 'Ikatan Daerah') {
+            return orgCategory.includes('ikatan daerah') || orgCategory.includes('kedaerahan') || orgCategory.includes('daerah') || orgName.includes('ikatan daerah') || orgName.includes('kedaerahan') || orgName.includes('daerah');
         }
 
-        return sorted;
+        return false;
+    }
+
+    function isStatusMatch(org, status) {
+        var orgStatus = normalizeText(org.status);
+        var active = orgStatus === 'active' || orgStatus === 'aktif';
+        if (status === 'aktif') {
+            return active;
+        }
+        if (status === 'tidak-aktif') {
+            return !active;
+        }
+        return true;
+    }
+
+    function applyPagination(items) {
+        var total = items.length;
+        var pages = Math.max(1, Math.ceil(total / itemsPerPage));
+        currentPage = Math.min(Math.max(1, currentPage), pages);
+        var start = (currentPage - 1) * itemsPerPage;
+        var end = start + itemsPerPage;
+        var pagedItems = items.slice(start, end);
+
+        if (pagination) {
+            pagination.innerHTML = '';
+            for (var i = 1; i <= pages; i += 1) {
+                var item = document.createElement('li');
+                item.className = 'figma-pagination-item' + (i === currentPage ? ' is-active' : '');
+                item.innerHTML = '<button type="button" class="figma-pagination-button" data-page="' + i + '">' + i + '</button>';
+                pagination.appendChild(item);
+            }
+
+            Array.from(pagination.querySelectorAll('[data-page]')).forEach(function (button) {
+                button.addEventListener('click', function () {
+                    currentPage = Number(button.getAttribute('data-page') || 1);
+                    render();
+                });
+            });
+        }
+
+        return pagedItems;
     }
 
     function render() {
-        var query = (searchInput.value || '').trim().toLowerCase();
+        var query = normalizeText(searchInput.value || '');
 
         var filtered = organizations.filter(function (org) {
-            var matchesSearch = (org.name || '').toLowerCase().includes(query);
-            var allCategoryLabel = categoryButtons.length > 0 ? categoryButtons[0].getAttribute('data-org-category') : '';
-            var matchesCategory = currentCategory === allCategoryLabel || currentCategory === '' || org.category === currentCategory;
-            return matchesSearch && matchesCategory;
+            var matchesSearch = normalizeText(org.name).includes(query);
+            var matchesCategory = isCategoryMatch(org, currentCategory);
+            var matchesStatus = isStatusMatch(org, currentStatus);
+            return matchesSearch && matchesCategory && matchesStatus;
         });
 
-        filtered = applySort(filtered);
+        filtered.sort(function (a, b) {
+            return normalizeText(a.name).localeCompare(normalizeText(b.name));
+        });
 
-        grid.innerHTML = filtered.map(buildCard).join('');
+        var paged = applyPagination(filtered);
+        grid.innerHTML = paged.map(buildCard).join('');
         count.textContent = String(filtered.length);
         empty.classList.toggle('d-none', filtered.length > 0);
     }
@@ -143,14 +214,22 @@
     categoryButtons.forEach(function (button) {
         button.addEventListener('click', function () {
             currentCategory = button.getAttribute('data-org-category') || '';
+            currentPage = 1;
             categoryButtons.forEach(function (item) { item.classList.remove('is-active'); });
             button.classList.add('is-active');
             render();
         });
     });
 
-    searchInput.addEventListener('input', render);
-    sortSelect.addEventListener('change', render);
+    searchInput.addEventListener('input', function () {
+        currentPage = 1;
+        render();
+    });
+    statusSelect.addEventListener('change', function () {
+        currentStatus = statusSelect.value;
+        currentPage = 1;
+        render();
+    });
 
     render();
 })();

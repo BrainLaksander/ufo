@@ -52,6 +52,7 @@ class LostFoundController extends Controller
             'location_found' => 'nullable|string|max:500',
             'reporter_name' => 'nullable|string|max:120',
             'contact' => 'nullable|string|max:120',
+            'image' => 'nullable|image|mimes:jpg,jpeg,png|max:10240',
         ]);
 
         $itemName = trim((string) ($validated['item_name'] ?? $validated['name'] ?? ''));
@@ -62,6 +63,11 @@ class LostFoundController extends Controller
         $location = trim((string) ($validated['location'] ?? $validated['location_found'] ?? ''));
         if ($location === '') {
             return back()->withErrors(['location' => 'Lokasi wajib diisi.'])->withInput();
+        }
+
+        $itemType = trim((string) ($validated['type'] ?? $validated['item_type'] ?? 'lost'));
+        if (!in_array($itemType, ['lost', 'found'], true)) {
+            $itemType = 'lost';
         }
 
         if (!Schema::hasTable('lost_found_items')) {
@@ -77,12 +83,12 @@ class LostFoundController extends Controller
         $description = trim($baseDescription . "\n" . implode("\n", array_filter([
             $reporterName !== '' ? 'Pelapor: ' . $reporterName : null,
             $reporterContact !== '' ? 'Kontak: ' . $reporterContact : null,
-            'ReviewStatus: approved',
+            'ReviewStatus: pending_bem',
         ])));
 
         $insertData = [
             'item_name' => $itemName,
-            'type' => 'lost',
+            'type' => $itemType,
             'description' => $description,
             'location_found' => $location,
             'status' => 'active',
@@ -98,10 +104,23 @@ class LostFoundController extends Controller
             $insertData['reporter_contact'] = $reporterContact !== '' ? $reporterContact : null;
         }
 
+        if ($hasColumn('image') && $request->hasFile('image')) {
+            $file = $request->file('image');
+            $directory = public_path('uploads/lost-found');
+            if (!is_dir($directory) && !@mkdir($directory, 0775, true) && !is_dir($directory)) {
+                return back()->with('error', 'Tidak dapat membuat folder unggahan foto.')->withInput();
+            }
+
+            $filename = 'lf-' . now()->format('YmdHis') . '-' . uniqid() . '.' . $file->getClientOriginalExtension();
+            $file->move($directory, $filename);
+            $insertData['image'] = '/uploads/lost-found/' . $filename;
+        }
+
         DB::table('lost_found_items')->insert($insertData);
 
         return redirect()->route('mahasiswa.lost-found')
-            ->with('success', 'Laporan barang hilang berhasil dikirim ke BEM. Untuk barang ditemukan, silakan lapor langsung ke BEM agar difoto real-time.');
+            ->with('success', 'Laporan sudah dikirim ke BEM UNKLAB dan akan ditinjau terlebih dahulu.')
+            ->with('lf_submission_info', 'Laporan Anda tidak langsung ditampilkan di daftar Lost & Found. Jika tidak disetujui oleh BEM UNKLAB, laporan ini tidak akan muncul.');
     }
 
     private function loadMahasiswaPublicUiContent(string $code): array

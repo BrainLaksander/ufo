@@ -262,23 +262,41 @@ class DashboardController extends Controller
     private function getKalenderKegiatanKampus(): array
     {
         if (Schema::hasTable('kemahasiswaan_schedules')) {
+            $columns = Schema::getColumnListing('kemahasiswaan_schedules');
+            $columnExists = static fn (string $column): bool => in_array($column, $columns, true);
+
+            $select = ['sch.id', 'sch.title', 'sch.start_at', 'sch.end_at', 'sch.location', 'sch.status', 'org.name as organization_name'];
+
+            if ($columnExists('category')) {
+                $select[] = 'sch.category';
+            }
+
+            if ($columnExists('description')) {
+                $select[] = 'sch.description';
+            }
+
             $rows = DB::table('kemahasiswaan_schedules as sch')
                 ->leftJoin('organizations as org', 'org.id', '=', 'sch.organization_id')
-                ->select(['sch.id', 'sch.title', 'sch.start_at', 'sch.location', 'sch.status', 'org.name as organization_name'])
+                ->select($select)
                 ->orderBy('sch.start_at')
                 ->limit(200)
                 ->get();
 
-            return $rows->map(function ($row) {
+            return $rows->map(function ($row) use ($columnExists) {
                 $startDate = $row->start_at ? Carbon::parse((string) $row->start_at) : null;
+                $endDate = $row->end_at ? Carbon::parse((string) $row->end_at) : $startDate;
+
                 return [
                     'id' => (int) $row->id,
                     'judul' => (string) $row->title,
                     'organisasi' => (string) ($row->organization_name ?? '-'),
                     'tanggal' => $startDate ? $startDate->translatedFormat('d F Y') : '-',
                     'tanggal_raw' => $startDate?->toDateString(),
-                    'tanggal_selesai_raw' => $startDate?->toDateString(),
+                    'tanggal_selesai_raw' => $endDate?->toDateString(),
                     'lokasi' => (string) ($row->location ?? '-'),
+                    'kategori' => $columnExists('category') ? (string) ($row->category ?? '') : '',
+                    'deskripsi' => $columnExists('description') ? (string) ($row->description ?? '') : '',
+                    'can_delete' => true,
                 ];
             })->all();
         }
@@ -305,6 +323,9 @@ class DashboardController extends Controller
                 'tanggal_raw' => $startDate?->toDateString(),
                 'tanggal_selesai_raw' => $endDate?->toDateString(),
                 'lokasi' => (string) ($row->location ?? '-'),
+                'kategori' => '',
+                'deskripsi' => '',
+                'can_delete' => false,
             ];
         })->all();
     }

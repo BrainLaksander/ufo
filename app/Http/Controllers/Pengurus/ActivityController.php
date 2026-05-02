@@ -203,18 +203,70 @@ class ActivityController extends Controller
     public function storeJadwal(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'title' => 'required|string|max:200',
-            'start_at' => 'required|date',
-            'end_at' => 'nullable|date|after_or_equal:start_at',
-            'location' => 'nullable|string|max:200',
-            'category' => 'nullable|string|max:40',
+            'judul' => 'required|string|max:150',
+            'tanggal_mulai' => 'required|date',
+            'tanggal_selesai' => 'nullable|date|after_or_equal:tanggal_mulai',
+            'lokasi' => 'required|string|max:160',
+            'kategori' => 'nullable|string|max:40',
+            'organization_id' => 'required|integer|exists:organizations,id',
+            'deskripsi' => 'nullable|string|max:1000',
         ]);
+
+        if (!Schema::hasTable('kemahasiswaan_schedules')) {
+            return back()->with('error', 'Tabel kemahasiswaan_schedules belum tersedia. Jalankan migrasi terlebih dahulu.');
+        }
+
+        $startAt = Carbon::parse((string) $validated['tanggal_mulai'])->startOfDay();
+        $endAt = null;
+        if (!empty($validated['tanggal_selesai'])) {
+            $endAt = Carbon::parse((string) $validated['tanggal_selesai'])->endOfDay();
+        }
+
+        $columns = Schema::getColumnListing('kemahasiswaan_schedules');
+        $columnExists = static fn (string $column): bool => in_array($column, $columns, true);
+
+        $insertData = [
+            'organization_id' => (int) $validated['organization_id'],
+            'title' => trim((string) $validated['judul']),
+            'start_at' => $startAt,
+            'end_at' => $endAt,
+            'location' => trim((string) $validated['lokasi']),
+            'status' => 'planned',
+            'created_at' => now(),
+            'updated_at' => now(),
+        ];
+
+        if ($columnExists('category')) {
+            $insertData['category'] = trim((string) ($validated['kategori'] ?? '')) ?: null;
+        }
+
+        if ($columnExists('description')) {
+            $insertData['description'] = trim((string) ($validated['deskripsi'] ?? '')) ?: null;
+        }
+
+        if ($columnExists('created_by')) {
+            $sessionUser = $request->session()->get('user');
+            $insertData['created_by'] = is_array($sessionUser) && isset($sessionUser['id'])
+                ? (int) $sessionUser['id']
+                : null;
+        }
+
+        DB::table('kemahasiswaan_schedules')->insert($insertData);
 
         return back()->with('success', 'Jadwal berhasil disimpan.');
     }
 
     public function destroyJadwal(int $id): RedirectResponse
     {
+        if (!Schema::hasTable('kemahasiswaan_schedules')) {
+            return back()->with('error', 'Tabel kemahasiswaan_schedules belum tersedia.');
+        }
+
+        $deleted = DB::table('kemahasiswaan_schedules')->where('id', $id)->delete();
+        if ($deleted === 0) {
+            return back()->with('error', 'Jadwal tidak ditemukan atau sudah dihapus.');
+        }
+
         return back()->with('success', 'Jadwal berhasil dihapus.');
     }
 

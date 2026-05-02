@@ -64,25 +64,128 @@ class EventController extends Controller
             return back()->with('error', 'Konteks organisasi tidak ditemukan.');
         }
 
+        $organizationId = (int) $context['organization_id'];
+
         $validated = $request->validate([
             'name' => 'required|string|max:200',
             'description' => 'required|string',
-            'start_date' => 'required|date|after_or_equal:today',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
             'location' => 'required|string|max:200',
             'quota' => 'required|integer|min:1',
+            'banner' => 'nullable|string|max:500',
+            'news_title' => 'nullable|string|max:255',
+            'news_content' => 'nullable|string',
+            'status' => 'nullable|string',
         ]);
 
-        return back()->with('success', 'Event berhasil dibuat.');
+        if (!Schema::hasTable('events')) {
+            return back()->with('error', 'Tabel event tidak ditemukan.');
+        }
+
+        try {
+            DB::table('events')->insert([
+                'organization_id' => $organizationId,
+                'created_by' => $context['member_id'],
+                'name' => trim((string) $validated['name']),
+                'description' => trim((string) $validated['description']),
+                'start_date' => $validated['start_date'],
+                'end_date' => !empty($validated['end_date']) ? $validated['end_date'] : $validated['start_date'],
+                'location' => trim((string) $validated['location']),
+                'quota' => (int) $validated['quota'],
+                'banner' => !empty($validated['banner']) ? trim((string) $validated['banner']) : null,
+                'status' => 'draft',
+                'participants_count' => 0,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+
+            return back()->with('success', 'Event berhasil dibuat. Status: Draft (belum publik). Klik tombol Submit untuk membuat event publik.');
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Gagal membuat event: ' . $e->getMessage());
+        }
     }
 
     public function submit(Request $request, int $id): RedirectResponse
     {
-        return back()->with('success', 'Event berhasil disubmit.');
+        $context = $this->resolvePengurusContext($request);
+        $organizationId = (int) ($context['organization_id'] ?? 0);
+
+        if ($organizationId <= 0 || $id <= 0 || !Schema::hasTable('events')) {
+            return back()->with('error', 'Event tidak valid.');
+        }
+
+        $event = DB::table('events')
+            ->where('id', $id)
+            ->where('organization_id', $organizationId)
+            ->first();
+
+        if (!$event) {
+            return back()->with('error', 'Event tidak ditemukan.');
+        }
+
+        try {
+            DB::table('events')
+                ->where('id', $id)
+                ->update([
+                    'status' => 'approved',
+                    'updated_at' => now(),
+                ]);
+
+            return back()->with('success', 'Event berhasil disubmit dan siap ditampilkan.');
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Gagal submit event: ' . $e->getMessage());
+        }
     }
 
     public function update(Request $request, int $id): RedirectResponse
     {
-        return back()->with('success', 'Event berhasil diperbarui.');
+        $context = $this->resolvePengurusContext($request);
+        $organizationId = (int) ($context['organization_id'] ?? 0);
+
+        if ($organizationId <= 0 || $id <= 0 || !Schema::hasTable('events')) {
+            return back()->with('error', 'Event tidak valid.');
+        }
+
+        $event = DB::table('events')
+            ->where('id', $id)
+            ->where('organization_id', $organizationId)
+            ->first();
+
+        if (!$event) {
+            return back()->with('error', 'Event tidak ditemukan.');
+        }
+
+        $validated = $request->validate([
+            'name' => 'required|string|max:200',
+            'description' => 'required|string',
+            'start_date' => 'required|date',
+            'end_date' => 'nullable|date|after_or_equal:start_date',
+            'location' => 'required|string|max:200',
+            'quota' => 'required|integer|min:1',
+            'banner' => 'nullable|string|max:500',
+            'news_title' => 'nullable|string|max:255',
+            'news_content' => 'nullable|string',
+        ]);
+
+        try {
+            DB::table('events')
+                ->where('id', $id)
+                ->update([
+                    'name' => trim((string) $validated['name']),
+                    'description' => trim((string) $validated['description']),
+                    'start_date' => $validated['start_date'],
+                    'end_date' => !empty($validated['end_date']) ? $validated['end_date'] : $validated['start_date'],
+                    'location' => trim((string) $validated['location']),
+                    'quota' => (int) $validated['quota'],
+                    'banner' => !empty($validated['banner']) ? trim((string) $validated['banner']) : null,
+                    'updated_at' => now(),
+                ]);
+
+            return back()->with('success', 'Event berhasil diperbarui.');
+        } catch (\Throwable $e) {
+            return back()->with('error', 'Gagal update event: ' . $e->getMessage());
+        }
     }
 
     /**
