@@ -1,0 +1,233 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    background: linear-gradient(135deg, #6f3ba7 0%, #5e3191 100%);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 32px;
+    animation: slideDown .5s ease;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.ufo-logo {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 12px;
+    color: #fff;
+}
+
+.ufo-logo svg {
+    width: 100%;
+    height: 100%;
+    filter: drop-shadow(0 4px 12px rgba(255, 255, 255, .2));
+}
+
+.page-title {
+    color: #fff;
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.page-subtitle {
+    color: rgba(255, 255, 255, .9);
+    font-size: 16px;
+}
+
+.login-container {
+    background: #fff;
+    border-radius: 28px;
+    box-shadow: 0 25px 70px rgba(15, 23, 42, .3);
+    width: 100%;
+    max-width: 480px;
+    padding: 34px 36px;
+    animation: slideUp .5s ease;
+}
+
+.login-header {
+    text-align: center;
+    margin-bottom: 18px;
+}
+
+.login-header h2 {
+    color: #4c3563;
+    font-size: 28px;
+    font-weight: 800;
+    margin-bottom: 8px;
+}
+
+.login-header p {
+    color: #999999;
+    font-size: 15px;
+}
+
+.form-group {
+    margin-bottom: 12px;
+}
+
+.form-group label {
+    display: block;
+    color: #1a1a1a;
+    font-weight: 700;
+    font-size: 15px;
+    margin-bottom: 6px;
+}
+
+.input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.input-icon {
+    position: absolute;
+    left: 16px;
+    width: 20px;
+    height: 20px;
+    color: #8b7fa8;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+}
+
+.input-icon svg {
+    width: 100%;
+    height: 100%;
+}
+
+input[type="email"],
+input[type="password"],
+input[type="text"],
+select {
+    width: 100%;
+    padding: 14px 16px 14px 50px;
+    border: 0;
+    border-radius: 12px;
+    font-size: 15px;
+    color: #333333;
+    font-family: inherit;
+    background: #e8f2ff;
+    transition: background .2s ease, box-shadow .2s ease;
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus,
+input[type="text"]:focus,
+select:focus {
+    outline: 0;
+    background: #dce8f5;
+    box-shadow: inset 0 0 0 2px #6f3ba7;
+}
+
+input[type="email"]::placeholder,
+input[type="password"]::placeholder,
+input[type="text"]::placeholder {
+    color: #999999;
+}
+
+.toggle-password {
+    position: absolute;
+    right: 14px;
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #8b7fa8;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color .2s ease, background .2s ease;
+}
+
+.toggle-password:hover {
+    color: #6f3ba7;
+    background: rgba(111, 59, 167, .08);
+}
+
+select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%238b7fa8' d='M1 1l5 5 5-5'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+}
+
+.login-button {
+    width: 100%;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: 0;
+    background: #4c3563;
+    color: #fff;
+    font-weight: 800;
+    font-size: 16px;
+    cursor: pointer;
+    box-shadow: 0 8px 20px rgba(76, 53, 99, .25);
+    transition: all .2s ease;
+    margin-top: 16px;
+}
+
+.login-button:hover {
+    background: #5a3f75;
+    transform: translateY(-2px);
+    box-shadow: 0 12px 28px rgba(76, 53, 99, .32);
+}
+
+.login-button:active {
+    transform: translateY(0);
+}
+
+.login-footer {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.back-link {
+    color: #111827;
+    text-decoration: none;
+    font-size: 15px;
+    font-weight: 600;
+    transition: color .2s ease;
+}
+
+.back-link:hover {
+    color: #000;
+}
